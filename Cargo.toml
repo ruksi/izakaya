@@ -4,3 +4,8 @@ resolver = "2"
 members = [
     "tatami",
 ]
+
+# this helps to sync used features so compile cache works better
+[workspace.dependencies]
+axum = { version = "0.7.3" }
+tokio = { version = "1.35.1", features = ["full"] }
