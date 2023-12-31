@@ -7,5 +7,18 @@ members = [
 
 # this helps to sync used features so compile cache works better
 [workspace.dependencies]
+
+# https://lib.rs/crates/axum
 axum = { version = "0.7.3" }
+
+# https://lib.rs/crates/tokio
 tokio = { version = "1.35.1", features = ["full"] }
+
+# https://lib.rs/crates/tower
+tower = { version = "0.4.13", features = ["util"] }
+
+# https://lib.rs/crates/tower-http
+tower-http = { version = "0.5.0", features = ["fs", "trace"] }
+
+# https://lib.rs/crates/dotenvy
+dotenvy = { version = "0.15.7" }
