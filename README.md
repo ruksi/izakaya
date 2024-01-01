@@ -7,25 +7,26 @@ Ryokan is a template project for running Rust services on [Render](https://rende
 
 ## Features / TODO
 
-- [x] Render Web Service, works OK but 10 min deploy
-- [x] Custom domain with HTTPS, works perfectly
-- [x] Render PostgreSQL, works perfectly
-- [ ] Render Redis
+- [x] Web Service, works OK but 10 min deploy
+- [x] Custom domain with HTTPS, worked very smoothly
+- [x] Environment Groups, a nice addition, shared Env Vars / files between services
+- [x] PostgreSQL, works perfectly
+- [ ] Redis
 - [ ] GitHub Actions CI/CD
 - [ ] AWS Health Check
 - [ ] Using a Docker image vs. Rust build
-- [ ] Render Job
-- [ ] Render Auto Scaling
-- [x] Render Web Shell, works OK but slow
-- [ ] Render SSH
-- [ ] Render Rollback
-- [ ] Render Persistent Disk
-- [ ] Render Static Site
-- [ ] Render Cron Job
-- [ ] Render Private Service
-- [ ] Render Background Worker
-- [ ] Render Blueprint
-- [ ] `cargo sqlx prepare`
+- [ ] Web Service Job
+- [x] Auto Scaling, sounds OK, CPU/Memory based
+- [x] Online Shell, works OK but can be slow without an upgrade
+- [ ] Web Service SSH
+- [ ] Web Service Rollback
+- [ ] Web Service Persistent Disk
+- [ ] Static Site
+- [ ] Cron Job
+- [ ] Private Service
+- [ ] Background Worker
+- [ ] Blueprint
+- [ ] `cargo sqlx prepare` 🤔
 
 ## Development
 
