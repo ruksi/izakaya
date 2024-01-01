@@ -37,7 +37,7 @@ cd tatami
 cp .env.example .env
 vim .env
 
-# create database and migrations
+# create database and apply migrations
 cargo sqlx database setup
 
 # apply all pending migrations
@@ -64,6 +64,7 @@ cargo run
     - PostgreSQL Version: `14`
 
 After the database is created, find the "Internal Database URL" from the dashboard.
+This is the `DATABASE_URL` you need to set in `tatami`'s `.env`.
 
 ### Web Service
 
@@ -86,6 +87,13 @@ After the database is created, find the "Internal Database URL" from the dashboa
 - After this, the web service will auto deploy when both:
     - files under the `/tatami` change on the `main` branch
     - health check responds OK after build
+
+If you need to run a quick command on the server, you can use the web shell.
+
+```bash
+cargo install sqlx-cli --no-default-features --features native-tls,postgres
+cargo sqlx migrate revert
+```
 
 ## Details
 
