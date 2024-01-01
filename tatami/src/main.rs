@@ -32,7 +32,7 @@ async fn main() {
         // the path is relative to where the binary is run so under `ryokan/tatami` here
         .nest_service("/assets", ServeDir::new("./assets"))
         .route("/favicon.ico", get(|| async { Redirect::permanent("/assets/favicon.ico") }))
-        .route("/greet", get(greet_from_database))
+        .route("/healthz", get(healthz))
         .route("/", get(index))
         .with_state(pool);
 
@@ -50,10 +50,10 @@ async fn index() -> Html<&'static str> {
     Html("<h1>Hello, World!</h1>")
 }
 
-async fn greet_from_database(
+async fn healthz(
     State(pool): State<PgPool>,
 ) -> Result<String, (StatusCode, String)> {
-    sqlx::query_scalar("SELECT 'hello world from database'")
+    sqlx::query_scalar("SELECT 'OK'")
         .fetch_one(&pool)
         .await
         .map_err(internal_error)
