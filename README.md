@@ -99,11 +99,13 @@ This is the `DATABASE_URL` you need to set in `tatami`'s `.env`.
     - files under the `/tatami` change on the `main` branch
     - health check responds OK after build
 
-If you need to run a quick command on the server, you can use the web shell.
+If you need to run commands on the server, you can use the web shell.
 
 ```bash
 cargo install sqlx-cli --no-default-features --features native-tls,postgres
 cargo sqlx migrate revert
+# but even just that takes _ages_ so you are probably better of taking
+# database URL from the dashboard and reverting any migrations locally
 ```
 
 ## Details
