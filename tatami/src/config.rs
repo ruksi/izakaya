@@ -5,9 +5,6 @@ pub struct Config {
 
 impl Config {
     pub fn load() -> Self {
-        // populate environment variables from `.env` file without overriding
-        dotenvy::dotenv().ok();
-
         let port = std::env::var("PORT")
             .unwrap_or_else(|_| "8080".to_string());
 
@@ -15,5 +12,9 @@ impl Config {
             .expect("DATABASE_URL must be set");
 
         Self { port, database_url }
+    }
+
+    pub fn bind_address(&self) -> String {
+        format!("0.0.0.0:{}", self.port)
     }
 }
