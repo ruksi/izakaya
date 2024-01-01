@@ -21,7 +21,7 @@ Ryokan is a template project for running Rust services on [Render](https://rende
 - [ ] Web Service SSH
 - [ ] Web Service Rollback
 - [ ] Web Service Persistent Disk
-- [ ] Static Site
+- [x] Static Site, seems straightforward, can build and customize headers / redirects
 - [ ] Cron Job
 - [ ] Private Service
 - [ ] Background Worker
