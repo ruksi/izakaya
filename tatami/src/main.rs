@@ -9,7 +9,7 @@ async fn main() {
     let config = tatami::config::Config::load();
 
     tracing_subscriber::registry()
-        .with(EnvFilter::try_from_default_env().unwrap_or_else(|_| "tatami=debug".into()))
+        .with(EnvFilter::builder().parse(&config.rust_log).unwrap())
         .with(tracing_subscriber::fmt::layer())
         .init();
 

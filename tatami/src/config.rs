@@ -1,5 +1,6 @@
 pub struct Config {
     pub port: String,
+    pub rust_log: String,
     pub database_url: String,
 }
 
@@ -8,10 +9,13 @@ impl Config {
         let port = std::env::var("PORT")
             .unwrap_or_else(|_| "8080".to_string());
 
+        let rust_log = std::env::var("RUST_LOG")
+            .unwrap_or_else(|_| "tatami=debug".to_string());
+
         let database_url = std::env::var("DATABASE_URL")
             .expect("DATABASE_URL must be set");
 
-        Self { port, database_url }
+        Self { port, rust_log, database_url }
     }
 
     pub fn bind_address(&self) -> String {
