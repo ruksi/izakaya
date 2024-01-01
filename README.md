@@ -78,11 +78,10 @@ After the database is created, find the "Internal Database URL" from the dashboa
         - Releasing ASAP is a good practice; you should be backwards compatible
         - And if you find issues, you find the sooner and can improve your review and CI process
     - Root Directory: `tatami`
-    - Environment Variables:
-        - `PORT=10000`
     - Secret Files: `.env`: copy and edit from `./tatami/.env.example`
     - Health Check Path: `/healthz`
-    - Pre-Deploy Command: `cargo install sqlx-cli --features postgres && cargo sqlx migrate run`
+    - Pre-Deploy Command:
+        - `cargo install sqlx-cli --no-default-features --features native-tls,postgres && cargo sqlx migrate run`
 - Go to https://ryokan-tatami.onrender.com/healthz or whatever
 - After this, the web service will auto deploy when both:
     - files under the `/tatami` change on the `main` branch
