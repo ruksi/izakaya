@@ -21,6 +21,7 @@ Trying to figure out if Render is a good replacement for degraded Heroku. 😢
 - [ ] Render Cron Job
 - [ ] Render Private Service
 - [ ] Render Blueprints
+- [ ] `cargo sqlx prepare`
 
 ## Development
 
@@ -47,6 +48,16 @@ cargo sqlx database setup
 #cargo sqlx migrate revert --target-version=0
 
 cargo run
+```
+
+If you need to change the database:
+
+```bash
+cargo sqlx migrate add -r my_migration
+# edit the files...
+cargo sqlx migrate run
+cargo sqlx migrate revert
+cargo sqlx migrate run
 ```
 
 ## "Production"
