@@ -2,7 +2,8 @@
 
 Ryokan is a template project for running Rust services on [Render](https://render.com/).
 
-Trying to figure out if Render is a good replacement for degraded Heroku. 😢
+- Evaluating if Render is a good replacement for degrading Heroku 😢
+- Playing around with `axum` and `sqlx` 🦀
 
 ## Features / TODO
 
@@ -13,16 +14,17 @@ Trying to figure out if Render is a good replacement for degraded Heroku. 😢
 - [ ] GitHub Actions CI/CD
 - [ ] AWS Health Check
 - [ ] Using a Docker image vs. Rust build
-- [ ] Render Jobs
+- [ ] Render Job
 - [ ] Render Auto Scaling
 - [x] Render Web Shell, works OK but slow
 - [ ] Render SSH
-- [ ] Render Rollbacks
-- [ ] Render Persistent Disks
+- [ ] Render Rollback
+- [ ] Render Persistent Disk
 - [ ] Render Static Site
 - [ ] Render Cron Job
 - [ ] Render Private Service
-- [ ] Render Blueprints
+- [ ] Render Background Worker
+- [ ] Render Blueprint
 - [ ] `cargo sqlx prepare`
 
 ## Development
