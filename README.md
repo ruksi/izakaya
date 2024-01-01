@@ -8,7 +8,7 @@ Trying to figure out if Render is a good replacement for degraded Heroku. 😢
 
 - [x] Render Web Service
 - [x] Custom domain with HTTPS
-- [ ] Render PostgreSQL
+- [x] Render PostgreSQL
 - [ ] Render Redis
 - [ ] GitHub Actions CI/CD
 - [ ] AWS Health Check
