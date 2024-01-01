@@ -27,6 +27,25 @@ Trying to figure out if Render is a good replacement for degraded Heroku. 😢
 > Remember to update both `.rtx.toml` and `rust-toolchain` when changing the Rust version!
 
 ```bash
+sudo apt update
+sudo apt install postgresql-14
+cargo install sqlx-cli --features postgres
+
+cd tatami
+
+# configure your environment
+cp .env.example .env
+vim .env
+
+# create database and migrations
+cargo sqlx database setup
+
+# apply all pending migrations
+#cargo sqlx migrate run
+
+# revert migrations to the given version
+#cargo sqlx migrate revert --target-version=0
+
 cargo run
 ```
 
@@ -42,6 +61,7 @@ cargo run
     - Name: `ryokan-postgresql`
     - Database: `ryokan`
     - User: `ryokan`
+    - PostgreSQL Version: `14`
 
 After the database is created, find the "Internal Database URL" from the dashboard.
 
@@ -60,9 +80,9 @@ After the database is created, find the "Internal Database URL" from the dashboa
     - Root Directory: `tatami`
     - Environment Variables:
         - `PORT=10000`
-    - Secret Files:
-        - `.env`: copy and edit from `./tatami/.env.dev`
-    - Advanced > Health Check Path: `/healthz`
+    - Secret Files: `.env`: copy and edit from `./tatami/.env.example`
+    - Health Check Path: `/healthz`
+    - Pre-Deploy Command: `cargo install sqlx-cli --features postgres && cargo sqlx migrate run`
 - Go to https://ryokan-tatami.onrender.com/healthz or whatever
 - After this, the web service will auto deploy when both:
     - files under the `/tatami` change on the `main` branch
