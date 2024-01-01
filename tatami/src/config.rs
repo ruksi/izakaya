@@ -2,6 +2,7 @@ pub struct Config {
     pub port: String,
     pub rust_log: String,
     pub database_url: String,
+    pub cache_url: String,
 }
 
 impl Config {
@@ -15,7 +16,10 @@ impl Config {
         let database_url = std::env::var("DATABASE_URL")
             .expect("DATABASE_URL must be set");
 
-        Self { port, rust_log, database_url }
+        let cache_url = std::env::var("CACHE_URL")
+            .expect("CACHE_URL must be set");
+
+        Self { port, rust_log, cache_url, database_url }
     }
 
     pub fn bind_address(&self) -> String {
