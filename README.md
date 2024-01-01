@@ -6,15 +6,17 @@ Trying to figure out if Render is a good replacement for degraded Heroku. 😢
 
 ## Features / TODO
 
-- [x] Render Web Service
-- [x] Custom domain with HTTPS
-- [x] Render PostgreSQL
+- [x] Render Web Service, works OK but 10 min deploy
+- [x] Custom domain with HTTPS, works perfectly
+- [x] Render PostgreSQL, works perfectly
 - [ ] Render Redis
 - [ ] GitHub Actions CI/CD
 - [ ] AWS Health Check
+- [ ] Using a Docker image vs. Rust build
 - [ ] Render Jobs
 - [ ] Render Auto Scaling
-- [x] Render Web Shell
+- [x] Render Web Shell, works OK but slow
+- [ ] Render SSH
 - [ ] Render Rollbacks
 - [ ] Render Persistent Disks
 - [ ] Render Static Site
