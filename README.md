@@ -1,6 +1,6 @@
-# 🏮 Ryokan
+# 🏮 `ryokan`
 
-Ryokan is a template project for running Rust services on [Render](https://render.com/).
+`ryokan` is a template project for running Rust services on [Render](https://render.com/).
 
 Why:
 
@@ -76,7 +76,7 @@ cargo sqlx migrate run
 
 - Create a new Render PostgreSQL
 - Configuration:
-    - Name: `ryokan-postgresql`
+    - Name: `ryokan-database`
     - Database: `ryokan`
     - User: `ryokan`
     - PostgreSQL Version: `14`
@@ -88,7 +88,7 @@ This is the `DATABASE_URL` you need to set in `tatami`'s `.env`.
 
 - Create a new Render Redis
 - Configuration:
-    - Name: `ryokan-redis`
+    - Name: `ryokan-cache`
 
 After the store is created, find the "Internal Redis URL" from the dashboard.
 This is the `CACHE_URL` you need to set in `tatami`'s `.env`.
