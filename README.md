@@ -2,8 +2,10 @@
 
 Ryokan is a template project for running Rust services on [Render](https://render.com/).
 
-- Evaluating if Render is a good replacement for degrading Heroku 😢
-- Playing around with `axum` and `sqlx` 🦀
+Why:
+
+- To evaluate if Render is a good replacement for degrading Heroku 😢
+- To play around with `axum` and `sqlx` 🦀
 
 ## Features / TODO
 
@@ -81,6 +83,15 @@ cargo sqlx migrate run
 
 After the database is created, find the "Internal Database URL" from the dashboard.
 This is the `DATABASE_URL` you need to set in `tatami`'s `.env`.
+
+### Redis
+
+- Create a new Render Redis
+- Configuration:
+    - Name: `ryokan-redis`
+
+After the store is created, find the "Internal Redis URL" from the dashboard.
+This is the `CACHE_URL` you need to set in `tatami`'s `.env`.
 
 ### Web Service
 
