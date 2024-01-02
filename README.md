@@ -1,6 +1,6 @@
-# 🏮 `ryokan`
+# 🏮🈺 Ryokan
 
-`ryokan` is a template project for running Rust services on [Render](https://render.com/).
+Ryokan is a template project for running Rust services on [Render](https://render.com/).
 
 Why:
 
