@@ -12,11 +12,13 @@ members = [
 axum = { version = "0.7.3" }
 
 # https://lib.rs/crates/sqlx
-sqlx = { version = "0.7.3", features = ["runtime-tokio-rustls", "postgres", "json", "uuid", "time"] }
+# Railway private networking generates non-x.509v3 certificates so we need to use native TLS
+sqlx = { version = "0.7.3", features = ["runtime-tokio-native-tls", "postgres", "json", "uuid", "time"] }
 
 # https://lib.rs/crates/redis
 # https://lib.rs/crates/deadpool-redis
-redis = { version = "0.24.0", features = ["tokio-rustls-comp", "json"] }
+# Railway private networking generates non-x.509v3 certificates so we need to use native TLS
+redis = { version = "0.24.0", features = ["tokio-native-tls-comp", "json"] }
 deadpool-redis = { version = "0.14.0", features = ["rt_tokio_1", "serde"] }
 
 # https://lib.rs/crates/serde

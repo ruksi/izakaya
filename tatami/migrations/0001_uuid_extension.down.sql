@@ -1,1 +1,1 @@
-DROP EXTENSION IF EXISTS "uuid-ossp" CASCADE;
+drop extension if exists "uuid-ossp";

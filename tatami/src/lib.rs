@@ -6,6 +6,7 @@ use axum::response::{Html, Redirect};
 use axum::Router;
 use axum::routing::get;
 use sqlx::Postgres;
+use tokio::time::sleep;
 use tower_http::services::ServeDir;
 
 use crate::config::Config;
@@ -14,12 +15,27 @@ pub mod config;
 mod error;
 
 pub async fn get_app(config: &Config) -> Router {
+
+    // Railway private networks take time to initialize on deploy,
+    // and app crashes make it re-initialize so we have to wait a bit
+    // https://docs.railway.app/reference/private-networking#caveats
+    if let Ok(_) = std::env::var("RAILWAY_ENVIRONMENT_NAME") {
+        tracing::debug!("Railway detected, waiting for private network to initialize...");
+        sleep(Duration::from_secs(5)).await;
+    }
+
     let db_pool = sqlx::pool::PoolOptions::new()
         .max_connections(5)
         .acquire_timeout(Duration::from_secs(3))
         .connect(&config.database_url)
         .await
         .expect("Can't connect to database");
+
+    // sqlx migrations lock the migrations table so it's fine to run on multiple instances
+    sqlx::migrate!()
+        .run(&db_pool)
+        .await
+        .expect("Can't run migrations");
 
     let cache_cfg = deadpool_redis::Config::from_url(&config.cache_url);
     let cache_pool = cache_cfg
