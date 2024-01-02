@@ -8,6 +8,7 @@ publish = false
 axum = { workspace = true }
 sqlx = { workspace = true }
 redis = { workspace = true }
+deadpool-redis = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 dotenvy = { workspace = true }
