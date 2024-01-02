@@ -1,28 +1,61 @@
 # 🏮🈺 Ryokan
 
-Ryokan is a template project for running Rust services on [Render](https://render.com/).
+Ryokan is a research / template project for running Rust services on various PaaS providers.
 
-Why:
+## Why?
 
-- To evaluate if Render is a good replacement for degrading Heroku 😢
-- To play around with `axum` and `sqlx` 🦀
+Mainly to play around with Rust 🦀
 
-## Features / TODO
+I haven't liked the direction Heroku is heading for a while now so looking for alternatives:
+
+- [x] [Heroku](https://www.heroku.com/)
+    - works, but the free tier is limited and the pricing is just ridiculous
+    - no native Rust support but there is a BuildPack for it
+    - no free SSL for the free tier :(
+- [x] [Vercel](https://vercel.com/)
+    - doesn't really support Rust, and the focus is heavily on frontend
+- [x] [Dokku](https://dokku.com/)
+    - works, but it's not really a PaaS if you have to manage it, even a little
+- [ ] [Render](https://render.com/)
+    - very intuitive to use and works well in general
+    - Rust building for deploy takes 10 minutes if you don't pay for extra build power...
+    - nice that it requires basically no changes to your repository
+    - the free PostgreSQL gets deleted after 90 days, which sounds strange
+    - the web UI is OK, but not great, but has a lot of options
+    - feels better through the web UI than through the CLI
+- [ ] [Railway](https://railway.app/)
+    - I like the general vibe; like the team rewriting the old Go CLI in Rust
+    - their build system on Nixpacks feels solid; and you can build them locally too
+    - because of
+      this, [supports a lot of languages out-of-the-box](https://docs.railway.app/reference/nixpacks#supported-languages)
+    - builds are a lot faster than with Render; and seem to automatically cache stuff
+    - the web UI is real slick and pretty 💅
+    - feels just as good to use through the web UI as through the CLI
+- [ ] [Fly.io](https://fly.io/)
+    - very quick response times even on the free tier
+    - everything feels... backend / API focused
+    - although I work a lot with Docker, it feels too boilerplate-y for a simple services
+    - you can get free PostgreSQL and Redis, but both come from a 3rd party (Supabase / Upstash)
+    - no native GitHub integrations; you have to do custom GitHub Actions
+    - the web UI feels horrible
+    - feels better through the CLI than through the web UI
+
+## Render
 
 - [x] Web Service, works OK but 10 min deploy
-- [x] Custom domain with HTTPS, worked very smoothly
+    - [x] Custom domain with HTTPS, worked very smoothly
+    - [x] Online Shell, works OK but can be slow without an upgrade
+    - [x] Auto Scaling, sounds OK, CPU/Memory based
+    - [x] Job, sounds OK, trigger one-off commands using `curl`
+    - [x] Rollback, works fine, also reverts secrets etc.
+    - [ ] SSH
+    - [ ] Persistent Disk
 - [x] Environment Groups, a nice addition, shared Env Vars / files between services
 - [x] PostgreSQL, works perfectly
-- [ ] Redis
+- [x] Redis
 - [ ] GitHub Actions CI/CD
 - [ ] AWS Health Check
 - [ ] Using a Docker image vs. Rust build
-- [ ] Web Service Job
-- [x] Auto Scaling, sounds OK, CPU/Memory based
-- [x] Online Shell, works OK but can be slow without an upgrade
-- [ ] Web Service SSH
-- [ ] Web Service Rollback
-- [ ] Web Service Persistent Disk
 - [x] Static Site, seems straightforward, can build and customize headers / redirects
 - [ ] Cron Job
 - [ ] Private Service
