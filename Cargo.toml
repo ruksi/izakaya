@@ -8,24 +8,14 @@ members = [
 # this helps to sync used features so compile cache works better
 [workspace.dependencies]
 
-# https://lib.rs/crates/tokio
-tokio = { version = "1.35.1", features = ["full"] }
-
-# https://lib.rs/crates/tower
-# https://lib.rs/crates/tower-http
-tower = { version = "0.4.13", features = ["util"] }
-tower-http = { version = "0.5.0", features = ["fs", "trace"] }
-
 # https://lib.rs/crates/axum
 axum = { version = "0.7.3" }
 
 # https://lib.rs/crates/sqlx
-sqlx = { version = "0.7.3", features = ["runtime-tokio-rustls", "postgres", "uuid", "time"] }
+sqlx = { version = "0.7.3", features = ["runtime-tokio-rustls", "postgres", "json", "uuid", "time"] }
 
-# https://lib.rs/crates/tracing
-# https://lib.rs/crates/tracing-subscriber
-tracing = { version = "0.1.40" }
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+# https://lib.rs/crates/redis
+redis = { version = "0.24.0", features = ["tokio-rustls-comp", "json"] }
 
 # https://lib.rs/crates/serde
 # https://lib.rs/crates/serde_json
@@ -38,5 +28,18 @@ uuid = { version = "1.6.1", features = ["serde"] }
 # https://docs.rs/time/0.3.31/time/
 time = { version = "0.3.31", features = ["std", "formatting", "parsing", "serde"] }
 
+# https://lib.rs/crates/tracing
+# https://lib.rs/crates/tracing-subscriber
+tracing = { version = "0.1.40" }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+
 # https://lib.rs/crates/dotenvy
 dotenvy = { version = "0.15.7" }
+
+# https://lib.rs/crates/tower
+# https://lib.rs/crates/tower-http
+tower = { version = "0.4.13", features = ["util"] }
+tower-http = { version = "0.5.0", features = ["fs", "trace"] }
+
+# https://lib.rs/crates/tokio
+tokio = { version = "1.35.1", features = ["full"] }
