@@ -109,7 +109,7 @@ This is the `CACHE_URL` you need to set in `tatami`'s `.env`.
     - Secret Files: `.env`: copy and edit from `./tatami/.env.example`
     - Health Check Path: `/healthz`
     - Pre-Deploy Command:
-        - `cargo install sqlx-cli --no-default-features --features native-tls,postgres && cargo sqlx migrate run`
+        - `cargo install sqlx-cli --no-default-features --features postgres && cargo sqlx migrate run`
 - Go to https://ryokan-tatami.onrender.com/healthz or whatever
 - After this, the web service will auto deploy when both:
     - files under the `/tatami` change on the `main` branch
@@ -118,7 +118,7 @@ This is the `CACHE_URL` you need to set in `tatami`'s `.env`.
 If you need to run commands on the server, you can use the web shell.
 
 ```bash
-cargo install sqlx-cli --no-default-features --features native-tls,postgres
+cargo install sqlx-cli --no-default-features --features postgres
 cargo sqlx migrate revert
 # but even just that takes _ages_ so you are probably better of taking
 # database URL from the dashboard and reverting any migrations locally
