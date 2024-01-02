@@ -5,8 +5,7 @@ use axum::http::StatusCode;
 use axum::response::{Html, Redirect};
 use axum::Router;
 use axum::routing::get;
-use sqlx::PgPool;
-use sqlx::postgres::PgPoolOptions;
+use sqlx::Postgres;
 use tower_http::services::ServeDir;
 
 use crate::config::Config;
@@ -15,12 +14,19 @@ pub mod config;
 mod error;
 
 pub async fn get_app(config: &Config) -> Router {
-    let pool = PgPoolOptions::new()
+    let db_pool = sqlx::pool::PoolOptions::new()
         .max_connections(5)
         .acquire_timeout(Duration::from_secs(3))
         .connect(&config.database_url)
         .await
         .expect("Can't connect to database");
+
+    let cache_cfg = deadpool_redis::Config::from_url(&config.cache_url);
+    let cache_pool = cache_cfg
+        .create_pool(Some(deadpool_redis::Runtime::Tokio1))
+        .expect("Can't create cache pool");
+
+    let state = AppState { db_pool, cache_pool };
 
     let app = Router::new();
 
@@ -32,7 +38,7 @@ pub async fn get_app(config: &Config) -> Router {
     let app = app.route("/favicon.ico", get(|| async { Redirect::permanent("/assets/favicon.ico") }));
     let app = app.route("/healthz", get(healthz));
 
-    let app = app.with_state(pool);
+    let app = app.with_state(state);
 
     app
 }
@@ -42,10 +48,33 @@ async fn index() -> Html<&'static str> {
 }
 
 async fn healthz(
-    State(pool): State<PgPool>,
+    State(state): State<AppState>,
 ) -> Result<String, (StatusCode, String)> {
-    sqlx::query_scalar("SELECT 'OK'")
-        .fetch_one(&pool)
+    let from_db: String = sqlx::query_scalar("SELECT 'DATABASE OK'")
+        .fetch_one(&state.db_pool)
         .await
-        .map_err(error::internal)
+        .map_err(error::internal)?;
+
+    let mut cache_conn = state.cache_pool
+        .get()
+        .await
+        .map_err(error::internal)?;
+    deadpool_redis::redis::cmd("SET")
+        .arg(&["deadpool/test_key", "CACHE OK"])
+        .query_async::<_, ()>(&mut cache_conn)
+        .await
+        .map_err(error::internal)?;
+    let from_cache: String = deadpool_redis::redis::cmd("GET")
+        .arg(&["deadpool/test_key"])
+        .query_async(&mut cache_conn)
+        .await
+        .map_err(error::internal)?;
+
+    Ok(format!("{}\n{}", from_db, from_cache))
+}
+
+#[derive(Clone)]
+struct AppState {
+    db_pool: sqlx::pool::Pool<Postgres>,
+    cache_pool: deadpool_redis::Pool,
 }
