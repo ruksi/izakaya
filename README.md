@@ -1,4 +1,4 @@
-# 🏮🈺 Ryokan
+# Ryokan 🏮🈺
 
 Ryokan is a research / template project for running Rust services on various PaaS providers.
 
@@ -24,16 +24,17 @@ I haven't liked the direction Heroku is heading for a while now so looking for a
     - no free SSL for the free tier :(
 - [x] [Vercel](https://vercel.com/)
     - doesn't really support Rust, and the focus is heavily on frontend
-    - could work well if paired with Fly.io; but that's a lot of moving parts
+    - could work well if paired with Fly.io; but that's too many moving parts for my liking
 - [x] [Dokku](https://dokku.com/)
     - works, but it's not really a managed PaaS if you have to manage it 😅
 - [ ] [Render](https://render.com/)
-    - very intuitive to use and works well in general
+    - intuitive to use and works well in general
+    - nice that it requires basically no changes to your repository
     - Rust building for deploy can take 10+ minutes
         - this was on the lowest paid plan
-        - there is some build performance boost if you are on team plan
-    - nice that it requires basically no changes to your repository
+        - there is some build performance boost if you are on a team plan
     - the free PostgreSQL gets deleted after 90 days, which sounds strange
+        - effectively this means you need to pay at least $14/month for an always-on service
     - the web UI is OK, not the best, but has a lot of options
     - feels better through the web UI than through the CLI
 - [ ] [Railway](https://railway.app/)
@@ -42,25 +43,27 @@ I haven't liked the direction Heroku is heading for a while now so looking for a
         - happened to read a couple of blog posts and dig the communication style
     - their build system on Nixpacks feels solid; and you can build them locally too
         - [supports a lot of languages out-of-the-box](https://docs.railway.app/reference/nixpacks#supported-languages)
-    - builds are a lot faster than with Render; and seem to automatically cache stuff
+    - builds Rust faster than Render; and seem to automatically cache stuff
         - from `git push` to receiving traffic: Railway 3 min, Render 7 min
         - on Render this was on the lowest paid plan, on Railway this was free tier
-    - private network not being initialized pre-deploy is annoying
+    - private network not being initialized pre-deploy is slightly annoying
         - and even in deploy container, it takes a few seconds to initialize 🤷
     - the web UI is real slick and pretty 💅
         - even has a minimalistic PostgreSQL editor if a quick production fix is needed
     - feels just as good to use through the web UI as through the CLI
 - [ ] [Fly.io](https://fly.io/)
-    - very quick response times even on the free tier
-    - everything feels... backend / API focused
+    - very quick response call times even on the free tier
+    - everything feels backend / API focused
     - working through Dockerfiles feels boilerplate-y for simple services
-    - you can get free PostgreSQL and Redis, but both come from a 3rd party (Supabase / Upstash) 🤔
+        - but Dockerfile-builds are essential for more complex setups 😆
+    - you can get a free PostgreSQL / Redis, but from a 3rd party (Supabase / Upstash) 🤔
     - no native GitHub integrations; you have to do custom GitHub Actions
-    - the web UI feels bad
+    - the web UI feels a bit clunky
     - feels better through the CLI than through the web UI
 
 ## Render
 
+- [x] Environment Groups, a nice addition, shared Env Vars / files between services
 - [x] Web Service, works OK but 10 min deploy
     - [x] Custom domain with HTTPS, worked very smoothly
     - [x] Online Shell, works OK but can be slow without an upgrade
@@ -69,18 +72,18 @@ I haven't liked the direction Heroku is heading for a while now so looking for a
     - [x] Rollback, works fine, also reverts secrets etc.
     - [ ] SSH
     - [ ] Persistent Disk
-- [x] Environment Groups, a nice addition, shared Env Vars / files between services
+    - [ ] Using a Dockerfile vs. Rust build
 - [x] PostgreSQL, works perfectly
 - [x] Redis
-- [ ] GitHub Actions CI/CD
-- [ ] AWS Health Check
-- [ ] Using a Docker image vs. Rust build
 - [x] Static Site, seems straightforward, can build and customize headers / redirects
 - [ ] Cron Job
 - [ ] Private Service
 - [ ] Background Worker
 - [ ] Blueprint
-- [ ] `cargo sqlx prepare` 🤔
+- Extra:
+    - [ ] GitHub Actions CI/CD
+    - [ ] AWS Health Check
+    - [ ] `cargo sqlx prepare` 🤔
 
 ## Development
 
