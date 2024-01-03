@@ -2,10 +2,19 @@
 
 Ryokan is a research / template project for running Rust services on various PaaS providers.
 
-In essence, this is a mono-repo style Rust workspace with multiple components that
+In essence, this is a mono-repo style Rust project with multiple components that
 are configured to auto-deploy on various PaaS providers. ☁️☁️☁️
 
-Using Rust workspace because:
+- Render:
+    - a static site: https://futon-render.ryokan.dev/
+    - a web app: https://tatami-render.ryokan.dev/
+- Railway:
+    - a static site: https://futon-railway.ryokan.dev/
+    - a web app: https://tatami-railway.ryokan.dev/
+
+> 🚧 These services might go offline later after I've finalized the latency / health testing 🚧
+
+Using Rust workspaces because:
 
 - Allows us to have multiple binaries in the same repository, mono-repo style.
 - These binaries can be anything form web services, to CLIs, to libraries, to cron jobs.
