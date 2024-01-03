@@ -2,9 +2,19 @@
 
 Ryokan is a research / template project for running Rust services on various PaaS providers.
 
+In essence, this is a mono-repo style Rust workspace with multiple components that
+are configured to auto-deploy on various PaaS providers. ☁️☁️☁️
+
+Using Rust workspace because:
+
+- Allows us to have multiple binaries in the same repository, mono-repo style.
+- These binaries can be anything form web services, to CLIs, to libraries, to cron jobs.
+- Makes all binaries share the same `Cargo.lock` file and thus dependency versions.
+- Binaries are in separate directories for scoped auto deploys.
+
 ## Why?
 
-Mainly to play around with Rust 🦀
+Mainly to play around with Rust 🦀 but also...
 
 I haven't liked the direction Heroku is heading for a while now so looking for alternatives:
 
@@ -14,30 +24,39 @@ I haven't liked the direction Heroku is heading for a while now so looking for a
     - no free SSL for the free tier :(
 - [x] [Vercel](https://vercel.com/)
     - doesn't really support Rust, and the focus is heavily on frontend
+    - could work well if paired with Fly.io; but that's a lot of moving parts
 - [x] [Dokku](https://dokku.com/)
-    - works, but it's not really a PaaS if you have to manage it, even a little
+    - works, but it's not really a managed PaaS if you have to manage it 😅
 - [ ] [Render](https://render.com/)
     - very intuitive to use and works well in general
-    - Rust building for deploy takes 10 minutes if you don't pay for extra build power...
+    - Rust building for deploy can take 10+ minutes
+        - this was on the lowest paid plan
+        - there is some build performance boost if you are on team plan
     - nice that it requires basically no changes to your repository
     - the free PostgreSQL gets deleted after 90 days, which sounds strange
-    - the web UI is OK, but not great, but has a lot of options
+    - the web UI is OK, not the best, but has a lot of options
     - feels better through the web UI than through the CLI
 - [ ] [Railway](https://railway.app/)
     - I like the general vibe; like the team rewriting the old Go CLI in Rust
+        - you can feel that whoever has made the examples is familiar with Rust
+        - happened to read a couple of blog posts and dig the communication style
     - their build system on Nixpacks feels solid; and you can build them locally too
-    - because of
-      this, [supports a lot of languages out-of-the-box](https://docs.railway.app/reference/nixpacks#supported-languages)
+        - [supports a lot of languages out-of-the-box](https://docs.railway.app/reference/nixpacks#supported-languages)
     - builds are a lot faster than with Render; and seem to automatically cache stuff
+        - from `git push` to receiving traffic: Railway 3 min, Render 7 min
+        - on Render this was on the lowest paid plan, on Railway this was free tier
+    - private network not being initialized pre-deploy is annoying
+        - and even in deploy container, it takes a few seconds to initialize 🤷
     - the web UI is real slick and pretty 💅
+        - even has a minimalistic PostgreSQL editor if a quick production fix is needed
     - feels just as good to use through the web UI as through the CLI
 - [ ] [Fly.io](https://fly.io/)
     - very quick response times even on the free tier
     - everything feels... backend / API focused
-    - although I work a lot with Docker, it feels too boilerplate-y for a simple services
-    - you can get free PostgreSQL and Redis, but both come from a 3rd party (Supabase / Upstash)
+    - working through Dockerfiles feels boilerplate-y for simple services
+    - you can get free PostgreSQL and Redis, but both come from a 3rd party (Supabase / Upstash) 🤔
     - no native GitHub integrations; you have to do custom GitHub Actions
-    - the web UI feels horrible
+    - the web UI feels bad
     - feels better through the CLI than through the web UI
 
 ## Render
@@ -141,8 +160,6 @@ This is the `CACHE_URL` you need to set in `tatami`'s `.env`.
     - Root Directory: `tatami`
     - Secret Files: `.env`: copy and edit from `./tatami/.env.example`
     - Health Check Path: `/healthz`
-    - Pre-Deploy Command:
-        - `cargo install sqlx-cli --no-default-features --features postgres && cargo sqlx migrate run`
 - Go to https://ryokan-tatami.onrender.com/healthz or whatever
 - After this, the web service will auto deploy when both:
     - files under the `/tatami` change on the `main` branch
@@ -157,14 +174,7 @@ cargo sqlx migrate revert
 # database URL from the dashboard and reverting any migrations locally
 ```
 
-## Details
-
-We are using a Rust workspace because:
-
-- Allows us to have multiple binaries in the same repository, mono-repo style.
-- These binaries can be anything form web services, to CLIs, to libraries, to cron jobs.
-- Makes all binaries share the same `Cargo.lock` file and thus dependency versions.
-- Binaries are in separate directories for auto deploys.
+### Details
 
 Render runs or builds the service with `cargo run/build --release`
 [by default](https://docs.render.com/deploy-rocket-rust)
