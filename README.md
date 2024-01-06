@@ -12,7 +12,7 @@ are configured to auto-deploy on various PaaS providers. ☁️☁️☁️
     - a static site: https://futon-railway.ryokan.dev/
     - a web app: https://tatami-railway.ryokan.dev/
 
-> 🚧 These services might go offline later after I've finalized the latency / health testing 🚧
+> 🚧 These services might go offline later after I've finalized the latency / health testing. 🚧
 
 Using Rust workspaces because:
 
@@ -23,13 +23,13 @@ Using Rust workspaces because:
 
 ## Why?
 
-Mainly to play around with Rust 🦀 but also...
+Mainly to play around with Rust 🦀 but...
 
-I haven't liked the direction Heroku is heading for a while now so looking for alternatives:
+I haven't liked the direction Heroku is heading for a while now, so looking for alternatives:
 
 - [x] [Heroku](https://www.heroku.com/)
-    - works, but the free tier is limited and the pricing is just ridiculous
-    - no native Rust support but there is a BuildPack for it
+    - it works, but the free tier is limited and the pricing is just ridiculous
+    - no native Rust support, but there is a BuildPack for it
     - no free SSL for the free tier :(
 - [x] [Vercel](https://vercel.com/)
     - doesn't really support Rust, and the focus is heavily on frontend
@@ -38,23 +38,24 @@ I haven't liked the direction Heroku is heading for a while now so looking for a
     - works, but it's not really a managed PaaS if you have to manage it 😅
 - [ ] [Render](https://render.com/)
     - intuitive to use and works well in general
-    - nice that it requires basically no changes to your repository
-    - Rust building for deploy can take 10+ minutes
+    - nice that it basically requires no changes to your repository
+    - Rust building for deployment can take 10+ minutes
         - this was on the lowest paid plan
         - there is some build performance boost if you are on a team plan
     - the free PostgreSQL gets deleted after 90 days, which sounds strange
-        - effectively this means you need to pay at least $14/month for an always-on service
+        - effectively, this means you need to pay at least $14/month for an always-on service
+        - the PostgreSQL does have a CIDR firewall, which is really nice 🧱
     - the web UI is OK, not the best, but has a lot of options
     - feels better through the web UI than through the CLI
 - [ ] [Railway](https://railway.app/)
-    - I like the general vibe; like the team rewriting the old Go CLI in Rust
+    - I like the general vibe, like the team rewriting the old Go CLI in Rust
         - you can feel that whoever has made the examples is familiar with Rust
         - happened to read a couple of blog posts and dig the communication style
     - their build system on Nixpacks feels solid; and you can build them locally too
         - [supports a lot of languages out-of-the-box](https://docs.railway.app/reference/nixpacks#supported-languages)
     - builds Rust faster than Render; and seem to automatically cache stuff
         - from `git push` to receiving traffic: Railway 3 min, Render 7 min
-        - on Render this was on the lowest paid plan, on Railway this was free tier
+        - on Render this was on the cheapest plan, on Railway this was the free tier
     - private network not being initialized pre-deploy is slightly annoying
         - and even in deploy container, it takes a few seconds to initialize 🤷
     - the web UI is real slick and pretty 💅
@@ -64,8 +65,8 @@ I haven't liked the direction Heroku is heading for a while now so looking for a
     - very quick response call times even on the free tier
     - everything feels backend / API focused
     - working through Dockerfiles feels boilerplate-y for simple services
-        - but Dockerfile-builds are essential for more complex setups 😆
-    - you can get a free PostgreSQL / Redis, but from a 3rd party (Supabase / Upstash) 🤔
+        - Dockerfile-builds are essential for more complex setups 😆
+    - you can get a free PostgreSQL / Redis, but from a third party (Supabase / Upstash) 🤔
     - no native GitHub integrations; you have to do custom GitHub Actions
     - the web UI feels a bit clunky
     - feels better through the CLI than through the web UI
@@ -73,16 +74,16 @@ I haven't liked the direction Heroku is heading for a while now so looking for a
 ## Render
 
 - [x] Environment Groups, a nice addition, shared Env Vars / files between services
-- [x] Web Service, works OK but 10 min deploy
+- [x] Web Service works OK but 10 min deploy
     - [x] Custom domain with HTTPS, worked very smoothly
-    - [x] Online Shell, works OK but can be slow without an upgrade
+    - [x] Online Shell works OK but can be slow without an upgrade
     - [x] Auto Scaling, sounds OK, CPU/Memory based
-    - [x] Job, sounds OK, trigger one-off commands using `curl`
-    - [x] Rollback, works fine, also reverts secrets etc.
+    - [x] Job, sounds OK, trigger one-off command using `curl`
+    - [x] Rollback, works fine, also reverts secrets, etc.
     - [ ] SSH
     - [ ] Persistent Disk
     - [ ] Using a Dockerfile vs. Rust build
-- [x] PostgreSQL, works perfectly
+- [x] PostgreSQL works perfectly
 - [x] Redis
 - [x] Static Site, seems straightforward, can build and customize headers / redirects
 - [ ] Cron Job
