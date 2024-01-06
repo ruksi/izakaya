@@ -1,1 +1,1 @@
-DROP COLLATION IF EXISTS case_insensitive;
+drop collation if exists case_insensitive;
