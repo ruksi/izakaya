@@ -5,16 +5,19 @@ use axum::http::StatusCode;
 use axum::response::{Html, Redirect};
 use axum::Router;
 use axum::routing::get;
-use sqlx::Postgres;
 use tokio::time::sleep;
 use tower_http::services::ServeDir;
 
 use crate::config::Config;
+use crate::state::AppState;
 
 pub mod config;
 mod error;
+mod user;
+mod state;
+mod api;
 
-pub async fn get_app(config: &Config) -> Router {
+pub async fn get_app<S>(config: &Config) -> Router<S> {
 
     // Railway private networks take time to initialize on deploy,
     // and app crashes make it re-initialize so we have to wait a bit
@@ -54,8 +57,9 @@ pub async fn get_app(config: &Config) -> Router {
     let app = app.route("/favicon.ico", get(|| async { Redirect::permanent("/assets/favicon.ico") }));
     let app = app.route("/healthz", get(healthz));
 
-    let app = app.with_state(state);
+    let app = app.nest("/api", api::router(state.clone()));
 
+    let app = app.with_state(state);
     app
 }
 
@@ -87,10 +91,4 @@ async fn healthz(
         .map_err(error::internal)?;
 
     Ok(format!("{}\n{}", from_db, from_cache))
-}
-
-#[derive(Clone)]
-struct AppState {
-    db_pool: sqlx::pool::Pool<Postgres>,
-    cache_pool: deadpool_redis::Pool,
 }
