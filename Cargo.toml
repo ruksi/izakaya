@@ -9,7 +9,9 @@ members = [
 [workspace.dependencies]
 
 # https://lib.rs/crates/axum
+# https://lib.rs/crates/axum-test
 axum = { version = "0.7.3" }
+axum-test = { version = "14.2.2" }
 
 # https://lib.rs/crates/sqlx
 # Railway private networking generates non-x.509v3 certificates so we need to use native TLS

@@ -19,8 +19,8 @@ mod api;
 
 pub async fn get_app<S>(config: &Config) -> Router<S> {
 
-    // Railway private networks take time to initialize on deploy,
-    // and app crashes make it re-initialize so we have to wait a bit
+    // Railway private networks take time to initialize on deployment,
+    // and application crashes make it re-initialize, so we have to wait
     // https://docs.railway.app/reference/private-networking#caveats
     if let Ok(_) = std::env::var("RAILWAY_ENVIRONMENT_NAME") {
         tracing::debug!("Railway detected, waiting for private network to initialize...");
@@ -47,6 +47,10 @@ pub async fn get_app<S>(config: &Config) -> Router<S> {
 
     let state = AppState { db_pool, cache_pool };
 
+    root_router(state)
+}
+
+fn root_router<S>(state: AppState) -> Router<S> {
     let app = Router::new();
 
     // the ServeDir path is relative to where the binary is run,
@@ -58,7 +62,6 @@ pub async fn get_app<S>(config: &Config) -> Router<S> {
     let app = app.route("/healthz", get(healthz));
 
     let app = app.nest("/api", api::router(state.clone()));
-
     let app = app.with_state(state);
     app
 }
@@ -91,4 +94,39 @@ async fn healthz(
         .map_err(error::internal)?;
 
     Ok(format!("{}\n{}", from_db, from_cache))
+}
+
+#[cfg(test)]
+mod tests {
+    use axum_test::TestServer;
+
+    use super::*;
+
+    async fn test_cache_pool() -> deadpool_redis::Pool {
+        // TODO: get the test Redis URL from somewhere
+        // TODO: is flushing the test Redis database necessary?
+        let pool = deadpool_redis::Config::from_url("redis://localhost:6379/9")
+            .create_pool(Some(deadpool_redis::Runtime::Tokio1))
+            .expect("Failed to create cache pool for tests");
+        let mut conn = pool
+            .get()
+            .await
+            .expect("Failed to get cache connection for tests");
+        deadpool_redis::redis::cmd("FLUSHDB")
+            .query_async::<_, ()>(&mut conn)
+            .await
+            .expect("Failed to flush cache for tests");
+        pool
+    }
+
+    #[sqlx::test]
+    async fn healthz_works(pool: sqlx::PgPool) {
+        let state = AppState { db_pool: pool, cache_pool: test_cache_pool().await };
+        let routes = root_router(state.clone());
+        let server = TestServer::new(routes).unwrap();
+        server
+            .get("/healthz")
+            .await
+            .assert_text("DATABASE OK\nCACHE OK");
+    }
 }
