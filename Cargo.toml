@@ -14,8 +14,24 @@ axum = { version = "0.7.3" }
 axum-test = { version = "14.2.2" }
 
 # https://lib.rs/crates/sqlx
-# Railway private networking generates non-x.509v3 certificates so we need to use native TLS
+# https://lib.rs/crates/sea-query
+# https://lib.rs/crates/sea-query-binder
+# Railway private networking generates non-x.509v3 certificates, so we need to use native TLS
 sqlx = { version = "0.7.3", features = ["runtime-tokio-native-tls", "postgres", "json", "uuid", "time"] }
+sea-query = { version = "0.30.6", no-default-features =false , features = [
+    "backend-postgres",
+    "with-json",
+    "with-uuid",
+    "with-time",
+    "attr"
+] }
+sea-query-binder = { version = "0.5.0", features = [
+    "runtime-tokio-native-tls",
+    "sqlx-postgres",
+    "with-json",
+    "with-uuid",
+    "with-time",
+] }
 
 # https://lib.rs/crates/redis
 # https://lib.rs/crates/deadpool-redis
@@ -29,7 +45,7 @@ serde = { version = "1.0.193", features = ["derive"] }
 serde_json = { version = "1.0.108" }
 
 # https://lib.rs/crates/uuid
-uuid = { version = "1.6.1", features = ["serde"] }
+uuid = { version = "1.6.1", features = ["serde", "v4"] }
 
 # https://docs.rs/time/0.3.31/time/
 time = { version = "0.3.31", features = ["std", "formatting", "parsing", "serde"] }

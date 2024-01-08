@@ -7,10 +7,13 @@ publish = false
 [dependencies]
 axum = { workspace = true }
 sqlx = { workspace = true }
+sea-query = { workspace = true }
+sea-query-binder = { workspace = true }
 redis = { workspace = true }
 deadpool-redis = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+uuid = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 dotenvy = { workspace = true }

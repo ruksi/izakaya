@@ -5,5 +5,5 @@ use crate::user;
 
 pub fn router(state: AppState) -> Router<AppState> {
     Router::new()
-        .nest("/users", user::routes::router(state.clone()))
+        .nest("/users", user::route::router(state.clone()))
 }

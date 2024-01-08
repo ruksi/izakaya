@@ -104,23 +104,23 @@ mod tests {
 
     async fn test_cache_pool() -> deadpool_redis::Pool {
         // TODO: get the test Redis URL from somewhere
-        // TODO: is flushing the test Redis database necessary?
         let pool = deadpool_redis::Config::from_url("redis://localhost:6379/9")
             .create_pool(Some(deadpool_redis::Runtime::Tokio1))
             .expect("Failed to create cache pool for tests");
-        let mut conn = pool
-            .get()
-            .await
-            .expect("Failed to get cache connection for tests");
-        deadpool_redis::redis::cmd("FLUSHDB")
-            .query_async::<_, ()>(&mut conn)
-            .await
-            .expect("Failed to flush cache for tests");
+        // TODO: is flushing the test Redis database necessary?
+        // let mut conn = pool
+        //     .get()
+        //     .await
+        //     .expect("Failed to get cache connection for tests");
+        // deadpool_redis::redis::cmd("FLUSHDB")
+        //     .query_async::<_, ()>(&mut conn)
+        //     .await
+        //     .expect("Failed to flush cache for tests");
         pool
     }
 
     #[sqlx::test]
-    async fn healthz_works(pool: sqlx::PgPool) {
+    async fn health_endpoint(pool: sqlx::PgPool) {
         let state = AppState { db_pool: pool, cache_pool: test_cache_pool().await };
         let routes = root_router(state.clone());
         let server = TestServer::new(routes).unwrap();
