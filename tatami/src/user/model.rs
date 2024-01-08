@@ -1,5 +1,5 @@
 use axum::http::StatusCode;
-use sea_query::Expr;
+use sea_query::{Expr, PostgresQueryBuilder, Query};
 use sea_query_binder::SqlxBinder;
 use uuid::Uuid;
 
@@ -21,12 +21,13 @@ pub async fn create(
     db: &sqlx::PgPool,
     declaration: UserDeclaration,
 ) -> Result<User, (StatusCode, String)> {
-    let user = sqlx::query_as!(
-            User,
-            // language=SQL
-            r#"insert into "user" (username) values ($1) returning user_id, username;"#,
-            declaration.username,
-        )
+    let (sql, values) = Query::insert()
+        .into_table(UserIden::Table)
+        .columns([UserIden::Username])
+        .values_panic(vec![declaration.username.into()])
+        .returning(Query::returning().columns([UserIden::UserId, UserIden::Username]))
+        .build_sqlx(PostgresQueryBuilder);
+    let user = sqlx::query_as_with(&sql, values)
         .fetch_one(db)
         .await
         .map_err(error::internal)?;
@@ -42,7 +43,7 @@ pub async fn list(
     db: &sqlx::PgPool,
     filter: UserFilter,
 ) -> Result<Vec<User>, (StatusCode, String)> {
-    let mut query = sea_query::Query::select();
+    let mut query = Query::select();
 
     query
         .column(UserIden::UserId)
@@ -55,7 +56,7 @@ pub async fn list(
         );
     }
 
-    let (sql, values) = query.build_sqlx(sea_query::PostgresQueryBuilder);
+    let (sql, values) = query.build_sqlx(PostgresQueryBuilder);
     let users = sqlx::query_as_with(&sql, values.clone())
         .fetch_all(db)
         .await
@@ -68,12 +69,12 @@ pub async fn describe(
     db: &sqlx::PgPool,
     user_id: Uuid,
 ) -> Result<Option<User>, (StatusCode, String)> {
-    let result = sqlx::query_as!(
-            User,
-            // language=SQL
-            r#"select user_id, username from "user" where user_id = $1;"#,
-            user_id,
-        )
+    let (sql, values) = Query::select()
+        .columns([UserIden::UserId, UserIden::Username])
+        .from(UserIden::Table)
+        .and_where(Expr::col(UserIden::UserId).eq(user_id))
+        .build_sqlx(PostgresQueryBuilder);
+    let result = sqlx::query_as_with(&sql, values.clone())
         .fetch_optional(db)
         .await
         .map_err(error::internal)?;
@@ -97,19 +98,19 @@ pub async fn amend(
         // TODO: fix unwrap
         return Ok(describe(db, user_id).await?.unwrap());
     }
-    let user = sqlx::query_as!(
-            User,
-            // language=SQL
-            r#"
-                update "user" u
-                set
-                    username = coalesce($2, u.username)
-                where user_id = $1
-                returning user_id, username;
-            "#,
-            user_id,
-            amendment.username,
-        )
+
+    let mut query = Query::update();
+    query
+        .table(UserIden::Table)
+        .and_where(Expr::col(UserIden::UserId).eq(user_id))
+        .returning(Query::returning().columns([UserIden::UserId, UserIden::Username]));
+
+    if let Some(username) = amendment.username {
+        query.value(UserIden::Username, username);
+    }
+
+    let (sql, values) = query.build_sqlx(PostgresQueryBuilder);
+    let user = sqlx::query_as_with(&sql, values)
         .fetch_one(db)
         .await
         .map_err(error::internal)?;
@@ -120,11 +121,11 @@ pub async fn destroy(
     db: &sqlx::PgPool,
     user_id: Uuid,
 ) -> Result<(), (StatusCode, String)> {
-    sqlx::query!(
-            // language=SQL
-            r#"delete from "user" where user_id = $1;"#,
-            user_id,
-        )
+    let (sql, values) = Query::delete()
+        .from_table(UserIden::Table)
+        .and_where(Expr::col(UserIden::UserId).eq(user_id))
+        .build_sqlx(PostgresQueryBuilder);
+    sqlx::query_with(&sql, values)
         .execute(db)
         .await
         .map_err(error::internal)?;
@@ -170,6 +171,8 @@ mod tests {
         assert_eq!(bobby.username, "bobby");
         let re_bobby = describe(&pool, bob.user_id).await?.unwrap();
         assert_eq!(bobby, re_bobby);
+        let re_alice = describe(&pool, alice.user_id).await?.unwrap();
+        assert_eq!(re_alice.username, "alice");
 
         // amend but nothing to change
         assert!(amend(&pool, bob.user_id, UserAmendment::default()).await.is_ok());
