@@ -1,15 +1,34 @@
 use axum::http::StatusCode;
-use sea_query::{Expr, PostgresQueryBuilder, Query};
-use sea_query_binder::SqlxBinder;
+use sea_query::*;
+use sea_query_binder::*;
 use uuid::Uuid;
 
 use crate::error;
 
-#[sea_query::enum_def]
+// the user database table identifiers
+#[derive(sea_query::Iden)]
+enum User {
+    Table,
+    UserId,
+    Username,
+    // CreatedAt,
+    // UpdatedAt,
+    // PrimaryEmailId,
+    // PasswordHash,
+}
+
+// one representation of the user
 #[derive(sqlx::FromRow, serde::Serialize, serde::Deserialize, Debug, PartialEq, Eq)]
-pub struct User {
+pub struct UserModel {
     pub user_id: Uuid,
     pub username: String,
+}
+
+impl UserModel {
+    // the columns from the database that make up this representation of a user
+    pub fn columns() -> impl IntoIterator<Item=impl IntoColumnRef> {
+        [User::UserId, User::Username]
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -20,12 +39,12 @@ pub struct UserDeclaration {
 pub async fn create(
     db: &sqlx::PgPool,
     declaration: UserDeclaration,
-) -> Result<User, (StatusCode, String)> {
+) -> Result<UserModel, (StatusCode, String)> {
     let (sql, values) = Query::insert()
-        .into_table(UserIden::Table)
-        .columns([UserIden::Username])
+        .into_table(User::Table)
+        .columns([User::Username])
         .values_panic(vec![declaration.username.into()])
-        .returning(Query::returning().columns([UserIden::UserId, UserIden::Username]))
+        .returning(Query::returning().columns(UserModel::columns()))
         .build_sqlx(PostgresQueryBuilder);
     let user = sqlx::query_as_with(&sql, values)
         .fetch_one(db)
@@ -42,22 +61,18 @@ pub struct UserFilter {
 pub async fn list(
     db: &sqlx::PgPool,
     filter: UserFilter,
-) -> Result<Vec<User>, (StatusCode, String)> {
+) -> Result<Vec<UserModel>, (StatusCode, String)> {
     let mut query = Query::select();
-
     query
-        .column(UserIden::UserId)
-        .column(UserIden::Username)
-        .from(UserIden::Table);
+        .columns(UserModel::columns())
+        .from(User::Table);
 
-    if filter != UserFilter::default() {
-        query.and_where(
-            Expr::col(UserIden::Username).eq(filter.username.unwrap())
-        );
+    if let Some(username) = filter.username {
+        query.and_where(Expr::col(User::Username).eq(username));
     }
 
     let (sql, values) = query.build_sqlx(PostgresQueryBuilder);
-    let users = sqlx::query_as_with(&sql, values.clone())
+    let users = sqlx::query_as_with(&sql, values)
         .fetch_all(db)
         .await
         .map_err(error::internal)?;
@@ -68,13 +83,13 @@ pub async fn list(
 pub async fn describe(
     db: &sqlx::PgPool,
     user_id: Uuid,
-) -> Result<Option<User>, (StatusCode, String)> {
+) -> Result<Option<UserModel>, (StatusCode, String)> {
     let (sql, values) = Query::select()
-        .columns([UserIden::UserId, UserIden::Username])
-        .from(UserIden::Table)
-        .and_where(Expr::col(UserIden::UserId).eq(user_id))
+        .columns(UserModel::columns())
+        .from(User::Table)
+        .and_where(Expr::col(User::UserId).eq(user_id))
         .build_sqlx(PostgresQueryBuilder);
-    let result = sqlx::query_as_with(&sql, values.clone())
+    let result = sqlx::query_as_with(&sql, values)
         .fetch_optional(db)
         .await
         .map_err(error::internal)?;
@@ -93,7 +108,7 @@ pub async fn amend(
     db: &sqlx::PgPool,
     user_id: Uuid,
     amendment: UserAmendment,
-) -> Result<User, (StatusCode, String)> {
+) -> Result<UserModel, (StatusCode, String)> {
     if amendment == UserAmendment::default() {
         // TODO: fix unwrap
         return Ok(describe(db, user_id).await?.unwrap());
@@ -101,12 +116,12 @@ pub async fn amend(
 
     let mut query = Query::update();
     query
-        .table(UserIden::Table)
-        .and_where(Expr::col(UserIden::UserId).eq(user_id))
-        .returning(Query::returning().columns([UserIden::UserId, UserIden::Username]));
+        .table(User::Table)
+        .and_where(Expr::col(User::UserId).eq(user_id))
+        .returning(Query::returning().columns(UserModel::columns()));
 
     if let Some(username) = amendment.username {
-        query.value(UserIden::Username, username);
+        query.value(User::Username, username);
     }
 
     let (sql, values) = query.build_sqlx(PostgresQueryBuilder);
@@ -122,8 +137,8 @@ pub async fn destroy(
     user_id: Uuid,
 ) -> Result<(), (StatusCode, String)> {
     let (sql, values) = Query::delete()
-        .from_table(UserIden::Table)
-        .and_where(Expr::col(UserIden::UserId).eq(user_id))
+        .from_table(User::Table)
+        .and_where(Expr::col(User::UserId).eq(user_id))
         .build_sqlx(PostgresQueryBuilder);
     sqlx::query_with(&sql, values)
         .execute(db)

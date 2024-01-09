@@ -25,7 +25,7 @@ struct CreateUserBody {
 async fn create(
     State(state): State<AppState>,
     Json(body): Json<CreateUserBody>,
-) -> Result<Json<user::model::User>, (axum::http::StatusCode, String)> {
+) -> Result<Json<user::model::UserModel>, (axum::http::StatusCode, String)> {
     let declaration = user::model::UserDeclaration {
         username: body.username,
     };
@@ -35,7 +35,7 @@ async fn create(
 
 async fn list(
     State(state): State<AppState>,
-) -> Result<Json<Vec<user::model::User>>, (axum::http::StatusCode, String)> {
+) -> Result<Json<Vec<user::model::UserModel>>, (axum::http::StatusCode, String)> {
     let users = user::model::list(&state.db_pool, UserFilter::default()).await?;
     Ok(Json(users))
 }
@@ -43,7 +43,7 @@ async fn list(
 async fn describe(
     State(state): State<AppState>,
     Path(user_id): Path<Uuid>,
-) -> Result<Json<user::model::User>, (axum::http::StatusCode, String)> {
+) -> Result<Json<user::model::UserModel>, (axum::http::StatusCode, String)> {
     let user = user::model::describe(&state.db_pool, user_id).await?;
     match user {
         Some(user) => Ok(Json(user)),
@@ -60,7 +60,7 @@ async fn amend(
     State(state): State<AppState>,
     Path(user_id): Path<Uuid>,
     Json(body): Json<AmendUserBody>,
-) -> Result<Json<user::model::User>, (axum::http::StatusCode, String)> {
+) -> Result<Json<user::model::UserModel>, (axum::http::StatusCode, String)> {
     let amendment = user::model::UserAmendment {
         username: Some(body.username.unwrap()),
     };
@@ -105,7 +105,7 @@ mod tests {
                 "password": "bobIsBest",
             }))
             .await;
-        let user = response.json::<user::model::User>();
+        let user = response.json::<user::model::UserModel>();
         assert_eq!(user.username, "bob");
         assert_ne!(user.user_id, Uuid::nil());
     }
@@ -118,7 +118,7 @@ mod tests {
         server.get("/").await.assert_json(&json!([]));
 
         user::model::create(&state.db_pool, UserDeclaration { username: "bob".into() }).await.unwrap();
-        let users = server.get("/").await.json::<Vec<user::model::User>>();
+        let users = server.get("/").await.json::<Vec<user::model::UserModel>>();
         assert_eq!(users.len(), 1);
         assert_eq!(users[0].username, "bob");
     }
@@ -133,7 +133,7 @@ mod tests {
         response.assert_text("User not found");
 
         let user = user::model::create(&state.db_pool, UserDeclaration { username: "bob".into() }).await.unwrap();
-        let re_user = server.get(format!("/{}", user.user_id).as_str()).await.json::<user::model::User>();
+        let re_user = server.get(format!("/{}", user.user_id).as_str()).await.json::<user::model::UserModel>();
         assert_eq!(user, re_user);
     }
 
@@ -151,7 +151,7 @@ mod tests {
                 "username": "bobby",
             }))
             .await
-            .json::<user::model::User>();
+            .json::<user::model::UserModel>();
         assert_eq!(user.username, "bobby");
 
         let user = user::model::describe(&state.db_pool, user.user_id).await.unwrap().unwrap();
