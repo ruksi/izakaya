@@ -99,12 +99,20 @@ I haven't liked the direction Heroku is heading for a while now, so looking for 
 
 > Remember to update both `.rtx.toml` and `rust-toolchain` when changing the Rust version!
 
+### General
+
 ```bash
+rtx install
+```
+
+### 🧘 `tatami` Backend
+
+```bash
+cd tatami
+
 sudo apt update
 sudo apt install postgresql-14
 cargo install sqlx-cli --features postgres
-
-cd tatami
 
 # configure your environment
 cp .env.example .env
@@ -120,6 +128,14 @@ cargo sqlx database setup
 #cargo sqlx migrate revert --target-version=0
 
 cargo run
+```
+
+### 👘 `kimono` Frontend
+
+```bash
+cd kimono
+npm install
+npm run dev
 ```
 
 If you need to change the database:
