@@ -34,22 +34,59 @@ impl UserModel {
 #[derive(Debug, PartialEq, Eq)]
 pub struct UserDeclaration {
     pub username: String,
+    pub email: String,
+}
+
+impl UserDeclaration {
+    pub fn new<T>(username: T, email: T) -> Self
+        where T: Into<String>,
+    {
+        Self { username: username.into(), email: email.into() }
+    }
 }
 
 pub async fn create(
     db: &sqlx::PgPool,
     declaration: UserDeclaration,
 ) -> Result<UserModel, (StatusCode, String)> {
+    let mut tx = db.begin().await.map_err(error::internal)?;
+
     let (sql, values) = Query::insert()
         .into_table(User::Table)
         .columns([User::Username])
         .values_panic(vec![declaration.username.into()])
         .returning(Query::returning().columns(UserModel::columns()))
         .build_sqlx(PostgresQueryBuilder);
-    let user = sqlx::query_as_with(&sql, values)
-        .fetch_one(db)
+    let user: UserModel = sqlx::query_as_with(&sql, values)
+        .fetch_one(&mut *tx)
         .await
         .map_err(error::internal)?;
+
+    let email_id = sqlx::query_scalar!(
+            // language=SQL
+            r#"insert into user_email (user_id, address)
+               values ($1, $2)
+               returning email_id;"#,
+            user.user_id,
+            declaration.email,
+        )
+        .fetch_one(&mut *tx)
+        .await
+        .map_err(error::internal)?;
+
+    sqlx::query!(
+            // language=SQL
+            r#"update "user"
+               set primary_email_id = $2
+               where user_id = $1"#,
+            user.user_id,
+            email_id,
+        )
+        .execute(&mut *tx)
+        .await
+        .map_err(error::internal)?;
+
+    tx.commit().await.map_err(error::internal)?;
     Ok(user)
 }
 
@@ -157,24 +194,29 @@ mod tests {
         let users = list(&pool, UserFilter::default()).await?;
         assert_eq!(users.len(), 0);
 
-        let bob = create(&pool, UserDeclaration { username: "bob".into() }).await?;
-        let alice = create(&pool, UserDeclaration { username: "alice".into() }).await?;
+        let bob = create(&pool, UserDeclaration::new("bob", "bob@example.com")).await?;
+        let alice = create(&pool, UserDeclaration::new("alice", "alice@example.com")).await?;
         assert_eq!(bob.username, "bob");
         assert_eq!(alice.username, "alice");
         assert_ne!(bob.user_id, alice.user_id);
 
         // trim
-        let john = create(&pool, UserDeclaration { username: "john ".into() }).await?;
+        let john = create(&pool, UserDeclaration::new("john ", "john@example.com")).await?;
         assert_eq!(john.username, "john");
 
         // existing username
-        assert!(create(&pool, UserDeclaration { username: "bob".into() }).await.is_err());
-        assert!(create(&pool, UserDeclaration { username: "bob ".into() }).await.is_err());
-        assert!(create(&pool, UserDeclaration { username: "Bob".into() }).await.is_err());
+        assert!(create(&pool, UserDeclaration::new("bob", "robert@example.com")).await.is_err());
+        assert!(create(&pool, UserDeclaration::new("bob ", "robert@example.com")).await.is_err());
+        assert!(create(&pool, UserDeclaration::new("Bob", "robert@example.com")).await.is_err());
+
+        // existing email
+        assert!(create(&pool, UserDeclaration::new("robert", "bob@example.com")).await.is_err());
+        assert!(create(&pool, UserDeclaration::new("bob", "bob+2@example.com")).await.is_err());
+        assert!(create(&pool, UserDeclaration::new("robert", "bob+2@example.com")).await.is_ok());
 
         // invalid username
-        assert!(create(&pool, UserDeclaration { username: "John Doe".into() }).await.is_err());
-        assert!(create(&pool, UserDeclaration { username: "JohnDoe".into() }).await.is_ok());
+        assert!(create(&pool, UserDeclaration::new("John Doe", "doe@exampe.com")).await.is_err());
+        assert!(create(&pool, UserDeclaration::new("JohnDoe", "doe@example.com")).await.is_ok());
 
         // describe
         let re_bob = describe(&pool, bob.user_id).await?.unwrap();
@@ -202,7 +244,7 @@ mod tests {
 
         // list
         let users = list(&pool, UserFilter::default()).await?;
-        assert_eq!(users.len(), 3);
+        assert_eq!(users.len(), 4);
 
         // list with a filter
         let users = list(&pool, UserFilter { username: Some("joHndOe".into()) }).await?;

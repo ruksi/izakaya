@@ -28,6 +28,7 @@ async fn create(
 ) -> Result<Json<user::model::UserModel>, (axum::http::StatusCode, String)> {
     let declaration = user::model::UserDeclaration {
         username: body.username,
+        email: body.email,
     };
     let user = user::model::create(&state.db_pool, declaration).await?;
     Ok(Json(user))
@@ -117,7 +118,7 @@ mod tests {
 
         server.get("/").await.assert_json(&json!([]));
 
-        user::model::create(&state.db_pool, UserDeclaration { username: "bob".into() }).await.unwrap();
+        user::model::create(&state.db_pool, UserDeclaration::new("bob", "bob@example.com")).await.unwrap();
         let users = server.get("/").await.json::<Vec<user::model::UserModel>>();
         assert_eq!(users.len(), 1);
         assert_eq!(users[0].username, "bob");
@@ -132,7 +133,7 @@ mod tests {
         response.assert_status(axum::http::StatusCode::NOT_FOUND);
         response.assert_text("User not found");
 
-        let user = user::model::create(&state.db_pool, UserDeclaration { username: "bob".into() }).await.unwrap();
+        let user = user::model::create(&state.db_pool, UserDeclaration::new("bob", "bob@example.com")).await.unwrap();
         let re_user = server.get(format!("/{}", user.user_id).as_str()).await.json::<user::model::UserModel>();
         assert_eq!(user, re_user);
     }
@@ -142,7 +143,7 @@ mod tests {
         let state = AppState { db_pool: pool, cache_pool: test_cache_pool().await };
         let server = TestServer::new(router(state.clone())).unwrap();
 
-        let user = user::model::create(&state.db_pool, UserDeclaration { username: "bob".into() }).await.unwrap();
+        let user = user::model::create(&state.db_pool, UserDeclaration::new("bob", "bob@example.com")).await.unwrap();
 
         let user = server
             .patch(format!("/{}", user.user_id).as_str())
@@ -163,7 +164,7 @@ mod tests {
         let state = AppState { db_pool: pool, cache_pool: test_cache_pool().await };
         let server = TestServer::new(router(state.clone())).unwrap();
 
-        let user = user::model::create(&state.db_pool, UserDeclaration { username: "bob".into() }).await.unwrap();
+        let user = user::model::create(&state.db_pool, UserDeclaration::new("bob", "bob@example.com")).await.unwrap();
         server.delete(format!("/{}", user.user_id).as_str()).await.assert_json(&json!({"status": "ok"}));
 
         let response = server.get(format!("/{}", user.user_id).as_str()).await;
