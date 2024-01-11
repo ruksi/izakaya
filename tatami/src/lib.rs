@@ -34,7 +34,7 @@ pub async fn get_app<S>(config: &Config) -> Router<S> {
         .await
         .expect("Can't connect to database");
 
-    // sqlx migrations lock the migrations table so it's fine to run on multiple instances
+    // sqlx locks the migration table, so it's fine to run on multiple instances
     sqlx::migrate!()
         .run(&db_pool)
         .await
@@ -46,7 +46,6 @@ pub async fn get_app<S>(config: &Config) -> Router<S> {
         .expect("Can't create cache pool");
 
     let state = AppState { db_pool, cache_pool };
-
     root_router(state)
 }
 

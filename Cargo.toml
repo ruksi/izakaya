@@ -60,7 +60,7 @@ dotenvy = { version = "0.15.7" }
 # https://lib.rs/crates/tower
 # https://lib.rs/crates/tower-http
 tower = { version = "0.4.13", features = ["util"] }
-tower-http = { version = "0.5.0", features = ["fs", "trace"] }
+tower-http = { version = "0.5.0", features = ["fs", "trace", "cors"] }
 
 # https://lib.rs/crates/tokio
 tokio = { version = "1.35.1", features = ["full"] }

@@ -3,6 +3,7 @@ pub struct Config {
     pub rust_log: String,
     pub database_url: String,
     pub cache_url: String,
+    pub frontend_url: Option<String>,
 }
 
 impl Config {
@@ -19,7 +20,11 @@ impl Config {
         let cache_url = std::env::var("CACHE_URL")
             .expect("CACHE_URL must be set");
 
-        Self { port, rust_log, cache_url, database_url }
+        let frontend_url = std::env::var("FRONTEND_URL")
+            .ok()
+            .map(|url| url.trim_end_matches('/').to_string());
+
+        Self { port, rust_log, database_url, cache_url, frontend_url }
     }
 
     pub fn bind_address(&self) -> String {
