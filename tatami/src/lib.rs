@@ -16,6 +16,7 @@ mod error;
 mod user;
 mod state;
 mod api;
+mod auth;
 
 pub async fn get_app<S>(config: &Config) -> Router<S> {
 
