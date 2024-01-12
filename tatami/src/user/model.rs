@@ -1,9 +1,7 @@
-use argon2::{Argon2, PasswordHash};
-use argon2::password_hash::{PasswordHasher, PasswordVerifier, SaltString};
 use axum::http::StatusCode;
 use uuid::Uuid;
 
-use crate::error;
+use crate::{crypto, error};
 
 #[derive(sqlx::FromRow, serde::Serialize, serde::Deserialize, Debug, PartialEq, Eq)]
 pub struct User {
@@ -30,7 +28,7 @@ pub async fn create(
     db: &sqlx::PgPool,
     declaration: UserDeclaration,
 ) -> Result<User, (StatusCode, String)> {
-    let password_hash = hash_password(declaration.password).await?;
+    let password_hash = crypto::hash_password(declaration.password).await?;
 
     let mut tx = db.begin().await.map_err(error::internal)?;
 
@@ -77,26 +75,6 @@ pub async fn create(
         username: user_record.username,
     };
     Ok(user_model)
-}
-
-async fn hash_password(password: String) -> Result<String, (StatusCode, String)> {
-    tokio::task::spawn_blocking(move || -> Result<String, (StatusCode, String)> {
-        let salt = SaltString::generate(rand::thread_rng());
-        let hash = Argon2::default()
-            .hash_password(password.as_ref(), &salt)
-            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
-            .to_string();
-        Ok(hash)
-    }).await.map_err(error::internal)?
-}
-
-async fn verify_password(hash_string: String, password: String) -> Result<(), (StatusCode, String)> {
-    let hash = PasswordHash::new(&hash_string).expect("unable to parse hash");
-    Ok(
-        Argon2::default()
-            .verify_password(&password.as_ref(), &hash)
-            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
-    )
 }
 
 #[derive(Default, Debug, PartialEq, Eq)]
@@ -162,7 +140,11 @@ pub async fn amend(
 ) -> Result<User, (StatusCode, String)> {
     if amendment == UserAmendment::default() {
         // TODO: fix unwrap
-        return Ok(describe(db, user_id).await?.unwrap());
+        let maybe_user = describe(db, user_id).await?;
+        match maybe_user {
+            Some(user) => return Ok(user),
+            None => return Err((StatusCode::NOT_FOUND, "User not found".into())),
+        }
     }
     let record = sqlx::query!(
             // language=SQL
@@ -203,15 +185,6 @@ pub async fn destroy(
 mod tests {
     use super::*;
 
-    #[tokio::test]
-    async fn password_hashing_works() -> Result<(), (StatusCode, String)> {
-        let hash = hash_password("p4ssw0rd".into()).await?;
-        assert!(hash.contains("argon2id")); // hash string contains the algorithm name
-        assert!(verify_password(hash.clone(), "p4ssw0rd".into()).await.is_ok());
-        assert!(verify_password(hash.clone(), "p4ssw0rdd".into()).await.is_err());
-        Ok(())
-    }
-
     #[sqlx::test]
     async fn everything_works(pool: sqlx::PgPool) -> Result<(), (StatusCode, String)> {
         // list works on empty
@@ -243,6 +216,7 @@ mod tests {
         assert!(create(&pool, UserDeclaration::new("JohnDoe", "doe@example.com", "pw")).await.is_ok());
 
         // describe
+        assert!(describe(&pool, Uuid::new_v4()).await?.is_none());
         let re_bob = describe(&pool, bob.user_id).await?.unwrap();
         assert_eq!(bob, re_bob);
 

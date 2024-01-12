@@ -12,11 +12,12 @@ use crate::config::Config;
 use crate::state::AppState;
 
 pub mod config;
-mod error;
-mod user;
-mod state;
 mod api;
-mod auth;
+mod crypto;
+mod error;
+mod me;
+mod state;
+mod user;
 
 pub async fn get_app<S>(config: &Config) -> Router<S> {
 

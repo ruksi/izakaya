@@ -26,11 +26,11 @@ async fn create(
     State(state): State<AppState>,
     Json(body): Json<CreateUserBody>,
 ) -> Result<Json<user::model::User>, (axum::http::StatusCode, String)> {
-    let declaration = user::model::UserDeclaration {
-        username: body.username,
-        email: body.email,
-        password: body.password,
-    };
+    let declaration = user::model::UserDeclaration::new(
+        body.username,
+        body.email,
+        body.password,
+    );
     let user = user::model::create(&state.db_pool, declaration).await?;
     Ok(Json(user))
 }
