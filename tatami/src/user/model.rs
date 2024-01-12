@@ -1,34 +1,12 @@
 use axum::http::StatusCode;
-use sea_query::*;
-use sea_query_binder::*;
 use uuid::Uuid;
 
 use crate::error;
 
-// the user database table identifiers
-#[derive(sea_query::Iden)]
-enum User {
-    Table,
-    UserId,
-    Username,
-    // CreatedAt,
-    // UpdatedAt,
-    // PrimaryEmailId,
-    // PasswordHash,
-}
-
-// one representation of the user
 #[derive(sqlx::FromRow, serde::Serialize, serde::Deserialize, Debug, PartialEq, Eq)]
-pub struct UserModel {
+pub struct User {
     pub user_id: Uuid,
     pub username: String,
-}
-
-impl UserModel {
-    // the columns from the database that make up this representation of a user
-    pub fn columns() -> impl IntoIterator<Item=impl IntoColumnRef> {
-        [User::UserId, User::Username]
-    }
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -48,16 +26,16 @@ impl UserDeclaration {
 pub async fn create(
     db: &sqlx::PgPool,
     declaration: UserDeclaration,
-) -> Result<UserModel, (StatusCode, String)> {
+) -> Result<User, (StatusCode, String)> {
     let mut tx = db.begin().await.map_err(error::internal)?;
 
-    let (sql, values) = Query::insert()
-        .into_table(User::Table)
-        .columns([User::Username])
-        .values_panic(vec![declaration.username.into()])
-        .returning(Query::returning().columns(UserModel::columns()))
-        .build_sqlx(PostgresQueryBuilder);
-    let user: UserModel = sqlx::query_as_with(&sql, values)
+    let user_record = sqlx::query!(
+            // language=SQL
+            r#"insert into "user" (username)
+               values ($1)
+               returning user_id, username;"#,
+            declaration.username,
+        )
         .fetch_one(&mut *tx)
         .await
         .map_err(error::internal)?;
@@ -67,7 +45,7 @@ pub async fn create(
             r#"insert into user_email (user_id, address)
                values ($1, $2)
                returning email_id;"#,
-            user.user_id,
+            user_record.user_id,
             declaration.email,
         )
         .fetch_one(&mut *tx)
@@ -79,7 +57,7 @@ pub async fn create(
             r#"update "user"
                set primary_email_id = $2
                where user_id = $1"#,
-            user.user_id,
+            user_record.user_id,
             email_id,
         )
         .execute(&mut *tx)
@@ -87,7 +65,12 @@ pub async fn create(
         .map_err(error::internal)?;
 
     tx.commit().await.map_err(error::internal)?;
-    Ok(user)
+
+    let user_model = User {
+        user_id: user_record.user_id,
+        username: user_record.username,
+    };
+    Ok(user_model)
 }
 
 #[derive(Default, Debug, PartialEq, Eq)]
@@ -98,40 +81,45 @@ pub struct UserFilter {
 pub async fn list(
     db: &sqlx::PgPool,
     filter: UserFilter,
-) -> Result<Vec<UserModel>, (StatusCode, String)> {
-    let mut query = Query::select();
-    query
-        .columns(UserModel::columns())
-        .from(User::Table);
-
-    if let Some(username) = filter.username {
-        query.and_where(Expr::col(User::Username).eq(username));
+) -> Result<Vec<User>, (StatusCode, String)> {
+    let mut query = sqlx::QueryBuilder::new(
+        // language=SQL
+        r#"select user_id, username from "user""#,
+    );
+    if filter != UserFilter::default() {
+        query.push(" where");
+        let mut conditions = query.separated(" and");
+        if let Some(username) = filter.username {
+            conditions.push(" username = ").push_bind_unseparated(username);
+        }
     }
 
-    let (sql, values) = query.build_sqlx(PostgresQueryBuilder);
-    let users = sqlx::query_as_with(&sql, values)
+    let users: Vec<User> = query.build_query_as()
         .fetch_all(db)
         .await
         .map_err(error::internal)?;
-
     Ok(users)
 }
 
 pub async fn describe(
     db: &sqlx::PgPool,
     user_id: Uuid,
-) -> Result<Option<UserModel>, (StatusCode, String)> {
-    let (sql, values) = Query::select()
-        .columns(UserModel::columns())
-        .from(User::Table)
-        .and_where(Expr::col(User::UserId).eq(user_id))
-        .build_sqlx(PostgresQueryBuilder);
-    let result = sqlx::query_as_with(&sql, values)
+) -> Result<Option<User>, (StatusCode, String)> {
+    let result = sqlx::query!(
+            // language=SQL
+            r#"select user_id, username
+               from "user"
+               where user_id = $1;"#,
+            user_id,
+        )
         .fetch_optional(db)
         .await
         .map_err(error::internal)?;
     match result {
-        Some(user) => Ok(Some(user)),
+        Some(record) => Ok(Some(User {
+            user_id: record.user_id,
+            username: record.username,
+        })),
         None => Ok(None),
     }
 }
@@ -145,39 +133,40 @@ pub async fn amend(
     db: &sqlx::PgPool,
     user_id: Uuid,
     amendment: UserAmendment,
-) -> Result<UserModel, (StatusCode, String)> {
+) -> Result<User, (StatusCode, String)> {
     if amendment == UserAmendment::default() {
         // TODO: fix unwrap
         return Ok(describe(db, user_id).await?.unwrap());
     }
-
-    let mut query = Query::update();
-    query
-        .table(User::Table)
-        .and_where(Expr::col(User::UserId).eq(user_id))
-        .returning(Query::returning().columns(UserModel::columns()));
-
-    if let Some(username) = amendment.username {
-        query.value(User::Username, username);
-    }
-
-    let (sql, values) = query.build_sqlx(PostgresQueryBuilder);
-    let user = sqlx::query_as_with(&sql, values)
+    let record = sqlx::query!(
+            // language=SQL
+            r#"update "user" u
+                set
+                    username = coalesce($2, u.username)
+                where user_id = $1
+                returning user_id, username;"#,
+            user_id,
+            amendment.username,
+        )
         .fetch_one(db)
         .await
         .map_err(error::internal)?;
-    Ok(user)
+    Ok(User {
+        user_id: record.user_id,
+        username: record.username,
+    })
 }
 
 pub async fn destroy(
     db: &sqlx::PgPool,
     user_id: Uuid,
 ) -> Result<(), (StatusCode, String)> {
-    let (sql, values) = Query::delete()
-        .from_table(User::Table)
-        .and_where(Expr::col(User::UserId).eq(user_id))
-        .build_sqlx(PostgresQueryBuilder);
-    sqlx::query_with(&sql, values)
+    sqlx::query!(
+            // language=SQL
+            r#"delete from "user"
+               where user_id = $1;"#,
+            user_id,
+        )
         .execute(db)
         .await
         .map_err(error::internal)?;
