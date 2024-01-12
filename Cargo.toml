@@ -33,6 +33,11 @@ serde_json = { version = "1.0.108" }
 # https://lib.rs/crates/uuid
 uuid = { version = "1.6.1", features = ["serde", "v4"] }
 
+# https://lib.rs/crates/argon2
+# https://lib.rs/crates/rand
+argon2 = { version = "0.5.2" }
+rand = { version = "0.8.5" }
+
 # https://docs.rs/time/0.3.31/time/
 time = { version = "0.3.31", features = ["std", "formatting", "parsing", "serde"] }
 
