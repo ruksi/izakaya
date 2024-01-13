@@ -6,7 +6,7 @@ use rand::Rng;
 use serde_json::{json, Value};
 
 use crate::{crypto, error};
-use crate::auth::{bearer_key, bearer_list_key, Visitor};
+use crate::auth::{access_token_key, access_token_list_key, Visitor};
 use crate::state::AppState;
 
 pub fn router<S>(state: AppState) -> Router<S> {
@@ -72,18 +72,18 @@ async fn login(
         .map_err(error::internal)?;
 
     deadpool_redis::redis::cmd("HSET")
-        .arg(&[bearer_key(token.clone()), "user_id".into(), record.user_id.into()])
+        .arg(&[access_token_key(token.clone()), "user_id".into(), record.user_id.into()])
         .query_async::<_, ()>(&mut cache_conn)
         .await
         .map_err(error::internal)?;
 
     deadpool_redis::redis::cmd("RPUSH")
-        .arg(&[bearer_list_key(record.user_id), token.clone()])
+        .arg(&[access_token_list_key(record.user_id), token.clone()])
         .query_async::<_, ()>(&mut cache_conn)
         .await
         .map_err(error::internal)?;
 
-    Ok(Json(json!({"bearer": token})))
+    Ok(Json(json!({"accessToken": token})))
 }
 
 async fn sessions(
@@ -100,7 +100,7 @@ async fn sessions(
         .map_err(error::internal)?;
 
     let tokens: Vec<String> = deadpool_redis::redis::cmd("LRANGE")
-        .arg(&[bearer_list_key(user_id), "0".into(), "-1".into()])
+        .arg(&[access_token_list_key(user_id), "0".into(), "-1".into()])
         .query_async(&mut cache_conn)
         .await
         .map_err(error::internal)?;
@@ -118,7 +118,7 @@ async fn logout(
     State(state): State<AppState>,
     Extension(visitor): Extension<Visitor>,
 ) -> Result<Json<()>, (StatusCode, String)> {
-    let Some(bearer) = visitor.bearer else {
+    let Some(access_token) = visitor.access_token else {
         return Ok(Json(()));
     };
     let Some(user_id) = visitor.user_id else {
@@ -132,13 +132,13 @@ async fn logout(
         .map_err(error::internal)?;
 
     deadpool_redis::redis::cmd("DEL")
-        .arg(&[bearer_key(bearer.clone())])
+        .arg(&[access_token_key(access_token.clone())])
         .query_async::<_, ()>(&mut cache_conn)
         .await
         .map_err(error::internal)?;
 
     deadpool_redis::redis::cmd("LREM")
-        .arg(&[bearer_list_key(user_id), "0".into(), bearer.clone()])
+        .arg(&[access_token_list_key(user_id), "0".into(), access_token.clone()])
         .query_async::<_, ()>(&mut cache_conn)
         .await
         .map_err(error::internal)?;
@@ -154,21 +154,15 @@ mod tests {
     use serde_json::json;
 
     use crate::auth::record_visit;
-    use crate::state::AppState;
+    use crate::test_utils::mock_state;
     use crate::user;
     use crate::user::model::UserDeclaration;
 
     use super::*;
 
-    async fn test_cache_pool() -> deadpool_redis::Pool {
-        deadpool_redis::Config::from_url("redis://localhost:6379/9")
-            .create_pool(Some(deadpool_redis::Runtime::Tokio1))
-            .expect("Failed to create cache pool for tests")
-    }
-
     #[sqlx::test]
     async fn login_works(pool: sqlx::PgPool) -> Result<(), (StatusCode, String)> {
-        let state = AppState { db_pool: pool, cache_pool: test_cache_pool().await };
+        let state = mock_state(pool).await;
         let db = &state.db_pool;
         user::model::create(db, UserDeclaration::new("bob", "bob@example.com", "bobIsBest")).await?;
 
@@ -198,7 +192,7 @@ mod tests {
             .await;
         response1.assert_status_ok();
         let json1 = response1.json::<Value>();
-        let token1 = json1.get("bearer").unwrap().as_str().unwrap();
+        let token1 = json1.get("accessToken").unwrap().as_str().unwrap();
         assert_eq!(token1.len(), 64);
 
         // works with email
@@ -208,7 +202,7 @@ mod tests {
             .await;
         response2.assert_status_ok();
         let json2 = response2.json::<Value>();
-        let token2 = json2.get("bearer").unwrap().as_str().unwrap();
+        let token2 = json2.get("accessToken").unwrap().as_str().unwrap();
         assert_eq!(token2.len(), 64);
 
         // double login is fine, you get two separate tokens

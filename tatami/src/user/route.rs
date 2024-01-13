@@ -83,20 +83,14 @@ mod tests {
     use axum_test::TestServer;
     use uuid::Uuid;
 
-    use crate::state::AppState;
+    use crate::test_utils::mock_state;
     use crate::user::model::UserDeclaration;
 
     use super::*;
 
-    async fn test_cache_pool() -> deadpool_redis::Pool {
-        deadpool_redis::Config::from_url("redis://localhost:6379/9")
-            .create_pool(Some(deadpool_redis::Runtime::Tokio1))
-            .expect("Failed to create cache pool for tests")
-    }
-
     #[sqlx::test]
     async fn create_works(pool: sqlx::PgPool) {
-        let state = AppState { db_pool: pool, cache_pool: test_cache_pool().await };
+        let state = mock_state(pool).await;
         let server = TestServer::new(router(state.clone())).unwrap();
         let response = server
             .post("/")
@@ -114,7 +108,7 @@ mod tests {
 
     #[sqlx::test]
     async fn list_works(pool: sqlx::PgPool) {
-        let state = AppState { db_pool: pool, cache_pool: test_cache_pool().await };
+        let state = mock_state(pool).await;
         let server = TestServer::new(router(state.clone())).unwrap();
 
         server.get("/").await.assert_json(&json!([]));
@@ -127,7 +121,7 @@ mod tests {
 
     #[sqlx::test]
     async fn describe_works(pool: sqlx::PgPool) {
-        let state = AppState { db_pool: pool, cache_pool: test_cache_pool().await };
+        let state = mock_state(pool).await;
         let server = TestServer::new(router(state.clone())).unwrap();
 
         let response = server.get(format!("/{}", Uuid::new_v4()).as_str()).await;
@@ -141,7 +135,7 @@ mod tests {
 
     #[sqlx::test]
     async fn amend_works(pool: sqlx::PgPool) {
-        let state = AppState { db_pool: pool, cache_pool: test_cache_pool().await };
+        let state = mock_state(pool).await;
         let server = TestServer::new(router(state.clone())).unwrap();
 
         let user = user::model::create(&state.db_pool, UserDeclaration::new("bob", "bob@example.com", "pw")).await.unwrap();
@@ -162,7 +156,7 @@ mod tests {
 
     #[sqlx::test]
     async fn destroy_works(pool: sqlx::PgPool) {
-        let state = AppState { db_pool: pool, cache_pool: test_cache_pool().await };
+        let state = mock_state(pool).await;
         let server = TestServer::new(router(state.clone())).unwrap();
 
         let user = user::model::create(&state.db_pool, UserDeclaration::new("bob", "bob@example.com", "pw")).await.unwrap();
