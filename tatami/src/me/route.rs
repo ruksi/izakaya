@@ -1,4 +1,4 @@
-use axum::{Json, Router};
+use axum::{Extension, Json, Router};
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::routing::post;
@@ -6,7 +6,7 @@ use rand::Rng;
 use serde_json::{json, Value};
 
 use crate::{crypto, error};
-use crate::auth::bearer_key;
+use crate::auth::{bearer_key, Visitor};
 use crate::state::AppState;
 
 pub fn router<S>(state: AppState) -> Router<S> {
@@ -79,18 +79,34 @@ async fn login(
 }
 
 async fn logout(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
+    Extension(visitor): Extension<Visitor>,
 ) -> Result<Json<()>, (StatusCode, String)> {
-    // TODO: if no bearer token, just return 200 OK
-    // TODO: delete the token from the cache
+    let Some(bearer) = visitor.bearer else {
+        return Ok(Json(()));
+    };
+
+    let mut cache_conn = state.cache_pool
+        .get()
+        .await
+        .map_err(error::internal)?;
+    deadpool_redis::redis::cmd("DEL")
+        .arg(&[bearer_key(bearer)])
+        .query_async::<_, ()>(&mut cache_conn)
+        .await
+        .map_err(error::internal)?;
+
     Ok(Json(()))
 }
 
 #[cfg(test)]
 mod tests {
+    use axum::http::header::AUTHORIZATION;
+    use axum::http::HeaderValue;
     use axum_test::TestServer;
     use serde_json::json;
 
+    use crate::auth::record_visit;
     use crate::state::AppState;
     use crate::user;
     use crate::user::model::UserDeclaration;
@@ -109,7 +125,10 @@ mod tests {
         let db = &state.db_pool;
         user::model::create(db, UserDeclaration::new("bob", "bob@example.com", "bobIsBest")).await?;
 
-        let server = TestServer::new(router(state.clone())).unwrap();
+        let server = TestServer::new(
+            router(state.clone())
+                .layer(axum::middleware::from_fn_with_state(state.clone(), record_visit))
+        ).unwrap();
 
         // wrong password
         server
@@ -145,15 +164,55 @@ mod tests {
         let token2 = json2.get("bearer").unwrap().as_str().unwrap();
         assert_eq!(token2.len(), 64);
 
-        // double login is fine, you get two tokens
+        // double login is fine, you get two separate tokens
         assert_ne!(token1, token2);
 
-        let mut cache_conn = state.cache_pool.get().await.unwrap();
-        deadpool_redis::redis::cmd("DEL")
-            .arg(&[bearer_key(token1), bearer_key(token2)])
-            .query_async::<_, ()>(&mut cache_conn)
+        // logout with token is fine as ever
+        server
+            .post("/logout")
             .await
-            .unwrap();
+            .assert_status_ok();
+
+        // logout with an unknown token is fine too
+        server
+            .post("/logout")
+            .add_header(
+                AUTHORIZATION,
+                HeaderValue::from_static("Bearer unknown"),
+            )
+            .await
+            .assert_status_ok();
+
+        // logout with a valid token is the same
+        // ... maybe should test that it got deleted
+        server
+            .post("/logout")
+            .add_header(
+                AUTHORIZATION,
+                HeaderValue::from_str(format!("Bearer {}", token1).as_str()).unwrap(),
+            )
+            .await
+            .assert_status_ok();
+
+        // again is fine and responds the same
+        server
+            .post("/logout")
+            .add_header(
+                AUTHORIZATION,
+                HeaderValue::from_str(format!("Bearer {}", token1).as_str()).unwrap(),
+            )
+            .await
+            .assert_status_ok();
+
+        // and again, just as fine
+        server
+            .post("/logout")
+            .add_header(
+                AUTHORIZATION,
+                HeaderValue::from_str(format!("Bearer {}", token2).as_str()).unwrap(),
+            )
+            .await
+            .assert_status_ok();
 
         Ok(())
     }
