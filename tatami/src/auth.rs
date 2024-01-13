@@ -10,13 +10,14 @@ use uuid::Uuid;
 
 use crate::state::AppState;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Visitor {
-    user_id: Option<Uuid>,
+    pub user_id: Option<Uuid>,
+    pub bearer: Option<String>,
 }
 
 impl Visitor {
-    fn is_anonymous(&self) -> bool {
+    pub fn is_anonymous(&self) -> bool {
         self.user_id.is_none()
     }
 }
@@ -31,7 +32,7 @@ pub async fn record_visit(
         .and_then(|header| header.to_str().ok())
         .and_then(|header| header.strip_prefix("Bearer "));
 
-    let mut visitor = Visitor { user_id: None };
+    let mut visitor = Visitor { user_id: None, bearer: None };
 
     if let Some(bearer_token) = bearer_token {
         if let Ok(mut conn) = state.cache_pool.get().await {
@@ -44,6 +45,7 @@ pub async fn record_visit(
                 // TODO: log an error if fails to parse?
                 if let Ok(user_id) = Uuid::parse_str(user_id) {
                     visitor.user_id = Some(user_id);
+                    visitor.bearer = Some(bearer_token.to_string());
                 }
             };
         }
