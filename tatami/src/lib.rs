@@ -64,7 +64,9 @@ fn root_router<S>(state: AppState) -> Router<S> {
     let app = app.route("/healthz", get(healthz));
 
     let app = app.nest("/api", api::router(state.clone()));
+    let app = app.layer(axum::middleware::from_fn_with_state(state.clone(), auth::record_visit));
     let app = app.with_state(state);
+
     app
 }
 

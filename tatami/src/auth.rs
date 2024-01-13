@@ -11,7 +11,7 @@ use uuid::Uuid;
 use crate::state::AppState;
 
 #[derive(Debug, Clone)]
-struct Visitor {
+pub struct Visitor {
     user_id: Option<Uuid>,
 }
 
@@ -21,7 +21,7 @@ impl Visitor {
     }
 }
 
-async fn record_visit(
+pub async fn record_visit(
     State(state): State<AppState>,
     mut request: Request,
     next: Next,
@@ -57,7 +57,7 @@ pub fn bearer_key<T: Into<String>>(token: T) -> String {
     format!("tatami:bearer:{}", token.into())
 }
 
-async fn require_login(
+pub async fn require_login(
     Extension(visitor): Extension<Visitor>,
     request: Request,
     next: Next,
