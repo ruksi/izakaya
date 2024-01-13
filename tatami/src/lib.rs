@@ -13,6 +13,7 @@ use crate::state::AppState;
 
 pub mod config;
 mod api;
+mod auth;
 mod crypto;
 mod error;
 mod me;
@@ -84,12 +85,12 @@ async fn healthz(
         .await
         .map_err(error::internal)?;
     deadpool_redis::redis::cmd("SET")
-        .arg(&["deadpool/test_key", "CACHE OK"])
+        .arg(&["deadpool:test_key", "CACHE OK"])
         .query_async::<_, ()>(&mut cache_conn)
         .await
         .map_err(error::internal)?;
     let from_cache: String = deadpool_redis::redis::cmd("GET")
-        .arg(&["deadpool/test_key"])
+        .arg(&["deadpool:test_key"])
         .query_async(&mut cache_conn)
         .await
         .map_err(error::internal)?;
