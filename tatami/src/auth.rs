@@ -59,6 +59,10 @@ pub fn bearer_key<T: Into<String>>(token: T) -> String {
     format!("tatami:bearer:{}", token.into())
 }
 
+pub fn bearer_list_key(user_id: Uuid) -> String {
+    format!("tatami:bearers:{}", user_id.to_string())
+}
+
 pub async fn require_login(
     Extension(visitor): Extension<Visitor>,
     request: Request,

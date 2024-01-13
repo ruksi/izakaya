@@ -1,18 +1,19 @@
 use axum::{Extension, Json, Router};
 use axum::extract::State;
 use axum::http::StatusCode;
-use axum::routing::post;
+use axum::routing::{get, post};
 use rand::Rng;
 use serde_json::{json, Value};
 
 use crate::{crypto, error};
-use crate::auth::{bearer_key, Visitor};
+use crate::auth::{bearer_key, bearer_list_key, Visitor};
 use crate::state::AppState;
 
 pub fn router<S>(state: AppState) -> Router<S> {
     Router::new()
         // .route("/sign-up", post(signUp))
         .route("/login", post(login))
+        .route("/sessions", get(sessions))
         .route("/logout", post(logout))
         // .route("/me", post(me))
         .with_state(state)
@@ -69,13 +70,48 @@ async fn login(
         .get()
         .await
         .map_err(error::internal)?;
+
     deadpool_redis::redis::cmd("HSET")
         .arg(&[bearer_key(token.clone()), "user_id".into(), record.user_id.into()])
         .query_async::<_, ()>(&mut cache_conn)
         .await
         .map_err(error::internal)?;
 
+    deadpool_redis::redis::cmd("RPUSH")
+        .arg(&[bearer_list_key(record.user_id), token.clone()])
+        .query_async::<_, ()>(&mut cache_conn)
+        .await
+        .map_err(error::internal)?;
+
     Ok(Json(json!({"bearer": token})))
+}
+
+async fn sessions(
+    State(state): State<AppState>,
+    Extension(visitor): Extension<Visitor>,
+) -> Result<Json<Value>, (StatusCode, String)> {
+    let Some(user_id) = visitor.user_id else {
+        return Err((StatusCode::UNAUTHORIZED, "You are not logged in.".into()));
+    };
+
+    let mut cache_conn = state.cache_pool
+        .get()
+        .await
+        .map_err(error::internal)?;
+
+    let tokens: Vec<String> = deadpool_redis::redis::cmd("LRANGE")
+        .arg(&[bearer_list_key(user_id), "0".into(), "-1".into()])
+        .query_async(&mut cache_conn)
+        .await
+        .map_err(error::internal)?;
+
+    // we don't want to expose the full tokens
+    let tokens: Vec<String> = tokens
+        .into_iter()
+        .map(|token| token[..8].to_string())
+        .collect();
+
+    Ok(Json(json!({"sessions": tokens})))
 }
 
 async fn logout(
@@ -85,13 +121,24 @@ async fn logout(
     let Some(bearer) = visitor.bearer else {
         return Ok(Json(()));
     };
+    let Some(user_id) = visitor.user_id else {
+        return Ok(Json(()));
+    };
+
 
     let mut cache_conn = state.cache_pool
         .get()
         .await
         .map_err(error::internal)?;
+
     deadpool_redis::redis::cmd("DEL")
-        .arg(&[bearer_key(bearer)])
+        .arg(&[bearer_key(bearer.clone())])
+        .query_async::<_, ()>(&mut cache_conn)
+        .await
+        .map_err(error::internal)?;
+
+    deadpool_redis::redis::cmd("LREM")
+        .arg(&[bearer_list_key(user_id), "0".into(), bearer.clone()])
         .query_async::<_, ()>(&mut cache_conn)
         .await
         .map_err(error::internal)?;
@@ -183,8 +230,20 @@ mod tests {
             .await
             .assert_status_ok();
 
+        // shows both sessions
+        let sessions_json = server
+            .get("/sessions")
+            .add_header(
+                AUTHORIZATION,
+                HeaderValue::from_str(format!("Bearer {}", token2).as_str()).unwrap(),
+            )
+            .await
+            .json::<Value>();
+        let sessions = sessions_json.get("sessions").unwrap().as_array().unwrap();
+        assert_eq!(sessions.len(), 2);
+        assert!(sessions.iter().all(|session| session.as_str().unwrap().len() == 8));
+
         // logout with a valid token is the same
-        // ... maybe should test that it got deleted
         server
             .post("/logout")
             .add_header(
@@ -193,6 +252,18 @@ mod tests {
             )
             .await
             .assert_status_ok();
+
+        // the session is gone
+        let sessions_json = server
+            .get("/sessions")
+            .add_header(
+                AUTHORIZATION,
+                HeaderValue::from_str(format!("Bearer {}", token2).as_str()).unwrap(),
+            )
+            .await
+            .json::<Value>();
+        let sessions = sessions_json.get("sessions").unwrap().as_array().unwrap();
+        assert_eq!(sessions.len(), 1);
 
         // again is fine and responds the same
         server
