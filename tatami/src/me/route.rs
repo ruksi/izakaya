@@ -2,8 +2,11 @@ use axum::{Json, Router};
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::routing::post;
+use rand::Rng;
+use serde_json::{json, Value};
 
 use crate::{crypto, error};
+use crate::auth::bearer_key;
 use crate::state::AppState;
 
 pub fn router<S>(state: AppState) -> Router<S> {
@@ -24,7 +27,7 @@ struct LoginBody {
 async fn login(
     State(state): State<AppState>,
     Json(body): Json<LoginBody>,
-) -> Result<Json<()>, (axum::http::StatusCode, String)> {
+) -> Result<Json<Value>, (StatusCode, String)> {
     let result = sqlx::query!(
             // language=SQL
             r#"select user_id, password_hash
@@ -52,19 +55,34 @@ async fn login(
         return Err((StatusCode::UNAUTHORIZED, "Incorrect username or password.".into()));
     }
 
-    // TODO: create session and session token
-    // TODO: store session and session token in Redis
-    // TODO: return session token cookie
+    // UUIDs have 16 bytes of randomness, and that is considered enough
+    // for session identifiers if the random generator is secure enough.
+    // Let's generate 64 bytes of randomness, just to be sure as I'm
+    // not 100% sure what is used to generate the numbers on the server. 🤷
+    let token: String = rand::thread_rng()
+        .sample_iter(&rand::distributions::Alphanumeric)
+        .take(64)
+        .map(char::from)
+        .collect();
 
-    Ok(Json(()))
+    let mut cache_conn = state.cache_pool
+        .get()
+        .await
+        .map_err(error::internal)?;
+    deadpool_redis::redis::cmd("HSET")
+        .arg(&[bearer_key(token.clone()), "user_id".into(), record.user_id.into()])
+        .query_async::<_, ()>(&mut cache_conn)
+        .await
+        .map_err(error::internal)?;
+
+    Ok(Json(json!({"bearer": token})))
 }
 
 async fn logout(
     State(_state): State<AppState>,
-    // Json(body): Json<crate::user::route::CreateUserBody>,
-) -> Result<Json<()>, (axum::http::StatusCode, String)> {
-    // TODO: if no session token in cookie, return
-    // TODO: delete session from Redis
+) -> Result<Json<()>, (StatusCode, String)> {
+    // TODO: if no bearer token, just return 200 OK
+    // TODO: delete the token from the cache
     Ok(Json(()))
 }
 
@@ -108,20 +126,35 @@ mod tests {
             .assert_status_unauthorized();
 
         // works with username
-        server
+        let response1 = server
             .post("/login")
             .json(&json!({"username_or_email": "bob", "password": "bobIsBest"}))
-            .await
-            .assert_status_ok();
+            .await;
+        response1.assert_status_ok();
+        let json1 = response1.json::<Value>();
+        let token1 = json1.get("bearer").unwrap().as_str().unwrap();
+        assert_eq!(token1.len(), 64);
 
         // works with email
-        server
+        let response2 = server
             .post("/login")
             .json(&json!({"username_or_email": "bob@example.com", "password": "bobIsBest"}))
-            .await
-            .assert_status_ok();
+            .await;
+        response2.assert_status_ok();
+        let json2 = response2.json::<Value>();
+        let token2 = json2.get("bearer").unwrap().as_str().unwrap();
+        assert_eq!(token2.len(), 64);
 
-        // TODO: check that there is some session cookie
+        // double login is fine, you get two tokens
+        assert_ne!(token1, token2);
+
+        let mut cache_conn = state.cache_pool.get().await.unwrap();
+        deadpool_redis::redis::cmd("DEL")
+            .arg(&[bearer_key(token1), bearer_key(token2)])
+            .query_async::<_, ()>(&mut cache_conn)
+            .await
+            .unwrap();
+
         Ok(())
     }
 }
