@@ -1,4 +1,4 @@
-use axum::http::{HeaderValue, Method};
+use axum::http::{header, HeaderValue, Method};
 use tokio::net::TcpListener;
 use tower_http::cors::CorsLayer;
 use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
@@ -28,6 +28,9 @@ async fn main() {
     if !origins.is_empty() {
         app = app.layer(
             CorsLayer::new()
+                .allow_headers([
+                    header::AUTHORIZATION,
+                ])
                 .allow_methods([
                     Method::GET,
                     Method::POST,
@@ -37,7 +40,6 @@ async fn main() {
                     Method::HEAD,
                     Method::OPTIONS,
                 ])
-                .allow_credentials(true)
                 .allow_origin(origins)
         );
     }
