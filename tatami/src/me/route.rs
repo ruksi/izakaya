@@ -153,7 +153,6 @@ mod tests {
     use axum_test::TestServer;
     use serde_json::json;
 
-    use crate::auth::record_visit;
     use crate::test_utils::mock_state;
     use crate::user;
     use crate::user::model::UserDeclaration;
@@ -168,7 +167,7 @@ mod tests {
 
         let server = TestServer::new(
             router(state.clone())
-                .layer(axum::middleware::from_fn_with_state(state.clone(), record_visit))
+                .layer(axum::middleware::from_fn_with_state(state.clone(), crate::auth::record_visit))
         ).unwrap();
 
         // wrong password
