@@ -154,7 +154,7 @@ mod tests {
     use serde_json::json;
 
     use crate::test_utils::mock_state;
-    use crate::user;
+    use crate::user::model;
     use crate::user::model::UserDeclaration;
 
     use super::*;
@@ -163,7 +163,7 @@ mod tests {
     async fn login_works(pool: sqlx::PgPool) -> Result<(), (StatusCode, String)> {
         let state = mock_state(pool).await;
         let db = &state.db_pool;
-        user::model::create(db, UserDeclaration::new("bob", "bob@example.com", "bobIsBest")).await?;
+        model::create(db, UserDeclaration::new("bob", "bob@example.com", "bobIsBest")).await?;
 
         let server = TestServer::new(
             router(state.clone())
