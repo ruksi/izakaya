@@ -10,8 +10,10 @@ members = [
 
 # https://lib.rs/crates/axum
 # https://lib.rs/crates/axum-test
+# https://lib.rs/crates/axum-extra
 axum = { version = "0.7.3" }
 axum-test = { version = "14.2.2" }
+axum-extra = { version = "0.9.1", features = ["cookie", "cookie-private"] }
 
 # https://lib.rs/crates/sqlx
 # https://lib.rs/crates/sea-query
@@ -30,16 +32,19 @@ deadpool-redis = { version = "0.14.0", features = ["rt_tokio_1", "serde"] }
 serde = { version = "1.0.193", features = ["derive"] }
 serde_json = { version = "1.0.108" }
 
+# https://docs.rs/time/0.3.31/time/
+# https://lib.rs/crates/url
 # https://lib.rs/crates/uuid
+time = { version = "0.3.31", features = ["std", "formatting", "parsing", "serde"] }
+url = { version = "2.5.0", features = ["serde"] }
 uuid = { version = "1.6.1", features = ["serde", "v4"] }
 
 # https://lib.rs/crates/argon2
 # https://lib.rs/crates/rand
+# https://lib.rs/crates/rand_seeder
 argon2 = { version = "0.5.2" }
 rand = { version = "0.8.5" }
-
-# https://docs.rs/time/0.3.31/time/
-time = { version = "0.3.31", features = ["std", "formatting", "parsing", "serde"] }
+rand_seeder = { version = "0.2.3" }
 
 # https://lib.rs/crates/tracing
 # https://lib.rs/crates/tracing-subscriber

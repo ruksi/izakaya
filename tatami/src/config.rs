@@ -1,8 +1,9 @@
 pub struct Config {
     pub port: String,
     pub rust_log: String,
-    pub database_url: String,
-    pub cache_url: String,
+    pub database_url: String, // aka. PostgreSQL
+    pub cache_url: String,    // aka. Redis
+    pub secret_key: String, // a generic seed (64+ character string) used for hashes, salts, and the like
     pub frontend_url: Option<String>,
 }
 
@@ -16,6 +17,8 @@ impl Config {
 
         let cache_url = std::env::var("CACHE_URL").expect("CACHE_URL must be set");
 
+        let secret_key = std::env::var("SECRET_KEY").expect("SECRET_KEY must be set");
+
         let frontend_url = std::env::var("FRONTEND_URL")
             .ok()
             .map(|url| url.trim_end_matches('/').to_string());
@@ -25,6 +28,7 @@ impl Config {
             rust_log,
             database_url,
             cache_url,
+            secret_key,
             frontend_url,
         }
     }

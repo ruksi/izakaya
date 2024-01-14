@@ -6,14 +6,18 @@ publish = false
 
 [dependencies]
 axum = { workspace = true }
+axum-extra = { workspace = true }
 sqlx = { workspace = true }
 redis = { workspace = true }
 deadpool-redis = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+time = { workspace = true }
+url = { workspace = true }
 uuid = { workspace = true }
 argon2 = { workspace = true }
 rand = { workspace = true }
+rand_seeder = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 dotenvy = { workspace = true }

@@ -1,3 +1,4 @@
+pub mod cookie;
 pub mod route;
 
 #[cfg(test)]

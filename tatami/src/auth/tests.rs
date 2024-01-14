@@ -12,7 +12,7 @@ use crate::test_utils::mock_state;
 async fn mock_endpoint(
     Extension(visitor): Extension<Visitor>,
 ) -> Result<Json<Value>, (StatusCode, String)> {
-    Ok(Json(json!({"is_anonymous": visitor.is_anonymous()})))
+    Ok(Json(json!({"isAnonymous": visitor.is_anonymous()})))
 }
 
 #[sqlx::test]
@@ -39,7 +39,7 @@ async fn authentication_flow_works(pool: sqlx::PgPool) {
     server
         .get("/public")
         .await
-        .assert_json(&json!({"is_anonymous": true}));
+        .assert_json(&json!({"isAnonymous": true}));
     server
         .get("/public")
         .add_header(
@@ -47,7 +47,7 @@ async fn authentication_flow_works(pool: sqlx::PgPool) {
             HeaderValue::from_static("Bearer test"),
         )
         .await
-        .assert_json(&json!({"is_anonymous": true}));
+        .assert_json(&json!({"isAnonymous": true}));
 
     server.get("/private").await.assert_status_unauthorized();
     server
@@ -82,7 +82,7 @@ async fn authentication_flow_works(pool: sqlx::PgPool) {
             HeaderValue::from_static("Bearer test"),
         )
         .await
-        .assert_json(&json!({"is_anonymous": false}));
+        .assert_json(&json!({"isAnonymous": false}));
 
     deadpool_redis::redis::cmd("DEL")
         .arg(&[access_token_key("test")])

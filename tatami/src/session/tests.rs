@@ -9,14 +9,11 @@ use crate::user::model;
 use crate::user::model::UserDeclaration;
 
 #[sqlx::test]
-async fn bearer_authentication_works(pool: sqlx::PgPool) -> Result<(), (StatusCode, String)> {
+async fn bearer_authentication_flow(pool: sqlx::PgPool) -> Result<(), (StatusCode, String)> {
     let state = mock_state(pool).await;
     let db = &state.db_pool;
-    model::create(
-        db,
-        UserDeclaration::new("bob", "bob@example.com", "bobIsBest"),
-    )
-    .await?;
+    let declaration = UserDeclaration::new("bob", "bob@example.com", "bobIsBest");
+    model::create(db, declaration).await?;
 
     let server = TestServer::new(router(state.clone()).layer(
         axum::middleware::from_fn_with_state(state.clone(), crate::auth::record_visit),
@@ -57,7 +54,7 @@ async fn bearer_authentication_works(pool: sqlx::PgPool) -> Result<(), (StatusCo
     let token2 = json2.get("accessToken").unwrap().as_str().unwrap();
     assert_eq!(token2.len(), 64);
 
-    // double login is fine, you get two separate tokens
+    // double log-in is fine, you get two separate tokens
     assert_ne!(token1, token2);
 
     // logout with token is fine as ever

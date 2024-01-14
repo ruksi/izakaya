@@ -1,10 +1,12 @@
 import {configureStore} from "@reduxjs/toolkit"
 import {setupListeners} from "@reduxjs/toolkit/query";
+import authSlice from "./auth/slice.ts";
 import counterSlice from "./Counter/slice.ts";
 import tatamiApi from "./services/tatami.ts";
 
 export const store = configureStore({
     reducer: {
+        auth: authSlice.reducer,
         counter: counterSlice.reducer,
         [tatamiApi.reducerPath]: tatamiApi.reducer,
     },

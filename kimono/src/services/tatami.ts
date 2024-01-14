@@ -1,24 +1,37 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react"
+import {tatamiUrl} from "../utils.ts";
 
-
-const createBaseQuery = () => {
-    let url = import.meta.env.VITE_TATAMI_URL ?? "";
-    url = url.trim();
-    if (url.endsWith("/")) {
-        url = url.slice(0, -1);
-    }
-    if (url === "") {
-        throw new Error("VITE_TATAMI_URL is not set");
-    }
-    const baseUrl = `${url}/api/`;
-    return fetchBaseQuery({baseUrl});
+function createBaseQuery() {
+    const baseUrl = tatamiUrl();
+    return fetchBaseQuery({
+        baseUrl,
+        credentials: "include",
+    });
 }
 
 const tatamiApi = createApi({
     baseQuery: createBaseQuery(),
     endpoints: (build) => ({
-        getUsers: build.query({query: () => "/users"}),
-        getUser: build.query({query: userId => `/users/${userId}`}),
+
+        // auth...
+        signUp: build.query({
+            query: (params: { username: string, email: string, password: string }) => ({
+                url: "/sessions/sign-up",
+                method: "POST",
+                body: params,
+            }),
+        }),
+        logIn: build.query({
+            query: (params: { username_or_email: string, password: string }) => ({
+                url: "/sessions/log-in",
+                method: "POST",
+                body: params,
+            }),
+        }),
+
+        // api...
+        getUsers: build.query({query: () => "/api/users"}),
+        getUser: build.query({query: userId => `/api/users/${userId}`}),
     }),
 });
 

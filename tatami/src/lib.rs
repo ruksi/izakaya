@@ -2,13 +2,14 @@ use std::time::Duration;
 
 use axum::extract::State;
 use axum::http::StatusCode;
-use axum::response::{Html, Redirect};
+use axum::response::Redirect;
 use axum::routing::get;
 use axum::Router;
 use tokio::time::sleep;
 use tower_http::services::ServeDir;
 
 use crate::config::Config;
+use crate::session::cookie::cookie_secret_from_seed;
 use crate::state::AppState;
 
 mod api;
@@ -50,9 +51,12 @@ pub async fn get_app<S>(config: &Config) -> Router<S> {
         .create_pool(Some(deadpool_redis::Runtime::Tokio1))
         .expect("Can't create cache pool");
 
+    let cookie_secret = cookie_secret_from_seed(config.secret_key.clone());
+
     let state = AppState {
         db_pool,
         cache_pool,
+        cookie_secret,
     };
     root_router(state)
 }
@@ -81,8 +85,8 @@ fn root_router<S>(state: AppState) -> Router<S> {
     app.with_state(state)
 }
 
-async fn index() -> Html<&'static str> {
-    Html("<h1>Hello, World!</h1>")
+async fn index() -> &'static str {
+    "Hello, World!"
 }
 
 async fn healthz(State(state): State<AppState>) -> Result<String, (StatusCode, String)> {

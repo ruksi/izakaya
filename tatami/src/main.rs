@@ -26,7 +26,11 @@ async fn main() {
     if !origins.is_empty() {
         app = app.layer(
             CorsLayer::new()
-                .allow_headers([header::AUTHORIZATION])
+                .allow_headers([
+                    header::CONTENT_TYPE,
+                    header::CONTENT_LENGTH,
+                    header::CONTENT_LANGUAGE,
+                ])
                 .allow_methods([
                     Method::GET,
                     Method::POST,
@@ -36,6 +40,7 @@ async fn main() {
                     Method::HEAD,
                     Method::OPTIONS,
                 ])
+                .allow_credentials(true) // allow frontend to send us cookies
                 .allow_origin(origins),
         );
     }
