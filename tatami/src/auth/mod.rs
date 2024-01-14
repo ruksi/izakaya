@@ -3,10 +3,10 @@ pub use record_visit::record_visit;
 pub use require_login::require_login;
 pub use visitor::Visitor;
 
-mod visitor;
 mod cache_keys;
 mod record_visit;
 mod require_login;
+mod visitor;
 
 #[cfg(test)]
 mod tests;

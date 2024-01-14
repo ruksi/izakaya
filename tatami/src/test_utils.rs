@@ -11,5 +11,8 @@ pub async fn mock_cache_pool() -> deadpool_redis::Pool {
 
 pub async fn mock_state(db_pool: sqlx::PgPool) -> AppState {
     let cache_pool = mock_cache_pool().await;
-    AppState { db_pool, cache_pool }
+    AppState {
+        db_pool,
+        cache_pool,
+    }
 }

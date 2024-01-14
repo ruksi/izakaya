@@ -30,7 +30,12 @@ mod tests {
 
         server.get("/").await.assert_json(&json!([]));
 
-        model::create(&state.db_pool, UserDeclaration::new("bob", "bob@example.com", "pw")).await.unwrap();
+        model::create(
+            &state.db_pool,
+            UserDeclaration::new("bob", "bob@example.com", "pw"),
+        )
+        .await
+        .unwrap();
         let users = server.get("/").await.json::<Vec<model::User>>();
         assert_eq!(users.len(), 1);
         assert_eq!(users[0].username, "bob");

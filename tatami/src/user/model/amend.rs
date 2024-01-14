@@ -1,5 +1,6 @@
-use uuid::Uuid;
 use axum::http::StatusCode;
+use uuid::Uuid;
+
 use crate::error;
 use crate::user::model;
 use crate::user::model::User;
@@ -23,18 +24,18 @@ pub async fn amend(
         };
     }
     let record = sqlx::query!(
-            // language=SQL
-            r#"update "user" u
+        // language=SQL
+        r#"update "user" u
                 set
                     username = coalesce($1, u.username)
                 where user_id = $2
                 returning user_id, username;"#,
-            amendment.username,
-            user_id,
-        )
-        .fetch_one(db)
-        .await
-        .map_err(error::internal)?;
+        amendment.username,
+        user_id,
+    )
+    .fetch_one(db)
+    .await
+    .map_err(error::internal)?;
     Ok(User {
         user_id: record.user_id,
         username: record.username,

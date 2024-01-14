@@ -8,9 +8,9 @@ pub use list::*;
 
 mod amend;
 mod create;
-mod list;
 mod describe;
 mod destroy;
+mod list;
 
 #[cfg(test)]
 mod tests;

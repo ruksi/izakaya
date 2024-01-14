@@ -1,9 +1,11 @@
+use std::collections::HashMap;
+
 use axum::extract::{Request, State};
+use axum::http::header::AUTHORIZATION;
 use axum::middleware::Next;
 use axum::response::Response;
-use axum::http::header::AUTHORIZATION;
-use std::collections::HashMap;
 use uuid::Uuid;
+
 use crate::auth;
 use crate::auth::Visitor;
 use crate::state::AppState;
@@ -13,12 +15,16 @@ pub async fn record_visit(
     mut request: Request,
     next: Next,
 ) -> Response {
-    let bearer = request.headers()
+    let bearer = request
+        .headers()
         .get(AUTHORIZATION)
         .and_then(|header| header.to_str().ok())
         .and_then(|header| header.strip_prefix("Bearer "));
 
-    let mut visitor = Visitor { user_id: None, access_token: None };
+    let mut visitor = Visitor {
+        user_id: None,
+        access_token: None,
+    };
 
     if let Some(bearer) = bearer {
         if let Ok(mut conn) = state.cache_pool.get().await {

@@ -1,13 +1,13 @@
-use axum::{Extension, Json, Router};
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::routing::{get, post};
+use axum::{Extension, Json, Router};
 use rand::Rng;
 use serde_json::{json, Value};
 
-use crate::{crypto, error};
 use crate::auth::{access_token_key, access_token_list_key, Visitor};
 use crate::state::AppState;
+use crate::{crypto, error};
 
 pub fn router<S>(state: AppState) -> Router<S> {
     Router::new()
@@ -30,30 +30,39 @@ async fn login(
     Json(body): Json<LoginBody>,
 ) -> Result<Json<Value>, (StatusCode, String)> {
     let result = sqlx::query!(
-            // language=SQL
-            r#"select user_id, password_hash
+        // language=SQL
+        r#"select user_id, password_hash
                from "user"
                left join user_email using (user_id)
                where username = $1
                or address = $1;"#,
-            body.username_or_email,
-        )
-        .fetch_optional(&state.db_pool)
-        .await
-        .map_err(error::internal)?;
+        body.username_or_email,
+    )
+    .fetch_optional(&state.db_pool)
+    .await
+    .map_err(error::internal)?;
 
     let Some(record) = result else {
-        return Err((StatusCode::UNAUTHORIZED, "Incorrect username or password.".into()));
+        return Err((
+            StatusCode::UNAUTHORIZED,
+            "Incorrect username or password.".into(),
+        ));
     };
 
     let Some(password_hash) = record.password_hash else {
-        return Err((StatusCode::UNAUTHORIZED, "Incorrect username or password.".into()));
+        return Err((
+            StatusCode::UNAUTHORIZED,
+            "Incorrect username or password.".into(),
+        ));
     };
 
     let verification = crypto::verify_password(password_hash, body.password).await;
     if verification.is_err() {
         // probably "invalid password"
-        return Err((StatusCode::UNAUTHORIZED, "Incorrect username or password.".into()));
+        return Err((
+            StatusCode::UNAUTHORIZED,
+            "Incorrect username or password.".into(),
+        ));
     }
 
     // UUIDs have 16 bytes of randomness, and that is considered enough
@@ -66,13 +75,14 @@ async fn login(
         .map(char::from)
         .collect();
 
-    let mut cache_conn = state.cache_pool
-        .get()
-        .await
-        .map_err(error::internal)?;
+    let mut cache_conn = state.cache_pool.get().await.map_err(error::internal)?;
 
     deadpool_redis::redis::cmd("HSET")
-        .arg(&[access_token_key(token.clone()), "user_id".into(), record.user_id.into()])
+        .arg(&[
+            access_token_key(token.clone()),
+            "user_id".into(),
+            record.user_id.into(),
+        ])
         .query_async::<_, ()>(&mut cache_conn)
         .await
         .map_err(error::internal)?;
@@ -94,10 +104,7 @@ async fn sessions(
         return Err((StatusCode::UNAUTHORIZED, "You are not logged in.".into()));
     };
 
-    let mut cache_conn = state.cache_pool
-        .get()
-        .await
-        .map_err(error::internal)?;
+    let mut cache_conn = state.cache_pool.get().await.map_err(error::internal)?;
 
     let tokens: Vec<String> = deadpool_redis::redis::cmd("LRANGE")
         .arg(&[access_token_list_key(user_id), "0".into(), "-1".into()])
@@ -125,11 +132,7 @@ async fn logout(
         return Ok(Json(()));
     };
 
-
-    let mut cache_conn = state.cache_pool
-        .get()
-        .await
-        .map_err(error::internal)?;
+    let mut cache_conn = state.cache_pool.get().await.map_err(error::internal)?;
 
     deadpool_redis::redis::cmd("DEL")
         .arg(&[access_token_key(access_token.clone())])
@@ -138,7 +141,11 @@ async fn logout(
         .map_err(error::internal)?;
 
     deadpool_redis::redis::cmd("LREM")
-        .arg(&[access_token_list_key(user_id), "0".into(), access_token.clone()])
+        .arg(&[
+            access_token_list_key(user_id),
+            "0".into(),
+            access_token.clone(),
+        ])
         .query_async::<_, ()>(&mut cache_conn)
         .await
         .map_err(error::internal)?;
@@ -163,12 +170,16 @@ mod tests {
     async fn login_works(pool: sqlx::PgPool) -> Result<(), (StatusCode, String)> {
         let state = mock_state(pool).await;
         let db = &state.db_pool;
-        model::create(db, UserDeclaration::new("bob", "bob@example.com", "bobIsBest")).await?;
+        model::create(
+            db,
+            UserDeclaration::new("bob", "bob@example.com", "bobIsBest"),
+        )
+        .await?;
 
-        let server = TestServer::new(
-            router(state.clone())
-                .layer(axum::middleware::from_fn_with_state(state.clone(), crate::auth::record_visit))
-        ).unwrap();
+        let server = TestServer::new(router(state.clone()).layer(
+            axum::middleware::from_fn_with_state(state.clone(), crate::auth::record_visit),
+        ))
+        .unwrap();
 
         // wrong password
         server
@@ -208,18 +219,12 @@ mod tests {
         assert_ne!(token1, token2);
 
         // logout with token is fine as ever
-        server
-            .post("/logout")
-            .await
-            .assert_status_ok();
+        server.post("/logout").await.assert_status_ok();
 
         // logout with an unknown token is fine too
         server
             .post("/logout")
-            .add_header(
-                AUTHORIZATION,
-                HeaderValue::from_static("Bearer unknown"),
-            )
+            .add_header(AUTHORIZATION, HeaderValue::from_static("Bearer unknown"))
             .await
             .assert_status_ok();
 
@@ -234,7 +239,9 @@ mod tests {
             .json::<Value>();
         let sessions = sessions_json.get("sessions").unwrap().as_array().unwrap();
         assert_eq!(sessions.len(), 2);
-        assert!(sessions.iter().all(|session| session.as_str().unwrap().len() == 8));
+        assert!(sessions
+            .iter()
+            .all(|session| session.as_str().unwrap().len() == 8));
 
         // logout with a valid token is the same
         server

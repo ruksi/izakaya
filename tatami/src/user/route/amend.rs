@@ -29,7 +29,6 @@ mod tests {
     use serde_json::json;
 
     use crate::test_utils::mock_state;
-    use crate::user::model;
     use crate::user::model::UserDeclaration;
     use crate::user::route::router;
 
@@ -40,7 +39,12 @@ mod tests {
         let state = mock_state(pool).await;
         let server = TestServer::new(router(state.clone())).unwrap();
 
-        let user = model::create(&state.db_pool, UserDeclaration::new("bob", "bob@example.com", "pw")).await.unwrap();
+        let user = model::create(
+            &state.db_pool,
+            UserDeclaration::new("bob", "bob@example.com", "pw"),
+        )
+        .await
+        .unwrap();
 
         let user = server
             .patch(format!("/{}", user.user_id).as_str())
@@ -52,7 +56,10 @@ mod tests {
             .json::<model::User>();
         assert_eq!(user.username, "bobby");
 
-        let user = model::describe(&state.db_pool, user.user_id).await.unwrap().unwrap();
+        let user = model::describe(&state.db_pool, user.user_id)
+            .await
+            .unwrap()
+            .unwrap();
         assert_eq!(user.username, "bobby");
     }
 }

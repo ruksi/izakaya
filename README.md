@@ -130,6 +130,11 @@ cargo sqlx database setup
 cargo run
 ```
 
+```bash
+cargo clippy --fix
+cargo fmt
+```
+
 ### 👘 `kimono` Frontend
 
 ```bash

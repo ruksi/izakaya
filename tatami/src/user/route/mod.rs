@@ -1,5 +1,5 @@
-use axum::Router;
 use axum::routing::get;
+use axum::Router;
 
 use amend::*;
 use create::*;
@@ -9,11 +9,11 @@ use list::*;
 
 use crate::state::AppState;
 
-mod list;
+mod amend;
+mod create;
 mod describe;
 mod destroy;
-mod create;
-mod amend;
+mod list;
 
 pub fn router<S>(state: AppState) -> Router<S> {
     Router::new()

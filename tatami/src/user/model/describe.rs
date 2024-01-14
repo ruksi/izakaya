@@ -9,15 +9,15 @@ pub async fn describe(
     user_id: Uuid,
 ) -> Result<Option<User>, (StatusCode, String)> {
     let result = sqlx::query!(
-            // language=SQL
-            r#"select user_id, username
+        // language=SQL
+        r#"select user_id, username
                from "user"
                where user_id = $1;"#,
-            user_id,
-        )
-        .fetch_optional(db)
-        .await
-        .map_err(error::internal)?;
+        user_id,
+    )
+    .fetch_optional(db)
+    .await
+    .map_err(error::internal)?;
     match result {
         Some(record) => Ok(Some(User {
             user_id: record.user_id,

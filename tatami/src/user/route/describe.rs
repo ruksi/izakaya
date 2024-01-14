@@ -13,7 +13,7 @@ pub async fn describe(
     let user = model::describe(&state.db_pool, user_id).await?;
     match user {
         Some(user) => Ok(Json(user)),
-        None => return Err((StatusCode::NOT_FOUND, "User not found".into())),
+        None => Err((StatusCode::NOT_FOUND, "User not found".into())),
     }
 }
 
@@ -36,8 +36,16 @@ mod tests {
         response.assert_status(StatusCode::NOT_FOUND);
         response.assert_text("User not found");
 
-        let user = model::create(&state.db_pool, UserDeclaration::new("bob", "bob@example.com", "pw")).await.unwrap();
-        let re_user = server.get(format!("/{}", user.user_id).as_str()).await.json::<model::User>();
+        let user = model::create(
+            &state.db_pool,
+            UserDeclaration::new("bob", "bob@example.com", "pw"),
+        )
+        .await
+        .unwrap();
+        let re_user = server
+            .get(format!("/{}", user.user_id).as_str())
+            .await
+            .json::<model::User>();
         assert_eq!(user, re_user);
     }
 }

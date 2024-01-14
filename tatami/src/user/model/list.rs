@@ -20,11 +20,14 @@ pub async fn list(
         query.push(" where");
         let mut conditions = query.separated(" and");
         if let Some(username) = filter.username {
-            conditions.push(" username = ").push_bind_unseparated(username);
+            conditions
+                .push(" username = ")
+                .push_bind_unseparated(username);
         }
     }
 
-    let users: Vec<User> = query.build_query_as()
+    let users: Vec<User> = query
+        .build_query_as()
         .fetch_all(db)
         .await
         .map_err(error::internal)?;

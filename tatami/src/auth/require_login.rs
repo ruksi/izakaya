@@ -1,8 +1,9 @@
-use axum::Extension;
 use axum::extract::Request;
+use axum::http::StatusCode;
 use axum::middleware::Next;
 use axum::response::Response;
-use axum::http::StatusCode;
+use axum::Extension;
+
 use crate::auth::Visitor;
 
 pub async fn require_login(

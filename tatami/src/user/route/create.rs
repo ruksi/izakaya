@@ -17,11 +17,7 @@ pub async fn create(
     State(state): State<AppState>,
     Json(body): Json<CreateUserBody>,
 ) -> Result<Json<model::User>, (StatusCode, String)> {
-    let declaration = UserDeclaration::new(
-        body.username,
-        body.email,
-        body.password,
-    );
+    let declaration = UserDeclaration::new(body.username, body.email, body.password);
     let user = model::create(&state.db_pool, declaration).await?;
     Ok(Json(user))
 }
@@ -33,7 +29,6 @@ mod tests {
     use uuid::Uuid;
 
     use crate::test_utils::mock_state;
-    use crate::user::model;
     use crate::user::route::router;
 
     use super::*;

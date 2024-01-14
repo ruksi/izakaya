@@ -1,14 +1,13 @@
-use axum::{Extension, Json, Router};
 use axum::http::{header, HeaderValue, StatusCode};
 use axum::routing::get;
+use axum::{Extension, Json, Router};
 use axum_test::TestServer;
 use serde_json::{json, Value};
 
-use crate::test_utils::mock_state;
-
-use crate::auth::*;
 use crate::auth::cache_keys::access_token_key;
+use crate::auth::*;
 use crate::auth::{record_visit, require_login};
+use crate::test_utils::mock_state;
 
 async fn mock_endpoint(
     Extension(visitor): Extension<Visitor>,
@@ -23,7 +22,10 @@ async fn authentication_flow_works(pool: sqlx::PgPool) {
         .route("/private", get(mock_endpoint))
         .route_layer(axum::middleware::from_fn(require_login::require_login))
         .route("/public", get(mock_endpoint))
-        .layer(axum::middleware::from_fn_with_state(state.clone(), record_visit::record_visit))
+        .layer(axum::middleware::from_fn_with_state(
+            state.clone(),
+            record_visit::record_visit,
+        ))
         .with_state(state.clone());
     let server = TestServer::new(app).unwrap();
 
@@ -34,19 +36,26 @@ async fn authentication_flow_works(pool: sqlx::PgPool) {
         .await
         .unwrap();
 
-    server.get("/public")
+    server
+        .get("/public")
         .await
         .assert_json(&json!({"is_anonymous": true}));
-    server.get("/public")
-        .add_header(header::AUTHORIZATION, HeaderValue::from_static("Bearer test"))
+    server
+        .get("/public")
+        .add_header(
+            header::AUTHORIZATION,
+            HeaderValue::from_static("Bearer test"),
+        )
         .await
         .assert_json(&json!({"is_anonymous": true}));
 
-    server.get("/private")
-        .await
-        .assert_status_unauthorized();
-    server.get("/private")
-        .add_header(header::AUTHORIZATION, HeaderValue::from_static("Bearer test"))
+    server.get("/private").await.assert_status_unauthorized();
+    server
+        .get("/private")
+        .add_header(
+            header::AUTHORIZATION,
+            HeaderValue::from_static("Bearer test"),
+        )
         .await
         .assert_status_unauthorized();
 
@@ -65,11 +74,13 @@ async fn authentication_flow_works(pool: sqlx::PgPool) {
         .await
         .unwrap();
 
-    server.get("/private")
-        .await
-        .assert_status_unauthorized();
-    server.get("/private")
-        .add_header(header::AUTHORIZATION, HeaderValue::from_static("Bearer test"))
+    server.get("/private").await.assert_status_unauthorized();
+    server
+        .get("/private")
+        .add_header(
+            header::AUTHORIZATION,
+            HeaderValue::from_static("Bearer test"),
+        )
         .await
         .assert_json(&json!({"is_anonymous": false}));
 

@@ -3,17 +3,17 @@ use std::time::Duration;
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::{Html, Redirect};
-use axum::Router;
 use axum::routing::get;
+use axum::Router;
 use tokio::time::sleep;
 use tower_http::services::ServeDir;
 
 use crate::config::Config;
 use crate::state::AppState;
 
-pub mod config;
 mod api;
 mod auth;
+pub mod config;
 mod crypto;
 mod error;
 mod me;
@@ -24,11 +24,10 @@ mod user;
 mod test_utils;
 
 pub async fn get_app<S>(config: &Config) -> Router<S> {
-
     // Railway private networks take time to initialize on deployment,
     // and application crashes make it re-initialize, so we have to wait
     // https://docs.railway.app/reference/private-networking#caveats
-    if let Ok(_) = std::env::var("RAILWAY_ENVIRONMENT_NAME") {
+    if std::env::var("RAILWAY_ENVIRONMENT_NAME").is_ok() {
         tracing::debug!("Railway detected, waiting for private network to initialize...");
         sleep(Duration::from_secs(5)).await;
     }
@@ -51,7 +50,10 @@ pub async fn get_app<S>(config: &Config) -> Router<S> {
         .create_pool(Some(deadpool_redis::Runtime::Tokio1))
         .expect("Can't create cache pool");
 
-    let state = AppState { db_pool, cache_pool };
+    let state = AppState {
+        db_pool,
+        cache_pool,
+    };
     root_router(state)
 }
 
@@ -63,32 +65,31 @@ fn root_router<S>(state: AppState) -> Router<S> {
     let app = app.nest_service("/assets", ServeDir::new("./assets"));
 
     let app = app.route("/", get(index));
-    let app = app.route("/favicon.ico", get(|| async { Redirect::permanent("/assets/favicon.ico") }));
+    let app = app.route(
+        "/favicon.ico",
+        get(|| async { Redirect::permanent("/assets/favicon.ico") }),
+    );
     let app = app.route("/healthz", get(healthz));
 
     let app = app.nest("/api", api::router(state.clone()));
-    let app = app.layer(axum::middleware::from_fn_with_state(state.clone(), crate::auth::record_visit));
-    let app = app.with_state(state);
-
-    app
+    let app = app.layer(axum::middleware::from_fn_with_state(
+        state.clone(),
+        crate::auth::record_visit,
+    ));
+    app.with_state(state)
 }
 
 async fn index() -> Html<&'static str> {
     Html("<h1>Hello, World!</h1>")
 }
 
-async fn healthz(
-    State(state): State<AppState>,
-) -> Result<String, (StatusCode, String)> {
+async fn healthz(State(state): State<AppState>) -> Result<String, (StatusCode, String)> {
     let from_db: String = sqlx::query_scalar("SELECT 'DATABASE OK'")
         .fetch_one(&state.db_pool)
         .await
         .map_err(error::internal)?;
 
-    let mut cache_conn = state.cache_pool
-        .get()
-        .await
-        .map_err(error::internal)?;
+    let mut cache_conn = state.cache_pool.get().await.map_err(error::internal)?;
     deadpool_redis::redis::cmd("SET")
         .arg(&["deadpool:test_key", "CACHE OK"])
         .query_async::<_, ()>(&mut cache_conn)

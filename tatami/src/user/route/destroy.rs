@@ -31,8 +31,16 @@ mod tests {
         let state = mock_state(pool).await;
         let server = TestServer::new(router(state.clone())).unwrap();
 
-        let user = model::create(&state.db_pool, UserDeclaration::new("bob", "bob@example.com", "pw")).await.unwrap();
-        server.delete(format!("/{}", user.user_id).as_str()).await.assert_json(&json!({"status": "ok"}));
+        let user = model::create(
+            &state.db_pool,
+            UserDeclaration::new("bob", "bob@example.com", "pw"),
+        )
+        .await
+        .unwrap();
+        server
+            .delete(format!("/{}", user.user_id).as_str())
+            .await
+            .assert_json(&json!({"status": "ok"}));
 
         let response = server.get(format!("/{}", user.user_id).as_str()).await;
         response.assert_status(StatusCode::NOT_FOUND);
