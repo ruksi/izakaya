@@ -16,7 +16,7 @@ mod auth;
 pub mod config;
 mod crypto;
 mod error;
-mod me;
+mod session;
 mod state;
 mod user;
 
@@ -72,6 +72,8 @@ fn root_router<S>(state: AppState) -> Router<S> {
     let app = app.route("/healthz", get(healthz));
 
     let app = app.nest("/api", api::router(state.clone()));
+    let app = app.nest("/sessions", session::route::router(state.clone()));
+
     let app = app.layer(axum::middleware::from_fn_with_state(
         state.clone(),
         crate::auth::record_visit,
