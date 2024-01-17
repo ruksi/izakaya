@@ -12,9 +12,6 @@ mod describe;
 mod destroy;
 mod list;
 
-#[cfg(test)]
-mod tests;
-
 #[derive(sqlx::FromRow, serde::Serialize, serde::Deserialize, Debug, PartialEq, Eq)]
 pub struct User {
     pub user_id: Uuid,

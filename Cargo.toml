@@ -25,6 +25,7 @@ sqlx = { version = "0.7.3", features = ["runtime-tokio-native-tls", "postgres", 
 # https://lib.rs/crates/deadpool-redis
 # Railway private networking generates non-x.509v3 certificates so we need to use native TLS
 redis = { version = "0.24.0", features = ["tokio-native-tls-comp", "json"] }
+deadpool = { version = "0.10.0" }
 deadpool-redis = { version = "0.14.0", features = ["rt_tokio_1", "serde"] }
 
 # https://lib.rs/crates/serde

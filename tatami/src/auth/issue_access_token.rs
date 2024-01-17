@@ -1,14 +1,15 @@
-use crate::auth::{access_token_key, access_token_list_key};
-use crate::state::AppState;
-use crate::{crypto, error};
-use axum::http::StatusCode;
 use rand::Rng;
+
+use crate::auth::{access_token_key, access_token_list_key};
+use crate::crypto;
+use crate::prelude::*;
+use crate::state::AppState;
 
 pub async fn issue_access_token(
     state: &AppState,
     username_or_email: String,
     password: String,
-) -> Result<String, (StatusCode, String)> {
+) -> Result<String> {
     let result = sqlx::query!(
         // language=SQL
         r#"select user_id, password_hash
@@ -19,30 +20,19 @@ pub async fn issue_access_token(
         username_or_email,
     )
     .fetch_optional(&state.db_pool)
-    .await
-    .map_err(error::internal)?;
+    .await?;
 
     let Some(record) = result else {
-        return Err((
-            StatusCode::UNAUTHORIZED,
-            "Incorrect username or password.".into(),
-        ));
+        return Err(Error::Unauthorized);
     };
 
     let Some(password_hash) = record.password_hash else {
-        return Err((
-            StatusCode::UNAUTHORIZED,
-            "Incorrect username or password.".into(),
-        ));
+        return Err(Error::Unauthorized);
     };
 
     let verification = crypto::verify_password(password_hash, password).await;
     if verification.is_err() {
-        // probably "invalid password"
-        return Err((
-            StatusCode::UNAUTHORIZED,
-            "Incorrect username or password.".into(),
-        ));
+        return Err(Error::Unauthorized);
     }
 
     // UUIDs have 16 bytes of randomness, and that is considered enough
@@ -55,7 +45,7 @@ pub async fn issue_access_token(
         .map(char::from)
         .collect();
 
-    let mut cache_conn = state.cache_pool.get().await.map_err(error::internal)?;
+    let mut cache_conn = state.cache_pool.get().await?;
 
     deadpool_redis::redis::cmd("HSET")
         .arg(&[
@@ -64,14 +54,12 @@ pub async fn issue_access_token(
             record.user_id.into(),
         ])
         .query_async::<_, ()>(&mut cache_conn)
-        .await
-        .map_err(error::internal)?;
+        .await?;
 
     deadpool_redis::redis::cmd("RPUSH")
         .arg(&[access_token_list_key(record.user_id), token.clone()])
         .query_async::<_, ()>(&mut cache_conn)
-        .await
-        .map_err(error::internal)?;
+        .await?;
 
     Ok(token)
 }

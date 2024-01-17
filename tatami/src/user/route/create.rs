@@ -1,7 +1,7 @@
 use axum::extract::State;
-use axum::http::StatusCode;
 use axum::Json;
 
+use crate::prelude::*;
 use crate::state::AppState;
 use crate::user::model;
 use crate::user::model::UserDeclaration;
@@ -16,7 +16,7 @@ pub struct CreateUserBody {
 pub async fn create(
     State(state): State<AppState>,
     Json(body): Json<CreateUserBody>,
-) -> Result<Json<model::User>, (StatusCode, String)> {
+) -> Result<Json<model::User>> {
     let declaration = UserDeclaration::new(body.username, body.email, body.password);
     let user = model::create(&state.db_pool, declaration).await?;
     Ok(Json(user))

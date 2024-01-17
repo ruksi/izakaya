@@ -1,8 +1,8 @@
 use axum::extract::{Path, State};
-use axum::http::StatusCode;
 use axum::Json;
 use uuid::Uuid;
 
+use crate::prelude::*;
 use crate::state::AppState;
 use crate::user::model;
 
@@ -15,9 +15,9 @@ pub async fn amend(
     State(state): State<AppState>,
     Path(user_id): Path<Uuid>,
     Json(body): Json<AmendUserBody>,
-) -> Result<Json<model::User>, (StatusCode, String)> {
+) -> Result<Json<model::User>> {
     let amendment = model::UserAmendment {
-        username: Some(body.username.unwrap()),
+        username: body.username,
     };
     let user = model::amend(&state.db_pool, user_id, amendment).await?;
     Ok(Json(user))
@@ -35,16 +35,12 @@ mod tests {
     use super::*;
 
     #[sqlx::test]
-    async fn amend_works(pool: sqlx::PgPool) {
+    async fn amend_works(pool: sqlx::PgPool) -> Result<()> {
         let state = mock_state(pool).await;
         let server = TestServer::new(router(state.clone())).unwrap();
 
-        let user = model::create(
-            &state.db_pool,
-            UserDeclaration::new("bob", "bob@example.com", "pw"),
-        )
-        .await
-        .unwrap();
+        let declaration = UserDeclaration::new("bob", "bob@example.com", "pw");
+        let user = model::create(&state.db_pool, declaration).await?;
 
         let user = server
             .patch(format!("/{}", user.user_id).as_str())
@@ -56,10 +52,9 @@ mod tests {
             .json::<model::User>();
         assert_eq!(user.username, "bobby");
 
-        let user = model::describe(&state.db_pool, user.user_id)
-            .await
-            .unwrap()
-            .unwrap();
-        assert_eq!(user.username, "bobby");
+        let user = model::describe(&state.db_pool, user.user_id).await?;
+        assert_eq!(user.unwrap().username, "bobby");
+
+        Ok(())
     }
 }

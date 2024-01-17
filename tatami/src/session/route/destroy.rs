@@ -1,14 +1,14 @@
 use axum::extract::State;
-use axum::http::StatusCode;
 use axum::{Extension, Json};
 
 use crate::auth::{revoke_access_token, Visitor};
+use crate::prelude::*;
 use crate::state::AppState;
 
 pub async fn destroy(
     State(state): State<AppState>,
     Extension(visitor): Extension<Visitor>,
-) -> Result<Json<()>, (StatusCode, String)> {
+) -> Result<Json<()>> {
     let Some(access_token) = visitor.access_token else {
         return Ok(Json(()));
     };

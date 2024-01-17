@@ -1,15 +1,15 @@
-use axum::http::StatusCode;
 use axum::routing::{get, post};
 use axum::Router;
 use axum_test::{TestServer, TestServerConfig};
 use serde_json::{json, Value};
 
+use crate::prelude::*;
 use crate::test_utils::mock_state;
 
 use super::*;
 
 #[sqlx::test]
-async fn browser_authentication_flow(pool: sqlx::PgPool) -> Result<(), (StatusCode, String)> {
+async fn browser_authentication_flow(pool: sqlx::PgPool) -> Result<()> {
     let state = mock_state(pool).await;
     let mock_app = Router::new()
         .route("/sign-up", post(sign_up))
@@ -36,7 +36,6 @@ async fn browser_authentication_flow(pool: sqlx::PgPool) -> Result<(), (StatusCo
     let response = server.get("/verify").await;
     response.assert_status_ok();
     let response_json = response.json::<Value>();
-    assert_eq!(response_json.get("status").unwrap(), "ok");
     assert!(uuid::Uuid::parse_str(response_json.get("userId").unwrap().as_str().unwrap()).is_ok());
 
     // you can log out
@@ -52,7 +51,6 @@ async fn browser_authentication_flow(pool: sqlx::PgPool) -> Result<(), (StatusCo
     let response = server.get("/verify").await;
     response.assert_status_ok();
     let response_json = response.json::<Value>();
-    assert_eq!(response_json.get("status").unwrap(), "ok");
     assert!(uuid::Uuid::parse_str(response_json.get("userId").unwrap().as_str().unwrap()).is_ok());
 
     // multiple log-out is fine

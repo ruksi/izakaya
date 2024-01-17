@@ -1,7 +1,6 @@
 use std::time::Duration;
 
 use axum::extract::State;
-use axum::http::StatusCode;
 use axum::response::Redirect;
 use axum::routing::get;
 use axum::Router;
@@ -9,6 +8,7 @@ use tokio::time::sleep;
 use tower_http::services::ServeDir;
 
 use crate::config::Config;
+use crate::prelude::*;
 use crate::session::cookie::cookie_secret_from_seed;
 use crate::state::AppState;
 
@@ -17,6 +17,7 @@ mod auth;
 pub mod config;
 mod crypto;
 mod error;
+mod prelude;
 mod session;
 mod state;
 mod user;
@@ -89,23 +90,20 @@ async fn index() -> &'static str {
     "Hello, World!"
 }
 
-async fn healthz(State(state): State<AppState>) -> Result<String, (StatusCode, String)> {
+async fn healthz(State(state): State<AppState>) -> Result<String> {
     let from_db: String = sqlx::query_scalar("SELECT 'DATABASE OK'")
         .fetch_one(&state.db_pool)
-        .await
-        .map_err(error::internal)?;
+        .await?;
 
-    let mut cache_conn = state.cache_pool.get().await.map_err(error::internal)?;
+    let mut cache_conn = state.cache_pool.get().await?;
     deadpool_redis::redis::cmd("SET")
         .arg(&["deadpool:test_key", "CACHE OK"])
         .query_async::<_, ()>(&mut cache_conn)
-        .await
-        .map_err(error::internal)?;
+        .await?;
     let from_cache: String = deadpool_redis::redis::cmd("GET")
         .arg(&["deadpool:test_key"])
         .query_async(&mut cache_conn)
-        .await
-        .map_err(error::internal)?;
+        .await?;
 
     Ok(format!("{}\n{}", from_db, from_cache))
 }

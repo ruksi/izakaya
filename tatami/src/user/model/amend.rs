@@ -1,7 +1,6 @@
-use axum::http::StatusCode;
 use uuid::Uuid;
 
-use crate::error;
+use crate::prelude::*;
 use crate::user::model;
 use crate::user::model::User;
 
@@ -10,17 +9,13 @@ pub struct UserAmendment {
     pub username: Option<String>,
 }
 
-pub async fn amend(
-    db: &sqlx::PgPool,
-    user_id: Uuid,
-    amendment: UserAmendment,
-) -> Result<User, (StatusCode, String)> {
+pub async fn amend(db: &sqlx::PgPool, user_id: Uuid, amendment: UserAmendment) -> Result<User> {
     if amendment == UserAmendment::default() {
         // TODO: fix unwrap
         let maybe_user = model::describe(db, user_id).await?;
         return match maybe_user {
             Some(user) => Ok(user),
-            None => Err((StatusCode::NOT_FOUND, "User not found".into())),
+            None => Err(Error::NotFound),
         };
     }
     let record = sqlx::query!(
@@ -34,10 +29,60 @@ pub async fn amend(
         user_id,
     )
     .fetch_one(db)
-    .await
-    .map_err(error::internal)?;
+    .await?;
+
     Ok(User {
         user_id: record.user_id,
         username: record.username,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::user::model::{amend, create, describe, UserDeclaration};
+
+    use super::*;
+
+    #[sqlx::test]
+    async fn amend_works(pool: sqlx::PgPool) -> Result<()> {
+        let declaration = UserDeclaration::new("bob", "bob@example.com", "pw");
+        let bob = create(&pool, declaration).await?;
+
+        let declaration = UserDeclaration::new("alice", "alice@example.com", "pw");
+        let alice = create(&pool, declaration).await?;
+
+        let amendment = UserAmendment {
+            username: Some("bobby".into()),
+        };
+        let bobby = amend(&pool, bob.user_id, amendment).await?;
+        assert_eq!(bobby.user_id, bob.user_id);
+        assert_eq!(bobby.username, "bobby");
+
+        let re_bobby = describe(&pool, bob.user_id).await?.unwrap();
+        assert_eq!(bobby, re_bobby);
+
+        let re_alice = describe(&pool, alice.user_id).await?.unwrap();
+        assert_eq!(re_alice.username, "alice");
+
+        // nothing to change 🤷
+        let amendment = UserAmendment::default();
+        let am_bobby = amend(&pool, bob.user_id, amendment).await?;
+        assert_eq!(bobby, am_bobby);
+
+        // invalid change
+        let amendment = UserAmendment {
+            username: Some("bad alice".into()),
+        };
+        let err = amend(&pool, alice.user_id, amendment).await.unwrap_err();
+        assert_eq!(err.reason(), "username_must_be_only_letters_and_dashes");
+
+        // bad change to an existing username
+        let amendment = UserAmendment {
+            username: Some("bobby".into()),
+        };
+        let err = amend(&pool, alice.user_id, amendment).await.unwrap_err();
+        assert_eq!(err.reason(), "username_already_in_use");
+
+        Ok(())
+    }
 }

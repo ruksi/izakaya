@@ -1,7 +1,6 @@
-use axum::http::StatusCode;
-
+use crate::crypto;
+use crate::prelude::*;
 use crate::user::model::User;
-use crate::{crypto, error};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct UserDeclaration {
@@ -23,13 +22,10 @@ impl UserDeclaration {
     }
 }
 
-pub async fn create(
-    db: &sqlx::PgPool,
-    declaration: UserDeclaration,
-) -> Result<User, (StatusCode, String)> {
+pub async fn create(db: &sqlx::PgPool, declaration: UserDeclaration) -> Result<User> {
     let password_hash = crypto::hash_password(declaration.password).await?;
 
-    let mut tx = db.begin().await.map_err(error::internal)?;
+    let mut tx = db.begin().await?;
 
     let user_record = sqlx::query!(
         // language=SQL
@@ -40,8 +36,7 @@ pub async fn create(
         password_hash,
     )
     .fetch_one(&mut *tx)
-    .await
-    .map_err(error::internal)?;
+    .await?;
 
     let email_id = sqlx::query_scalar!(
         // language=SQL
@@ -52,8 +47,7 @@ pub async fn create(
         declaration.email,
     )
     .fetch_one(&mut *tx)
-    .await
-    .map_err(error::internal)?;
+    .await?;
 
     sqlx::query!(
         // language=SQL
@@ -64,14 +58,76 @@ pub async fn create(
         user_record.user_id,
     )
     .execute(&mut *tx)
-    .await
-    .map_err(error::internal)?;
+    .await?;
 
-    tx.commit().await.map_err(error::internal)?;
+    tx.commit().await?;
 
     let user_model = User {
         user_id: user_record.user_id,
         username: user_record.username,
     };
     Ok(user_model)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[sqlx::test]
+    async fn create_works(pool: sqlx::PgPool) -> Result<()> {
+        let declaration = UserDeclaration::new("bob", "bob@example.com", "pw");
+        let bob = create(&pool, declaration).await?;
+
+        let declaration = UserDeclaration::new("4lice", "alice@example.com", "pw");
+        let alice = create(&pool, declaration).await?;
+
+        assert_eq!(bob.username, "bob");
+        assert_eq!(alice.username, "4lice");
+        assert_ne!(bob.user_id, alice.user_id);
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn create_trims_username(pool: sqlx::PgPool) -> Result<()> {
+        let declaration = UserDeclaration::new("john ", "john@example.com", "pw");
+        let john = create(&pool, declaration).await?;
+        assert_eq!(john.username, "john");
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn create_rejects_existing_username(pool: sqlx::PgPool) -> Result<()> {
+        let declaration = UserDeclaration::new("bob", "bob@example.com", "pw");
+        create(&pool, declaration).await?;
+
+        for username in ["bob", "bob ", "Bob"] {
+            let declaration = UserDeclaration::new(username, "robert@example.com", "pw");
+            let err = create(&pool, declaration).await.unwrap_err();
+            assert_eq!(err.reason(), "username_already_in_use");
+        }
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn create_rejects_existing_email(pool: sqlx::PgPool) -> Result<()> {
+        let declaration = UserDeclaration::new("bob", "bob@example.com", "pw");
+        create(&pool, declaration).await?;
+        for email in ["bob@example.com", " bob@example.com"] {
+            let declaration = UserDeclaration::new("robert", email, "pw");
+            let err = create(&pool, declaration).await.unwrap_err();
+            assert_eq!(err.reason(), "email_address_already_in_use");
+        }
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn create_rejects_invalid_username(pool: sqlx::PgPool) -> Result<()> {
+        // TODO: reject , "-Doe", "Doe-"
+        for username in ["John Doe", "John_Doe", "JohnDoe!"] {
+            let declaration = UserDeclaration::new(username, "doe@example.com", "pw");
+            let err = create(&pool, declaration).await.unwrap_err();
+            assert_eq!(err.reason(), "username_must_be_only_letters_and_dashes");
+        }
+        Ok(())
+    }
 }

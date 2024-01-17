@@ -1,5 +1,4 @@
 use axum::extract::State;
-use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::{Extension, Json};
 use axum_extra::extract::PrivateCookieJar;
@@ -7,6 +6,7 @@ use serde_json::json;
 
 use crate::auth::revoke_access_token;
 use crate::auth::Visitor;
+use crate::prelude::*;
 use crate::session::cookie;
 use crate::state::AppState;
 
@@ -14,7 +14,7 @@ pub async fn log_out(
     State(state): State<AppState>,
     Extension(visitor): Extension<Visitor>,
     mut jar: PrivateCookieJar,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
+) -> Result<impl IntoResponse> {
     let Some(access_token) = visitor.access_token else {
         return Ok((jar, Json(json!({}))));
     };

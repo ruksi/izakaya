@@ -1,4 +1,4 @@
-use axum::http::{header, HeaderValue, StatusCode};
+use axum::http::{header, HeaderValue};
 use axum::routing::get;
 use axum::{Extension, Json, Router};
 use axum_test::TestServer;
@@ -7,11 +7,10 @@ use serde_json::{json, Value};
 use crate::auth::cache_keys::access_token_key;
 use crate::auth::*;
 use crate::auth::{record_visit, require_login};
+use crate::prelude::*;
 use crate::test_utils::mock_state;
 
-async fn mock_endpoint(
-    Extension(visitor): Extension<Visitor>,
-) -> Result<Json<Value>, (StatusCode, String)> {
+async fn mock_endpoint(Extension(visitor): Extension<Visitor>) -> Result<Json<Value>> {
     Ok(Json(json!({"isAnonymous": visitor.is_anonymous()})))
 }
 

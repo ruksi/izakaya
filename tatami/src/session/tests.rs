@@ -1,15 +1,16 @@
 use axum::http::header::AUTHORIZATION;
-use axum::http::{HeaderValue, StatusCode};
+use axum::http::HeaderValue;
 use axum_test::TestServer;
 use serde_json::{json, Value};
 
+use crate::prelude::*;
 use crate::session::route::*;
 use crate::test_utils::mock_state;
 use crate::user::model;
 use crate::user::model::UserDeclaration;
 
 #[sqlx::test]
-async fn bearer_authentication_flow(pool: sqlx::PgPool) -> Result<(), (StatusCode, String)> {
+async fn bearer_authentication_flow(pool: sqlx::PgPool) -> Result<()> {
     let state = mock_state(pool).await;
     let db = &state.db_pool;
     let declaration = UserDeclaration::new("bob", "bob@example.com", "bobIsBest");

@@ -9,6 +9,7 @@ axum = { workspace = true }
 axum-extra = { workspace = true }
 sqlx = { workspace = true }
 redis = { workspace = true }
+deadpool = { workspace = true }
 deadpool-redis = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
