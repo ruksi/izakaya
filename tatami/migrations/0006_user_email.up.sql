@@ -21,15 +21,25 @@ begin
                          and e.email_id != self.email_id);
     end if;
     if is_not_unique then
-        call wrong_value('email_address_already_in_use', email_address);
+        call wrong_named_value(
+                'Email is already in use',
+                'Email',
+                email_address,
+                'Try to login with your email or reset your password'
+             );
     end if;
 
     if (email_address collate "ucs_basic") !~ '^[^@]+@[^@]+$' then
-        call wrong_value('email_address_must_be_contain_an_at_sign', email_address);
+        call wrong_named_value(
+                'Email is missing an @ sign',
+                'Email',
+                email_address,
+                'Check that your email address is correct'
+             );
     end if;
 
     return true;
-end;
+end ;
 $$ language plpgsql;
 
 

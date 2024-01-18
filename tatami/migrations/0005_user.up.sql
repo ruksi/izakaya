@@ -22,19 +22,34 @@ begin
                          and u.user_id != self.user_id);
     end if;
     if is_not_unique then
-        call wrong_value('username_already_in_use', user_username);
+        call wrong_named_value(
+                'Username is already in use',
+                'Username',
+                user_username,
+                'Choose more unique username'
+             );
     end if;
 
     if char_length(user_username) < 3 then
-        call wrong_value('username_must_be_at_least_3_letters', user_username);
+        call wrong_named_value(
+                'Username is too short',
+                'Username',
+                user_username,
+                'Choose a username with at least 3 characters'
+             );
     end if;
 
-    if (user_username collate "ucs_basic") !~ '^[a-zA-Z0-9\-]+$' then
-        call wrong_value('username_must_be_only_letters_and_dashes', user_username);
+    if (user_username collate "ucs_basic") !~ '^[a-zA-Z0-9][a-zA-Z0-9\-]+[a-zA-Z0-9]$' then
+        call wrong_named_value(
+                'Username is invalid',
+                'Username',
+                user_username,
+                'Choose a username with only letters and numbers; you may use dashes (-) to separate words'
+             );
     end if;
 
     return true;
-end;
+end ;
 $$ language plpgsql;
 
 
