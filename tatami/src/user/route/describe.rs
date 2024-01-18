@@ -36,7 +36,7 @@ mod tests {
 
         let response = server.get(format!("/{}", Uuid::new_v4()).as_str()).await;
         response.assert_status(StatusCode::NOT_FOUND);
-        response.assert_json(&json!({"reason": "the resource was not found"}));
+        response.assert_json(&json!({"reason": "the thing doesn't exist"}));
 
         let declaration = UserDeclaration::new("bob", "bob@example.com", "pw");
         let user = model::create(&state.db_pool, declaration).await.unwrap();

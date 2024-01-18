@@ -1,8 +1,7 @@
 use axum::http::StatusCode;
 use axum::Json;
-use serde_json::Value;
 
-use crate::error::utils::reason;
+use crate::error::utils::{reason, ErrorBody};
 
 mod cache_error;
 mod cache_pool_error;
@@ -27,27 +26,28 @@ pub enum Error {
 }
 
 impl Error {
-    pub fn response_tuple(&self) -> (StatusCode, Json<Value>) {
+    pub fn response_tuple(&self) -> (StatusCode, Json<ErrorBody>) {
         use Error::*;
         match self {
             Unauthorized => (StatusCode::UNAUTHORIZED, reason("authentication required")),
-            Forbidden => (StatusCode::FORBIDDEN, reason("cannot perform this action")),
-            NotFound => (StatusCode::NOT_FOUND, reason("the resource was not found")),
-            Database(err) => database_error::sqlx_error_into_response(err),
-            Cache(err) => cache_error::redis_error_into_response(err),
-            CachePool(err) => cache_pool_error::deadpool_redis_error_into_response(err),
-            Password(err) => password_error::argon2_password_hash_error_into_response(err),
-            Task(err) => task_error::tokio_task_join_error_into_response(err),
+            Forbidden => (StatusCode::FORBIDDEN, reason("you cannot do this thing")),
+            NotFound => (StatusCode::NOT_FOUND, reason("the thing doesn't exist")),
+            Database(err) => database_error::sqlx_error_to_response_tuple(err),
+            Cache(err) => cache_error::redis_error_to_response_tuple(err),
+            CachePool(err) => cache_pool_error::deadpool_redis_error_to_response_tuple(err),
+            Password(err) => password_error::argon2_password_hash_error_to_response_tuple(err),
+            Task(err) => task_error::tokio_task_join_error_to_response_tuple(err),
         }
     }
 
     #[cfg(test)]
+    pub fn status(&self) -> StatusCode {
+        self.response_tuple().0
+    }
+
+    #[cfg(test)]
     pub fn reason(&self) -> String {
-        // probably could be made safer 😅
-        self.response_tuple().1["reason"]
-            .as_str()
-            .unwrap()
-            .to_string()
+        self.response_tuple().1.reason.clone()
     }
 }
 
