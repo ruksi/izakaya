@@ -1,11 +1,12 @@
 use std::time::Duration;
 
-use axum::extract::State;
+use axum::extract::{MatchedPath, Request, State};
 use axum::response::Redirect;
 use axum::routing::get;
 use axum::Router;
 use tokio::time::sleep;
 use tower_http::services::ServeDir;
+use tower_http::trace::TraceLayer;
 
 use crate::config::Config;
 use crate::prelude::*;
@@ -83,6 +84,24 @@ fn root_router<S>(state: AppState) -> Router<S> {
         state.clone(),
         crate::auth::record_visit,
     ));
+
+    let app = app.layer(
+        TraceLayer::new_for_http()
+            .make_span_with(|req: &Request| {
+                let method = req.method();
+                let uri = req.uri();
+
+                // this extension is set by axum
+                let matched_path = req
+                    .extensions()
+                    .get::<MatchedPath>()
+                    .map(|matched_path| matched_path.as_str());
+
+                tracing::debug_span!("request", %method, %uri, matched_path)
+            })
+            .on_failure(()), // we trace::error the errors ourselves
+    );
+
     app.with_state(state)
 }
 
