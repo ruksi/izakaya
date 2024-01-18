@@ -74,14 +74,14 @@ mod tests {
             username: Some("bad alice".into()),
         };
         let err = amend(&pool, alice.user_id, amendment).await.unwrap_err();
-        assert_eq!(err.reason(), "username_must_be_only_letters_and_dashes");
+        assert_eq!(err.reason(), "Username is invalid");
 
         // bad change to an existing username
         let amendment = UserAmendment {
             username: Some("bobby".into()),
         };
         let err = amend(&pool, alice.user_id, amendment).await.unwrap_err();
-        assert_eq!(err.reason(), "username_already_in_use");
+        assert_eq!(err.reason(), "Username is already in use");
 
         Ok(())
     }

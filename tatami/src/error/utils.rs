@@ -4,17 +4,28 @@ use axum::Json;
 
 // a generic error message for when we don't want to expose what went wrong,
 // you should always log the full details before returning this reason
-pub const INTERNAL_REASON: &str = "something went wrong";
+pub const INTERNAL_REASON: &str = "Something went wrong";
 
-#[derive(serde::Serialize)]
-pub struct ErrorBody {
+#[derive(serde::Serialize, Debug)]
+pub struct ErrorResponseBody {
+    // user-friendly answer to the question: "Why did this error happen?"
     pub reason: String,
-    // pub detail: Option<Json<serde_json::Value>>, // details like the value that caused the error
-    // pub hint: Option<String>, // how to fix the problem (if applicable)
+
+    // optional further information about the error, possibly shown depending on context, e.g.:
+    //   - name: human-readable, capitalized name of the _thing_ that caused the error
+    //   - value: human-readable value of the _thing_ that caused the error
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detail: Option<serde_json::Value>,
+
+    // optional, user-friendly answer to the question: "What can I do to fix this?"
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hint: Option<String>,
 }
 
-pub fn reason<T: Display>(reason: T) -> Json<ErrorBody> {
-    Json(ErrorBody {
+pub fn reason<T: Display>(reason: T) -> Json<ErrorResponseBody> {
+    Json(ErrorResponseBody {
         reason: reason.to_string(),
+        detail: None,
+        hint: None,
     })
 }

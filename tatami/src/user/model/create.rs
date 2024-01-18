@@ -103,7 +103,7 @@ mod tests {
         for username in ["bob", "bob ", "Bob"] {
             let declaration = UserDeclaration::new(username, "robert@example.com", "pw");
             let err = create(&pool, declaration).await.unwrap_err();
-            assert_eq!(err.reason(), "username_already_in_use");
+            assert_eq!(err.reason(), "Username is already in use");
         }
         Ok(())
     }
@@ -115,7 +115,7 @@ mod tests {
         for email in ["bob@example.com", " bob@example.com"] {
             let declaration = UserDeclaration::new("robert", email, "pw");
             let err = create(&pool, declaration).await.unwrap_err();
-            assert_eq!(err.reason(), "email_address_already_in_use");
+            assert_eq!(err.reason(), "Email is already in use");
         }
         Ok(())
     }
@@ -126,7 +126,7 @@ mod tests {
         for username in ["John Doe", "John_Doe", "JohnDoe!"] {
             let declaration = UserDeclaration::new(username, "doe@example.com", "pw");
             let err = create(&pool, declaration).await.unwrap_err();
-            assert_eq!(err.reason(), "username_must_be_only_letters_and_dashes");
+            assert_eq!(err.reason(), "Username is invalid");
         }
         Ok(())
     }

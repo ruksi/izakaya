@@ -1,7 +1,7 @@
 use axum::http::StatusCode;
 use axum::Json;
 
-use crate::error::utils::{reason, ErrorBody};
+use crate::error::utils::{reason, ErrorResponseBody};
 
 mod cache_error;
 mod cache_pool_error;
@@ -26,12 +26,12 @@ pub enum Error {
 }
 
 impl Error {
-    pub fn response_tuple(&self) -> (StatusCode, Json<ErrorBody>) {
+    pub fn response_tuple(&self) -> (StatusCode, Json<ErrorResponseBody>) {
         use Error::*;
         match self {
-            Unauthorized => (StatusCode::UNAUTHORIZED, reason("authentication required")),
-            Forbidden => (StatusCode::FORBIDDEN, reason("you cannot do this thing")),
-            NotFound => (StatusCode::NOT_FOUND, reason("the thing doesn't exist")),
+            Unauthorized => (StatusCode::UNAUTHORIZED, reason("Authentication required")),
+            Forbidden => (StatusCode::FORBIDDEN, reason("You cannot do this thing")),
+            NotFound => (StatusCode::NOT_FOUND, reason("The thing doesn't exist")),
             Database(err) => database_error::sqlx_error_to_response_tuple(err),
             Cache(err) => cache_error::redis_error_to_response_tuple(err),
             CachePool(err) => cache_pool_error::deadpool_redis_error_to_response_tuple(err),
