@@ -22,6 +22,7 @@ mod prelude;
 mod session;
 mod state;
 mod user;
+pub mod valid;
 
 #[cfg(test)]
 mod test_utils;

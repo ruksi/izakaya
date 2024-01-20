@@ -29,7 +29,7 @@ mod tests {
 
     #[sqlx::test]
     async fn describe_works(pool: sqlx::PgPool) -> Result<()> {
-        let declaration = UserDeclaration::new("bob", "bob@example.com", "pw");
+        let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
         let bob = create(&pool, declaration).await?;
         let re_bob = describe(&pool, bob.user_id).await?.unwrap();
         assert_eq!(bob, re_bob);

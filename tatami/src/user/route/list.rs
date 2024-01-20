@@ -21,18 +21,22 @@ mod tests {
     use crate::user::model::UserDeclaration;
     use crate::user::route::router;
 
+    use super::*;
+
     #[sqlx::test]
-    async fn list_handler_works(pool: sqlx::PgPool) {
+    async fn list_handler_works(pool: sqlx::PgPool) -> Result<()> {
         let state = mock_state(pool).await;
         let server = TestServer::new(router(state.clone())).unwrap();
 
         server.get("/").await.assert_json(&json!([]));
 
-        let declaration = UserDeclaration::new("bob", "bob@example.com", "pw");
+        let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
         model::create(&state.db_pool, declaration).await.unwrap();
 
         let users = server.get("/").await.json::<Vec<model::User>>();
         assert_eq!(users.len(), 1);
         assert_eq!(users[0].username, "bob");
+
+        Ok(())
     }
 }

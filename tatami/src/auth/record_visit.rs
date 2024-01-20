@@ -37,10 +37,11 @@ pub async fn record_visit(
                 .await
                 .unwrap_or_default();
             if let Some(user_id) = session.get("user_id") {
-                // TODO: log an error if fails to parse?
                 if let Ok(user_id) = Uuid::parse_str(user_id) {
                     visitor.user_id = Some(user_id);
                     visitor.access_token = Some(bearer.to_string());
+                } else {
+                    tracing::error!("failed to parse session user_id: {}", user_id);
                 }
             };
         }
@@ -59,10 +60,11 @@ pub async fn record_visit(
                         .await
                         .unwrap_or_default();
                     if let Some(user_id) = session.get("user_id") {
-                        // TODO: log an error if fails to parse?
                         if let Ok(user_id) = Uuid::parse_str(user_id) {
                             visitor.user_id = Some(user_id);
                             visitor.access_token = Some(access_token.to_string());
+                        } else {
+                            tracing::error!("failed to parse session user_id: {}", user_id);
                         }
                     };
                 }

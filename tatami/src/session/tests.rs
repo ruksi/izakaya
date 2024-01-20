@@ -13,7 +13,7 @@ use crate::user::model::UserDeclaration;
 async fn bearer_authentication_flow(pool: sqlx::PgPool) -> Result<()> {
     let state = mock_state(pool).await;
     let db = &state.db_pool;
-    let declaration = UserDeclaration::new("bob", "bob@example.com", "bobIsBest");
+    let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "bobIsBest")?;
     model::create(db, declaration).await?;
 
     let server = TestServer::new(router(state.clone()).layer(

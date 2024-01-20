@@ -8,23 +8,17 @@ use crate::prelude::*;
 use crate::session::cookie;
 use crate::state::AppState;
 use crate::user::model::UserDeclaration;
-
-#[derive(serde::Deserialize, Debug)]
-pub struct SignUpBody {
-    username: String,
-    email: String,
-    password: String,
-}
+use crate::valid::Valid;
 
 pub async fn sign_up(
     State(state): State<AppState>,
     mut jar: PrivateCookieJar,
-    Json(body): Json<SignUpBody>,
+    declaration: Valid<UserDeclaration>,
 ) -> Result<(PrivateCookieJar, Json<Value>)> {
-    let declaration = UserDeclaration::new(body.username, body.email, body.password.clone());
+    let password = declaration.0.password.clone();
     let user = crate::user::model::create(&state.db_pool, declaration).await?;
 
-    let access_token = issue_access_token(&state, user.username, body.password).await?;
+    let access_token = issue_access_token(&state, user.username, password).await?;
     let cookie = cookie::bake(cookie::ACCESS_TOKEN, access_token, time::Duration::days(14));
     jar = jar.add(cookie);
 

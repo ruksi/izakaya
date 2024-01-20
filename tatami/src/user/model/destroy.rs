@@ -30,9 +30,9 @@ mod tests {
 
     #[sqlx::test]
     async fn destroy_works(pool: sqlx::PgPool) -> Result<()> {
-        let declaration = UserDeclaration::new("bob", "bob@example.com", "pw");
+        let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
         let bob = create(&pool, declaration).await?;
-        let declaration = UserDeclaration::new("alice", "alice@example.com", "pw");
+        let declaration = UserDeclaration::new_valid("alice", "alice@example.com", "p4ssw0rd")?;
         let alice = create(&pool, declaration).await?;
 
         destroy(&pool, bob.user_id).await?;

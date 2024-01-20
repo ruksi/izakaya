@@ -5,19 +5,12 @@ use crate::prelude::*;
 use crate::state::AppState;
 use crate::user::model;
 use crate::user::model::UserDeclaration;
-
-#[derive(serde::Deserialize, Debug)]
-pub struct CreateUserBody {
-    username: String,
-    email: String,
-    password: String,
-}
+use crate::valid::Valid;
 
 pub async fn create(
     State(state): State<AppState>,
-    Json(body): Json<CreateUserBody>,
+    declaration: Valid<UserDeclaration>,
 ) -> Result<Json<model::User>> {
-    let declaration = UserDeclaration::new(body.username, body.email, body.password);
     let user = model::create(&state.db_pool, declaration).await?;
     Ok(Json(user))
 }
@@ -50,5 +43,31 @@ mod tests {
         let user = response.json::<model::User>();
         assert_eq!(user.username, "bob");
         assert_ne!(user.user_id, Uuid::nil());
+    }
+
+    #[sqlx::test]
+    async fn create_handler_handles_validation_errors(pool: sqlx::PgPool) {
+        let state = mock_state(pool).await;
+        let server = TestServer::new(router(state.clone())).unwrap();
+        server
+            .post("/")
+            .json(&json!({
+                "username": "john doe",
+                "email": "john@example.com",
+                "password": "johnIsBest",
+            }))
+            .await
+            .assert_json(&json!({
+                "message": "Validation failed",
+                "details": {
+                    "username": [{
+                        "code": "regex",
+                        "message": "Username must be aLpHaNuMeR1c, but may contain hyphens (-)",
+                        "params": {
+                            "value": "john doe"
+                        }
+                    }]
+                }
+            }));
     }
 }

@@ -11,6 +11,9 @@ sqlx = { workspace = true }
 redis = { workspace = true }
 deadpool = { workspace = true }
 deadpool-redis = { workspace = true }
+once_cell = { workspace = true }
+regex = { workspace = true }
+validator = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 time = { workspace = true }

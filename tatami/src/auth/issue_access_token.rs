@@ -16,7 +16,7 @@ pub async fn issue_access_token(
                from "user"
                left join user_email using (user_id)
                where username = $1
-               or address = $1;"#,
+               or email = $1;"#,
         username_or_email,
     )
     .fetch_optional(&state.db_pool)
@@ -26,11 +26,7 @@ pub async fn issue_access_token(
         return Err(Error::Unauthorized);
     };
 
-    let Some(password_hash) = record.password_hash else {
-        return Err(Error::Unauthorized);
-    };
-
-    let verification = crypto::verify_password(password_hash, password).await;
+    let verification = crypto::verify_password(record.password_hash, password).await;
     if verification.is_err() {
         return Err(Error::Unauthorized);
     }

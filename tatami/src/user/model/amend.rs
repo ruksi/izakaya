@@ -1,17 +1,38 @@
+use serde::Deserialize;
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::prelude::*;
 use crate::user::model;
 use crate::user::model::User;
+use crate::valid::Valid;
 
-#[derive(Default, Debug, PartialEq, Eq)]
+#[derive(Deserialize, Validate, Default, Debug, PartialEq, Eq)]
 pub struct UserAmendment {
+    #[validate(custom = "crate::valid::username")]
     pub username: Option<String>,
 }
 
-pub async fn amend(db: &sqlx::PgPool, user_id: Uuid, amendment: UserAmendment) -> Result<User> {
+#[cfg(test)]
+impl UserAmendment {
+    pub fn new_valid<T>(username: Option<T>) -> Result<Valid<Self>>
+    where
+        T: Into<String>,
+    {
+        let declaration = Self {
+            username: username.map(Into::into),
+        };
+        declaration.validate()?;
+        Ok(Valid(declaration))
+    }
+}
+
+pub async fn amend(
+    db: &sqlx::PgPool,
+    user_id: Uuid,
+    Valid(amendment): Valid<UserAmendment>,
+) -> Result<User> {
     if amendment == UserAmendment::default() {
-        // TODO: fix unwrap
         let maybe_user = model::describe(db, user_id).await?;
         return match maybe_user {
             Some(user) => Ok(user),
@@ -39,22 +60,26 @@ pub async fn amend(db: &sqlx::PgPool, user_id: Uuid, amendment: UserAmendment) -
 
 #[cfg(test)]
 mod tests {
+    use axum::http::StatusCode;
+    use serde_json::json;
+
     use crate::user::model::{amend, create, describe, UserDeclaration};
 
     use super::*;
 
     #[sqlx::test]
     async fn amend_works(pool: sqlx::PgPool) -> Result<()> {
-        let declaration = UserDeclaration::new("bob", "bob@example.com", "pw");
+        let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
         let bob = create(&pool, declaration).await?;
 
-        let declaration = UserDeclaration::new("alice", "alice@example.com", "pw");
+        let declaration = UserDeclaration::new_valid("alice", "alice@example.com", "p4ssw0rd")?;
         let alice = create(&pool, declaration).await?;
 
         let amendment = UserAmendment {
             username: Some("bobby".into()),
         };
-        let bobby = amend(&pool, bob.user_id, amendment).await?;
+        amendment.validate()?;
+        let bobby = amend(&pool, bob.user_id, Valid(amendment)).await?;
         assert_eq!(bobby.user_id, bob.user_id);
         assert_eq!(bobby.username, "bobby");
 
@@ -66,22 +91,42 @@ mod tests {
 
         // nothing to change 🤷
         let amendment = UserAmendment::default();
-        let am_bobby = amend(&pool, bob.user_id, amendment).await?;
+        amendment.validate()?;
+        let am_bobby = amend(&pool, bob.user_id, Valid(amendment)).await?;
         assert_eq!(bobby, am_bobby);
 
         // invalid change
-        let amendment = UserAmendment {
-            username: Some("bad alice".into()),
-        };
-        let err = amend(&pool, alice.user_id, amendment).await.unwrap_err();
-        assert_eq!(err.reason(), "Username is invalid");
+        UserAmendment::new_valid(Some("bad alice"))
+            .unwrap_err()
+            .assert_json(json!({
+                "message": "Validation failed",
+                "details": {
+                    "username": [{
+                        "code": "regex",
+                        "message": "Username must be aLpHaNuMeR1c, but may contain hyphens (-)",
+                        "params": {"value": "bad alice"},
+                    }],
+                }
+            }));
 
         // bad change to an existing username
         let amendment = UserAmendment {
             username: Some("bobby".into()),
         };
-        let err = amend(&pool, alice.user_id, amendment).await.unwrap_err();
-        assert_eq!(err.reason(), "Username is already in use");
+        amendment.validate()?;
+        amend(&pool, alice.user_id, Valid(amendment))
+            .await
+            .unwrap_err()
+            .assert_status(StatusCode::BAD_REQUEST)
+            .assert_json(json!({
+                "message": "Validation failed",
+                "details": {
+                    "username": [{
+                        "code": "unique",
+                        "params": {"value": "bobby"},
+                    }],
+                }
+            }));
 
         Ok(())
     }

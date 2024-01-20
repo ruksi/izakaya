@@ -28,16 +28,12 @@ mod tests {
     use super::*;
 
     #[sqlx::test]
-    async fn destroy_works(pool: sqlx::PgPool) {
+    async fn destroy_works(pool: sqlx::PgPool) -> Result<()> {
         let state = mock_state(pool).await;
         let server = TestServer::new(router(state.clone())).unwrap();
 
-        let user = model::create(
-            &state.db_pool,
-            UserDeclaration::new("bob", "bob@example.com", "pw"),
-        )
-        .await
-        .unwrap();
+        let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
+        let user = model::create(&state.db_pool, declaration).await.unwrap();
         server
             .delete(format!("/{}", user.user_id).as_str())
             .await
@@ -46,5 +42,7 @@ mod tests {
         let response = server.get(format!("/{}", user.user_id).as_str()).await;
         response.assert_status(StatusCode::NOT_FOUND);
         // response.assert_text("User not found");
+
+        Ok(())
     }
 }

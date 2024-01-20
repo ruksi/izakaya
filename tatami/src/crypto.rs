@@ -4,7 +4,6 @@ use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
 use crate::prelude::*;
 
 pub async fn hash_password(password: String) -> Result<String> {
-    // TODO: the error shouldn't be something to be exposed...
     tokio::task::spawn_blocking(move || -> Result<String> {
         let salt = SaltString::generate(rand::thread_rng());
         let hash = hasher()
@@ -16,7 +15,6 @@ pub async fn hash_password(password: String) -> Result<String> {
 }
 
 pub async fn verify_password(hash_string: String, password: String) -> Result<()> {
-    // TODO: the error shouldn't be something to be exposed...
     let hash = PasswordHash::new(&hash_string)?;
     hasher().verify_password(password.as_ref(), &hash)?;
     Ok(())

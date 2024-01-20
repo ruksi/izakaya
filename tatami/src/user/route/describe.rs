@@ -30,20 +30,22 @@ mod tests {
     use super::*;
 
     #[sqlx::test]
-    async fn describe_route_works(pool: sqlx::PgPool) {
+    async fn describe_route_works(pool: sqlx::PgPool) -> Result<()> {
         let state = mock_state(pool).await;
         let server = TestServer::new(router(state.clone())).unwrap();
 
         let response = server.get(format!("/{}", Uuid::new_v4()).as_str()).await;
         response.assert_status(StatusCode::NOT_FOUND);
-        response.assert_json(&json!({"reason": "The thing doesn't exist"}));
+        response.assert_json(&json!({"message": "The thing doesn't exist"}));
 
-        let declaration = UserDeclaration::new("bob", "bob@example.com", "pw");
+        let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
         let user = model::create(&state.db_pool, declaration).await.unwrap();
         let fetched_user = server
             .get(format!("/{}", user.user_id).as_str())
             .await
             .json::<model::User>();
         assert_eq!(user, fetched_user);
+
+        Ok(())
     }
 }

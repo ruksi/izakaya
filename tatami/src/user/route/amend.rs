@@ -5,20 +5,14 @@ use uuid::Uuid;
 use crate::prelude::*;
 use crate::state::AppState;
 use crate::user::model;
-
-#[derive(serde::Deserialize, Debug)]
-pub struct AmendUserBody {
-    username: Option<String>,
-}
+use crate::user::model::UserAmendment;
+use crate::valid::Valid;
 
 pub async fn amend(
     State(state): State<AppState>,
     Path(user_id): Path<Uuid>,
-    Json(body): Json<AmendUserBody>,
+    amendment: Valid<UserAmendment>,
 ) -> Result<Json<model::User>> {
-    let amendment = model::UserAmendment {
-        username: body.username,
-    };
     let user = model::amend(&state.db_pool, user_id, amendment).await?;
     Ok(Json(user))
 }
@@ -35,11 +29,11 @@ mod tests {
     use super::*;
 
     #[sqlx::test]
-    async fn amend_works(pool: sqlx::PgPool) -> Result<()> {
+    async fn amend_route_works(pool: sqlx::PgPool) -> Result<()> {
         let state = mock_state(pool).await;
         let server = TestServer::new(router(state.clone())).unwrap();
 
-        let declaration = UserDeclaration::new("bob", "bob@example.com", "pw");
+        let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
         let user = model::create(&state.db_pool, declaration).await?;
 
         let user = server

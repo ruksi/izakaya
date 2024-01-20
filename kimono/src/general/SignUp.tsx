@@ -1,5 +1,4 @@
 import React, {useCallback, useState} from "react";
-import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
@@ -10,6 +9,7 @@ import Row from "react-bootstrap/Row";
 import {Link} from "react-router-dom";
 import tatami from "../services/tatami.ts";
 import ButtonSpinnerIf from "./ButtonSpinnerIf.tsx";
+import {FormAlert} from "./FormAlert.tsx";
 
 export default function SignUp() {
 
@@ -30,22 +30,6 @@ export default function SignUp() {
             <Row className="justify-content-center mt-lg-3">
                 <Col xs md="8" lg="6" xl="5" xxl="4">
                     <Form className="p-sm-2" noValidate onSubmit={submit}>
-
-                        {isError || (isLoading && error) ? (
-                            <Alert variant="danger">
-                                <div className="text-danger">Signup Failed</div>
-                                <div className="small text-secondary">
-                                    {error?.status
-                                        ? `${error.status} `
-                                        : null}
-                                    {error?.data?.reason
-                                        ? `${error?.data?.reason}`
-                                        : null}
-                                    &nbsp;
-                                    {isLoading ? "Retrying..." : null}
-                                </div>
-                            </Alert>
-                        ) : null}
 
                         <Card className="my-2 my-sm-4" bg="dark">
 
@@ -114,6 +98,11 @@ export default function SignUp() {
                             </Card.Footer>
 
                         </Card>
+
+                        {isError || (isLoading && error)
+                            ? <FormAlert title="Signup Failed" error={error} isLoading={isLoading}/>
+                            : null}
+
                     </Form>
                 </Col>
             </Row>
@@ -127,3 +116,4 @@ export default function SignUp() {
         </Container>
     );
 }
+

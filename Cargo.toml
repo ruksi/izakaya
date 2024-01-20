@@ -28,6 +28,13 @@ redis = { version = "0.24.0", features = ["tokio-native-tls-comp", "json"] }
 deadpool = { version = "0.10.0" }
 deadpool-redis = { version = "0.14.0", features = ["rt_tokio_1", "serde"] }
 
+# https://lib.rs/crates/once_cell
+# https://lib.rs/crates/regex
+# https://lib.rs/crates/validator
+once_cell = { version = "1.19.0" }
+regex = { version = "1.10.2" }
+validator = { version = "0.16.1", features = ["derive"] }
+
 # https://lib.rs/crates/serde
 # https://lib.rs/crates/serde_json
 serde = { version = "1.0.193", features = ["derive"] }

@@ -51,7 +51,7 @@ mod tests {
         assert_eq!(list(&pool, alice_filter.clone()).await?.len(), 0);
         assert_eq!(list(&pool, john_filter.clone()).await?.len(), 0);
 
-        let declaration = UserDeclaration::new("bob", "bob@example.com", "pw");
+        let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
         create(&pool, declaration).await?;
 
         assert_eq!(list(&pool, UserFilter::default()).await?.len(), 1);
@@ -59,7 +59,7 @@ mod tests {
         assert_eq!(list(&pool, alice_filter.clone()).await?.len(), 0);
         assert_eq!(list(&pool, john_filter.clone()).await?.len(), 0);
 
-        let declaration = UserDeclaration::new("alice", "alice@example.com", "pw");
+        let declaration = UserDeclaration::new_valid("alice", "alice@example.com", "p4ssw0rd")?;
         create(&pool, declaration).await?;
 
         assert_eq!(list(&pool, UserFilter::default()).await?.len(), 2);
@@ -67,7 +67,7 @@ mod tests {
         assert_eq!(list(&pool, alice_filter.clone()).await?.len(), 1);
         assert_eq!(list(&pool, john_filter.clone()).await?.len(), 0);
 
-        let declaration = UserDeclaration::new("john ", "john@example.com", "pw");
+        let declaration = UserDeclaration::new_valid("john", "john@example.com", "p4ssw0rd")?;
         create(&pool, declaration).await?;
 
         assert_eq!(list(&pool, UserFilter::default()).await?.len(), 3);
