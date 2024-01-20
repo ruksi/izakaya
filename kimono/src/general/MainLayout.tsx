@@ -1,5 +1,7 @@
 import viteLogo from "/vite.svg"
+import React from "react";
 import Button from "react-bootstrap/Button";
+import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/esm/Stack";
 import {useSelector} from "react-redux";
 import {Link, Outlet} from "react-router-dom";
@@ -8,7 +10,7 @@ import {selectIsAuthenticated} from "../auth/slice.ts";
 import {authLogOut, authVerify} from "../auth/thunks.ts";
 import {store} from "../store.ts";
 
-export default function MainLayout() {
+export default function MainLayout({children}: { children: React.ReactNode }) {
 
     const verify = () => {
         store.dispatch(authVerify());
@@ -20,42 +22,46 @@ export default function MainLayout() {
     const isAuthenticated = useSelector(selectIsAuthenticated);
 
     return (
-        <>
-            <header className="bg-body-tertiary">
-                <Stack direction="horizontal" gap={2} className="p-3">
-                    <Link to={`/`}>Home</Link>
-                    <Button onClick={verify} className="ms-auto">Verify</Button>
-                    {
-                        isAuthenticated &&
-                        <>
-                            <Button onClick={logOut}>Log Out</Button>
-                        </>
-                    }
-                    {
-                        !isAuthenticated &&
-                        <>
-                            <Link to={`/log-in`}>Log In</Link>
-                            <Link to={`/sign-up`}>Sign Up</Link>
-                        </>
-                    }
+        <div className="d-flex flex-column min-vh-100">
 
-                </Stack>
+            <header className="bg-body-tertiary">
+                <Container>
+                    <Stack direction="horizontal" gap={2} className="p-3">
+                        <Link to={`/`}>Home</Link>
+                        <Button onClick={verify} className="ms-auto">Verify</Button>
+                        {
+                            isAuthenticated &&
+                            <>
+                                <Button onClick={logOut}>Log Out</Button>
+                            </>
+                        }
+                        {
+                            !isAuthenticated &&
+                            <>
+                                <Link to={`/log-in`}>Log In</Link>
+                                <Link to={`/sign-up`}>Sign Up</Link>
+                            </>
+                        }
+                    </Stack>
+                </Container>
             </header>
 
-            <div className="outlet">
+            <main className="flex-grow-1">
+                {children ? children : null}
                 <Outlet/>
-            </div>
+            </main>
 
-            <footer className="bg-body-tertiary text-center fixed-bottom">
-                <div className="text-center p-3">
+            <footer className="bg-body-tertiary text-center">
+                <Container className="p-3">
                     <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
                         <img src={viteLogo} className="logo" alt="Vite logo"/>
                     </a>
                     <a href="https://react.dev" target="_blank" rel="noreferrer">
                         <img src={reactLogo} className="logo react" alt="React logo"/>
                     </a>
-                </div>
+                </Container>
             </footer>
-        </>
+
+        </div>
     )
 }

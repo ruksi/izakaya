@@ -9,7 +9,7 @@ function createBaseQuery() {
     });
 }
 
-const tatamiApi = createApi({
+const tatami = createApi({
     baseQuery: createBaseQuery(),
     endpoints: (build) => ({
 
@@ -35,9 +35,9 @@ const tatamiApi = createApi({
     }),
 });
 
-export const {
-    useGetUsersQuery,
-    useGetUserQuery,
-} = tatamiApi;
+// export const {
+//     useGetUsersQuery,
+//     useGetUserQuery,
+// } = tatami;
 
-export default tatamiApi;
+export default tatami;

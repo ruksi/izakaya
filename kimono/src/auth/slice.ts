@@ -1,5 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit"
-import tatamiApi from "../services/tatami.ts";
+import tatami from "../services/tatami.ts";
 import {authLogOut, authVerify} from "./thunks.ts";
 
 type AuthState = {
@@ -32,14 +32,14 @@ const authSlice = createSlice({
         )
 
         builder.addMatcher(
-            tatamiApi.endpoints.signUp.matchFulfilled,
+            tatami.endpoints.signUp.matchFulfilled,
             (state) => {
                 state.isAuthenticated = true;
             },
         );
 
         builder.addMatcher(
-            tatamiApi.endpoints.logIn.matchFulfilled,
+            tatami.endpoints.logIn.matchFulfilled,
             (state) => {
                 state.isAuthenticated = true;
             },
