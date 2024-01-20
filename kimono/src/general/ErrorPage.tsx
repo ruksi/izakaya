@@ -14,7 +14,7 @@ export default function ErrorPage() {
                         <span className="text-body-emphasis">Sorry</span>,
                         an unexpected <span className="text-danger-emphasis">error</span> occurred
                     </h1>
-                    <div className="fst-italic text-muted">
+                    <div className="fst-italic text-secondary">
                         {error?.status ? `${error.status} - ` : null}
                         {error.statusText || error.message}
                     </div>

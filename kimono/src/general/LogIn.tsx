@@ -16,7 +16,7 @@ export default function LogIn() {
     const [usernameOrEmail, setUsernameOrEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const [logIn, {isLoading, error}] = tatami.endpoints.logIn.useLazyQuery();
+    const [logIn, {isLoading, isError, error}] = tatami.endpoints.logIn.useLazyQuery();
 
     const submit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -30,7 +30,7 @@ export default function LogIn() {
                 <Col xs md="8" lg="6" xl="5" xxl="4">
                     <Form className="pt-2 p-sm-2" noValidate onSubmit={submit}>
 
-                        {error ? (
+                        {isError || (isLoading && error) ? (
                             <Alert variant="danger">
                                 <div className="text-danger">Login Failed</div>
                                 {error?.status == 401
@@ -45,7 +45,7 @@ export default function LogIn() {
                                             Please try again later
                                         </div>
                                     )}
-                                <div className="small text-muted">
+                                <div className="small text-secondary">
                                     {error?.status
                                         ? `${error.status} `
                                         : null}
@@ -71,7 +71,7 @@ export default function LogIn() {
 
                                     <Form.Group className="mb-3" controlId="username-or-email">
                                         <Form.Label id="identity-label">
-                                            Username <span className="text-muted small">or Email</span>
+                                            Username <span className="text-secondary small">or Email</span>
                                         </Form.Label>
                                         <Form.Control
                                             arial-describedby="identity-label"
@@ -118,7 +118,7 @@ export default function LogIn() {
             </Row>
 
             <Row className="justify-content-center mt-3 mb-5">
-                <Col className="text-center text-muted">
+                <Col className="text-center text-secondary">
                     New to Ryokan? <Link to="/sign-up">Create an account</Link>
                 </Col>
             </Row>

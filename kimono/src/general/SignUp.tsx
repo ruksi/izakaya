@@ -17,9 +17,7 @@ export default function SignUp() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const [signUp, {isLoading, error}] = tatami.endpoints.signUp.useLazyQuery();
-
-    console.log(error);
+    const [signUp, {isLoading, isError, error}] = tatami.endpoints.signUp.useLazyQuery();
 
     const submit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -33,10 +31,10 @@ export default function SignUp() {
                 <Col xs md="8" lg="6" xl="5" xxl="4">
                     <Form className="p-sm-2" noValidate onSubmit={submit}>
 
-                        {error ? (
+                        {isError || (isLoading && error) ? (
                             <Alert variant="danger">
                                 <div className="text-danger">Signup Failed</div>
-                                <div className="small text-muted">
+                                <div className="small text-secondary">
                                     {error?.status
                                         ? `${error.status} `
                                         : null}
@@ -55,7 +53,7 @@ export default function SignUp() {
                                 <Card.Title>
                                     Sign Up
                                 </Card.Title>
-                                <Card.Subtitle className="text-muted">
+                                <Card.Subtitle className="text-secondary">
                                     Create a new account
                                 </Card.Subtitle>
                             </Card.Header>
@@ -121,7 +119,7 @@ export default function SignUp() {
             </Row>
 
             <Row className="justify-content-center mt-3 mb-5">
-                <Col className="text-center text-muted">
+                <Col className="text-center text-secondary">
                     Already got an account? <Link to="/log-in">Log in</Link>
                 </Col>
             </Row>

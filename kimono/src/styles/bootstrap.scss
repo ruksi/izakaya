@@ -51,6 +51,12 @@ $danger: $red;
 $light: $gray-100;
 $dark: $gray-800;
 
+$body-color-dark: $gray-300; // text color
+$input-bg: $gray-900;
+$input-disabled-color: darken($body-color-dark, 20%);
+$input-disabled-bg: lighten($input-bg, 2%);
+$input-disabled-border-color: lighten($input-bg, 10%);
+
 // can also copy-paste the entire definitions from Bootstrap
 // if more customization is needed:
 @import "../../node_modules/bootstrap/scss/bootstrap";
