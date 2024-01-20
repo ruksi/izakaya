@@ -9,7 +9,7 @@ import Row from "react-bootstrap/Row";
 import {Link} from "react-router-dom";
 import tatami from "../services/tatami.ts";
 import ButtonSpinnerIf from "./ButtonSpinnerIf.tsx";
-import {FormAlert} from "./FormAlert.tsx";
+import {FormAlert, FormGroupFeedback} from "./forms.tsx";
 
 export default function SignUp() {
 
@@ -54,6 +54,7 @@ export default function SignUp() {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                         />
+                                        <FormGroupFeedback field="email" error={error}/>
                                     </Form.Group>
 
                                     <Form.Group className="mb-3" controlId="username">
@@ -65,6 +66,7 @@ export default function SignUp() {
                                             value={username}
                                             onChange={(e) => setUsername(e.target.value)}
                                         />
+                                        <FormGroupFeedback field="username" error={error}/>
                                     </Form.Group>
 
                                     <Form.Group className="mb-4" controlId="password">
@@ -76,6 +78,7 @@ export default function SignUp() {
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                         />
+                                        <FormGroupFeedback field="password" error={error}/>
                                     </Form.Group>
 
                                 </div>

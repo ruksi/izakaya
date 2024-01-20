@@ -9,7 +9,7 @@ import Row from "react-bootstrap/Row";
 import {Link} from "react-router-dom";
 import tatami from "../services/tatami.ts";
 import ButtonSpinnerIf from "./ButtonSpinnerIf.tsx";
-import {FormAlert} from "./FormAlert.tsx";
+import {FormAlert} from "./forms.tsx";
 
 export default function LogIn() {
 
