@@ -1,12 +1,13 @@
 import {createBrowserRouter} from "react-router-dom";
+import AnonymousOnly from "./auth/AnonymousOnly.tsx";
+import AuthenticatedOnly from "./auth/AuthenticatedOnly.tsx";
+import LogIn from "./auth/LogIn.tsx";
+import SignUp from "./auth/SignUp.tsx";
 import {authVerify} from "./auth/thunks.ts";
-import AnonymousOnly from "./general/AnonymousOnly.tsx";
-import AuthenticatedOnly from "./general/AuthenticatedOnly.tsx";
 import ErrorPage from "./general/ErrorPage.tsx";
 import Home from "./general/Home.tsx";
-import LogIn from "./general/LogIn.tsx";
 import MainLayout from "./general/MainLayout.tsx";
-import SignUp from "./general/SignUp.tsx";
+import {Settings} from "./settings/Settings.tsx";
 import {store} from "./store.ts";
 import StyleTester from "./styles/StyleTester.tsx";
 
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
             {
                 element: <AuthenticatedOnly/>,
                 children: [
+                    {
+                        path: "settings",
+                        element: <Settings/>,
+                    },
                     {
                         path: "styles",
                         element: <StyleTester/>,

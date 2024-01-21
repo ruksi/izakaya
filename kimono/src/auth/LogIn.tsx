@@ -10,7 +10,7 @@ import {Link} from "react-router-dom";
 
 import {FormAlert} from "../forms/FormAlert.tsx";
 import tatami from "../services/tatami.ts";
-import ButtonSpinnerIf from "./ButtonSpinnerIf.tsx";
+import ButtonSpinnerIf from "../general/ButtonSpinnerIf.tsx";
 
 export default function LogIn() {
 

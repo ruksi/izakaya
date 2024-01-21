@@ -27,12 +27,13 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
             <header className="bg-body-tertiary">
                 <Container>
                     <Stack direction="horizontal" gap={2} className="p-3">
-                        <Link to={`/`}>Home</Link>
+                        <Link to={`/`} className="me-auto">Home</Link>
                         <Button onClick={verify} className="ms-auto">Verify</Button>
                         {
                             isAuthenticated &&
                             <>
-                                <Button onClick={logOut}>Log Out</Button>
+                                <Link to={`/settings`}>Settings</Link>
+                                <Button variant="link" onClick={logOut}>Log Out</Button>
                             </>
                         }
                         {

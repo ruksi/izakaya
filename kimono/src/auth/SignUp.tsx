@@ -8,9 +8,9 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import {Link} from "react-router-dom";
 import {isErroneous} from "../forms/checks.ts";
-import {FormGroupFeedback} from "../forms/FormGroupFeedback";
+import {FormGroupFeedback} from "../forms/FormGroupFeedback.tsx";
 import tatami from "../services/tatami.ts";
-import ButtonSpinnerIf from "./ButtonSpinnerIf.tsx";
+import ButtonSpinnerIf from "../general/ButtonSpinnerIf.tsx";
 
 export default function SignUp() {
 
