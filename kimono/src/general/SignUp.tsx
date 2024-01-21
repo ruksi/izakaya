@@ -7,9 +7,10 @@ import Stack from "react-bootstrap/esm/Stack";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import {Link} from "react-router-dom";
+import {isErroneous} from "../forms/checks.ts";
+import {FormGroupFeedback} from "../forms/FormGroupFeedback";
 import tatami from "../services/tatami.ts";
 import ButtonSpinnerIf from "./ButtonSpinnerIf.tsx";
-import {FormAlert, FormGroupFeedback} from "./forms.tsx";
 
 export default function SignUp() {
 
@@ -17,7 +18,7 @@ export default function SignUp() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const [signUp, {isLoading, isError, error}] = tatami.endpoints.signUp.useLazyQuery();
+    const [signUp, {isLoading, error}] = tatami.endpoints.signUp.useLazyQuery();
 
     const submit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -50,6 +51,7 @@ export default function SignUp() {
                                         <Form.Control
                                             aria-describedby="email-label"
                                             disabled={isLoading}
+                                            isInvalid={isErroneous("email", error)}
                                             type="email"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
@@ -62,6 +64,7 @@ export default function SignUp() {
                                         <Form.Control
                                             aria-describedby="username-label"
                                             disabled={isLoading}
+                                            isInvalid={isErroneous("username", error)}
                                             type="text"
                                             value={username}
                                             onChange={(e) => setUsername(e.target.value)}
@@ -74,6 +77,7 @@ export default function SignUp() {
                                         <Form.Control
                                             aria-describedby="password-label"
                                             disabled={isLoading}
+                                            isInvalid={isErroneous("password", error)}
                                             type="password"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
@@ -101,10 +105,6 @@ export default function SignUp() {
                             </Card.Footer>
 
                         </Card>
-
-                        {isError || (isLoading && error)
-                            ? <FormAlert title="Signup Failed" error={error} isLoading={isLoading}/>
-                            : null}
 
                     </Form>
                 </Col>

@@ -10,7 +10,7 @@ import {selectIsAuthenticated} from "../auth/slice.ts";
 import {authLogOut, authVerify} from "../auth/thunks.ts";
 import {store} from "../store.ts";
 
-export default function MainLayout({children}: { children: React.ReactNode }) {
+export default function MainLayout({children}: { children?: React.ReactNode }) {
 
     const verify = () => {
         store.dispatch(authVerify());

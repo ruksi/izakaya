@@ -7,9 +7,10 @@ import Stack from "react-bootstrap/esm/Stack";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import {Link} from "react-router-dom";
+
+import {FormAlert} from "../forms/FormAlert.tsx";
 import tatami from "../services/tatami.ts";
 import ButtonSpinnerIf from "./ButtonSpinnerIf.tsx";
-import {FormAlert} from "./forms.tsx";
 
 export default function LogIn() {
 
@@ -29,6 +30,10 @@ export default function LogIn() {
             <Row className="justify-content-center mt-lg-3">
                 <Col xs md="8" lg="6" xl="5" xxl="4">
                     <Form className="pt-2 p-sm-2" noValidate onSubmit={submit}>
+
+                        {isError || (isLoading && error)
+                            ? <FormAlert title="Login Failed" error={error} isLoading={isLoading}/>
+                            : null}
 
                         {/*{isError || (isLoading && error) ? (*/}
                         {/*    <Alert variant="danger">*/}
@@ -114,10 +119,6 @@ export default function LogIn() {
 
                         </Card>
 
-                        {isError || (isLoading && error)
-                            ? <FormAlert title="Login Failed" error={error} isLoading={isLoading}/>
-                            : null}
-
                     </Form>
                 </Col>
             </Row>
@@ -129,5 +130,6 @@ export default function LogIn() {
             </Row>
 
         </Container>
-    );
+    )
+        ;
 }
