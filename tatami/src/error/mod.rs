@@ -19,7 +19,7 @@ pub enum Error {
     Unauthorized,
     Forbidden,
     NotFound,
-    Json(axum::extract::rejection::JsonRejection),
+    JsonRejection(axum::extract::rejection::JsonRejection),
     Validation(validator::ValidationErrors),
     Database(sqlx::Error),
     Cache(redis::RedisError),
@@ -44,7 +44,7 @@ impl Error {
                 StatusCode::NOT_FOUND,
                 json_message("The thing doesn't exist"),
             ),
-            Json(_err) => (StatusCode::BAD_REQUEST, json_message("Invalid JSON")), // TODO: could provide more info
+            JsonRejection(err) => (err.status(), json_message(err.body_text())),
             Validation(err) => validation_error::validation_error_to_response_tuple(err),
             Database(err) => database_error::sqlx_error_to_response_tuple(err),
             Cache(err) => cache_error::redis_error_to_response_tuple(err),
@@ -76,7 +76,7 @@ impl axum::response::IntoResponse for Error {
 
 impl From<axum::extract::rejection::JsonRejection> for Error {
     fn from(err: axum::extract::rejection::JsonRejection) -> Self {
-        Self::Json(err)
+        Self::JsonRejection(err)
     }
 }
 
