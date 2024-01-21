@@ -8,7 +8,7 @@ async fn main() {
     // populate environment variables from `.env` file without overriding
     dotenvy::dotenv().ok();
 
-    let config = tatami::config::Config::load();
+    let config = tatami::Config::load();
 
     tracing_subscriber::registry()
         .with(EnvFilter::builder().parse(&config.rust_log).unwrap())

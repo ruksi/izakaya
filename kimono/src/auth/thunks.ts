@@ -11,7 +11,7 @@ interface VerifyPayload {
 export const authVerify = createAsyncThunk(
     "auth/verify",
     async () => {
-        const response = await fetch(`${baseUrl}/sessions/verify`, {credentials: "include"});
+        const response = await fetch(`${baseUrl}/api/verify`, {credentials: "include"});
         if (response.status === 401) {
             return {isAuthenticated: false} as VerifyPayload;
         }

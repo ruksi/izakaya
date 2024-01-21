@@ -8,21 +8,23 @@ use tokio::time::sleep;
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
 
-use crate::config::Config;
+pub use crate::config::Config;
 use crate::prelude::*;
 use crate::session::cookie::cookie_secret_from_seed;
 use crate::state::AppState;
 
 mod api;
 mod auth;
-pub mod config;
+mod config;
 mod crypto;
 mod error;
 mod prelude;
 mod session;
+mod settings;
 mod state;
 mod user;
-pub mod valid;
+mod valid;
+mod verify;
 
 #[cfg(test)]
 mod test_utils;
