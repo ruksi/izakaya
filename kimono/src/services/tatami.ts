@@ -30,6 +30,7 @@ const tatami = createApi({
         }),
 
         // api...
+        getProfile: build.query({query: () => "/api/settings/profile"}),
         getUsers: build.query({query: () => "/api/users"}),
         getUser: build.query({query: userId => `/api/users/${userId}`}),
     }),
