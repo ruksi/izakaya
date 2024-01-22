@@ -25,13 +25,13 @@ pub async fn healthz(State(state): State<AppState>) -> Result<String> {
 mod tests {
     use axum_test::TestServer;
 
-    use crate::handle::router;
+    use crate::endpoints::router;
     use crate::test_utils::mock_state;
 
     use super::*;
 
     #[sqlx::test]
-    async fn health_endpoint(pool: sqlx::PgPool) -> Result<()> {
+    async fn health_handler(pool: sqlx::PgPool) -> Result<()> {
         let state = mock_state(pool).await;
         let server = TestServer::new(router(state.clone())).unwrap();
         server

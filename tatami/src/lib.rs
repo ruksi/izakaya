@@ -14,8 +14,8 @@ use crate::state::AppState;
 mod auth;
 mod config;
 mod crypto;
+mod endpoints;
 mod error;
-mod handle;
 mod prelude;
 mod state;
 mod user;
@@ -72,7 +72,7 @@ fn root_router<S>(state: AppState) -> Router<S> {
         "/favicon.ico",
         get(|| async { Redirect::permanent("/assets/favicon.ico") }),
     );
-    let app = app.merge(handle::router(state.clone()));
+    let app = app.merge(endpoints::router(state.clone()));
     let app = app.layer(axum::middleware::from_fn_with_state(
         state.clone(),
         crate::auth::record_visit,

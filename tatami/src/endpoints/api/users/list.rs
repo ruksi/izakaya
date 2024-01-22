@@ -16,7 +16,7 @@ mod tests {
     use axum_test::TestServer;
     use serde_json::json;
 
-    use crate::handle::api::users::router;
+    use crate::endpoints::api::users::router;
     use crate::test_utils::mock_state;
     use crate::user::UserDeclaration;
 

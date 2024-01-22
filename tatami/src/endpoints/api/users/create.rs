@@ -21,7 +21,7 @@ mod tests {
     use serde_json::json;
     use uuid::Uuid;
 
-    use crate::handle::api::users::router;
+    use crate::endpoints::api::users::router;
     use crate::test_utils::mock_state;
 
     use super::*;
