@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use axum::extract::{MatchedPath, Request, State};
+use axum::extract::{MatchedPath, Request};
 use axum::response::Redirect;
 use axum::routing::get;
 use axum::Router;
@@ -9,7 +9,6 @@ use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
 
 pub use crate::config::Config;
-use crate::prelude::*;
 use crate::state::AppState;
 
 mod auth;
@@ -69,12 +68,10 @@ fn root_router<S>(state: AppState) -> Router<S> {
     // thus this is assuming working directory is `ryokan/tatami`
     let app = app.nest_service("/assets", ServeDir::new("./assets"));
 
-    let app = app.route("/", get(index));
     let app = app.route(
         "/favicon.ico",
         get(|| async { Redirect::permanent("/assets/favicon.ico") }),
     );
-    let app = app.route("/healthz", get(healthz));
     let app = app.merge(handle::router(state.clone()));
     let app = app.layer(axum::middleware::from_fn_with_state(
         state.clone(),
@@ -99,46 +96,4 @@ fn root_router<S>(state: AppState) -> Router<S> {
     );
 
     app.with_state(state)
-}
-
-async fn index() -> &'static str {
-    "Hello, World!"
-}
-
-async fn healthz(State(state): State<AppState>) -> Result<String> {
-    let from_db: String = sqlx::query_scalar("SELECT 'DATABASE OK'")
-        .fetch_one(&state.db_pool)
-        .await?;
-
-    let mut cache_conn = state.cache_pool.get().await?;
-    deadpool_redis::redis::cmd("SET")
-        .arg(&["deadpool:test_key", "CACHE OK"])
-        .query_async::<_, ()>(&mut cache_conn)
-        .await?;
-    let from_cache: String = deadpool_redis::redis::cmd("GET")
-        .arg(&["deadpool:test_key"])
-        .query_async(&mut cache_conn)
-        .await?;
-
-    Ok(format!("{}\n{}", from_db, from_cache))
-}
-
-#[cfg(test)]
-mod tests {
-    use axum_test::TestServer;
-
-    use crate::test_utils;
-
-    use super::*;
-
-    #[sqlx::test]
-    async fn health_endpoint(pool: sqlx::PgPool) {
-        let state = test_utils::mock_state(pool).await;
-        let routes = root_router(state.clone());
-        let server = TestServer::new(routes).unwrap();
-        server
-            .get("/healthz")
-            .await
-            .assert_text("DATABASE OK\nCACHE OK");
-    }
 }
