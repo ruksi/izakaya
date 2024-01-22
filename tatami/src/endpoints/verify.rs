@@ -5,8 +5,6 @@ use crate::auth::Visitor;
 use crate::prelude::*;
 
 pub async fn verify(Extension(visitor): Extension<Visitor>) -> Result<Json<Value>> {
-    let Some(user_id) = visitor.user_id else {
-        return Err(Error::Unauthorized);
-    };
+    let user_id = visitor.get_user_id_or_respond_unauthorized()?;
     Ok(Json(json!({"userId": user_id})))
 }

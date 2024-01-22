@@ -10,9 +10,7 @@ pub async fn list(
     State(state): State<AppState>,
     Extension(visitor): Extension<Visitor>,
 ) -> Result<Json<Value>> {
-    let Some(user_id) = visitor.user_id else {
-        return Err(Error::Unauthorized);
-    };
+    let user_id = visitor.get_user_id_or_respond_unauthorized()?;
 
     let mut cache_conn = state.cache_pool.get().await?;
 

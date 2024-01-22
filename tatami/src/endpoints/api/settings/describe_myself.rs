@@ -11,9 +11,7 @@ pub async fn describe_myself(
     State(state): State<AppState>,
     Extension(visitor): Extension<Visitor>,
 ) -> crate::error::Result<Json<Value>> {
-    let Some(user_id) = visitor.user_id else {
-        return Err(Error::Unauthorized);
-    };
+    let user_id = visitor.get_user_id_or_respond_unauthorized()?;
     let user = user::describe(&state.db_pool, user_id).await?;
     let Some(user) = user else {
         tracing::error!("User {} could not find itself", user_id);
