@@ -1,5 +1,3 @@
-use axum_extra::extract::cookie;
-
 use crate::state::AppState;
 
 pub async fn mock_cache_pool() -> deadpool_redis::Pool {
@@ -13,7 +11,7 @@ pub async fn mock_cache_pool() -> deadpool_redis::Pool {
 
 pub async fn mock_state(db_pool: sqlx::PgPool) -> AppState {
     let cache_pool = mock_cache_pool().await;
-    let cookie_secret = cookie::Key::generate();
+    let cookie_secret = axum_extra::extract::cookie::Key::generate();
     AppState {
         db_pool,
         cache_pool,

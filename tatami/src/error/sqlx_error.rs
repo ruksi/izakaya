@@ -111,7 +111,7 @@ mod tests {
         .await
         .unwrap_err();
 
-        Error::Database(sqlx_err)
+        Error::Sqlx(sqlx_err)
             .assert_status(StatusCode::BAD_REQUEST)
             .assert_json(json!({
                 "message": "Validation failed",

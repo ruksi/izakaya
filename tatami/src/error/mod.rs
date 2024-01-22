@@ -1,14 +1,22 @@
 use axum::http::StatusCode;
 use axum::Json;
 
+use crate::error::argon2_hash_error::argon2_password_hash_error_to_response_tuple;
+use crate::error::axum_json_rejection::axum_json_rejection_to_response_tuple;
 use crate::error::error_response::{json_message, ErrorBody};
+use crate::error::redis_error::redis_error_to_response_tuple;
+use crate::error::redis_pool_error::deadpool_redis_error_to_response_tuple;
+use crate::error::sqlx_error::sqlx_error_to_response_tuple;
+use crate::error::tokio_task_error::tokio_task_join_error_to_response_tuple;
+use crate::error::validation_error::validator_error_to_response_tuple;
 
-mod cache_error;
-mod cache_pool_error;
-mod database_error;
+mod argon2_hash_error;
+mod axum_json_rejection;
 mod error_response;
-mod password_error;
-mod task_error;
+mod redis_error;
+mod redis_pool_error;
+mod sqlx_error;
+mod tokio_task_error;
 mod validation_error;
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -19,13 +27,13 @@ pub enum Error {
     Unauthorized,
     Forbidden,
     NotFound,
-    JsonRejection(axum::extract::rejection::JsonRejection),
-    Validation(validator::ValidationErrors),
-    Database(sqlx::Error),
-    Cache(redis::RedisError),
-    CachePool(deadpool::managed::PoolError<redis::RedisError>),
-    Password(argon2::password_hash::Error),
-    Task(tokio::task::JoinError),
+    AxumJsonRejection(axum::extract::rejection::JsonRejection),
+    Validator(validator::ValidationErrors),
+    Sqlx(sqlx::Error),
+    Redis(redis::RedisError),
+    RedisPool(deadpool::managed::PoolError<redis::RedisError>),
+    Argon2Hash(argon2::password_hash::Error),
+    TokioTask(tokio::task::JoinError),
 }
 
 impl Error {
@@ -44,13 +52,13 @@ impl Error {
                 StatusCode::NOT_FOUND,
                 json_message("The thing doesn't exist"),
             ),
-            JsonRejection(err) => (err.status(), json_message(err.body_text())),
-            Validation(err) => validation_error::validation_error_to_response_tuple(err),
-            Database(err) => database_error::sqlx_error_to_response_tuple(err),
-            Cache(err) => cache_error::redis_error_to_response_tuple(err),
-            CachePool(err) => cache_pool_error::deadpool_redis_error_to_response_tuple(err),
-            Password(err) => password_error::argon2_password_hash_error_to_response_tuple(err),
-            Task(err) => task_error::tokio_task_join_error_to_response_tuple(err),
+            AxumJsonRejection(rejection) => axum_json_rejection_to_response_tuple(rejection),
+            Validator(err) => validator_error_to_response_tuple(err),
+            Sqlx(err) => sqlx_error_to_response_tuple(err),
+            Redis(err) => redis_error_to_response_tuple(err),
+            RedisPool(err) => deadpool_redis_error_to_response_tuple(err),
+            Argon2Hash(err) => argon2_password_hash_error_to_response_tuple(err),
+            TokioTask(err) => tokio_task_join_error_to_response_tuple(err),
         }
     }
 
@@ -76,42 +84,42 @@ impl axum::response::IntoResponse for Error {
 
 impl From<axum::extract::rejection::JsonRejection> for Error {
     fn from(err: axum::extract::rejection::JsonRejection) -> Self {
-        Self::JsonRejection(err)
+        Self::AxumJsonRejection(err)
     }
 }
 
 impl From<validator::ValidationErrors> for Error {
     fn from(err: validator::ValidationErrors) -> Self {
-        Self::Validation(err)
+        Self::Validator(err)
     }
 }
 
 impl From<sqlx::Error> for Error {
     fn from(err: sqlx::Error) -> Self {
-        Self::Database(err)
+        Self::Sqlx(err)
     }
 }
 
 impl From<redis::RedisError> for Error {
     fn from(err: redis::RedisError) -> Self {
-        Self::Cache(err)
+        Self::Redis(err)
     }
 }
 
 impl From<deadpool::managed::PoolError<redis::RedisError>> for Error {
     fn from(err: deadpool::managed::PoolError<redis::RedisError>) -> Self {
-        Self::CachePool(err)
+        Self::RedisPool(err)
     }
 }
 
 impl From<argon2::password_hash::Error> for Error {
     fn from(err: argon2::password_hash::Error) -> Self {
-        Self::Password(err)
+        Self::Argon2Hash(err)
     }
 }
 
 impl From<tokio::task::JoinError> for Error {
     fn from(err: tokio::task::JoinError) -> Self {
-        Self::Task(err)
+        Self::TokioTask(err)
     }
 }

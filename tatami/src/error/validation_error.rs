@@ -3,7 +3,7 @@ use axum::Json;
 
 use crate::error::error_response::{ErrorBody, INVALID_REASON};
 
-pub fn validation_error_to_response_tuple(
+pub fn validator_error_to_response_tuple(
     err: &validator::ValidationErrors,
 ) -> (StatusCode, Json<ErrorBody>) {
     let error_body = ErrorBody::new(INVALID_REASON).with_validator_details(err.clone());
