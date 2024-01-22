@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use validator::Validate;
 
-use crate::crypto;
+use crate::auth::crypto;
 use crate::prelude::*;
 use crate::user::User;
 use crate::valid::Valid;

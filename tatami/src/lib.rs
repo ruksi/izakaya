@@ -13,7 +13,6 @@ use crate::state::AppState;
 
 mod auth;
 mod config;
-mod crypto;
 mod endpoints;
 mod error;
 mod prelude;

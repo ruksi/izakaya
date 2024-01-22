@@ -7,6 +7,7 @@ pub use visitor::Visitor;
 
 mod cache_keys;
 pub mod cookie;
+pub mod crypto;
 mod issue_access_token;
 mod record_visit;
 mod require_login;

@@ -1,7 +1,6 @@
 use rand::Rng;
 
-use crate::auth::{access_token_key, access_token_list_key};
-use crate::crypto;
+use crate::auth::{access_token_key, access_token_list_key, crypto};
 use crate::prelude::*;
 use crate::state::AppState;
 
