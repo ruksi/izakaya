@@ -11,7 +11,7 @@ interface VerifyPayload {
 export const authVerify = createAsyncThunk(
     "auth/verify",
     async () => {
-        const response = await fetch(`${baseUrl}/api/verify`, {credentials: "include"});
+        const response = await fetch(`${baseUrl}/verify`, {credentials: "include"});
         if (response.status === 401) {
             return {isAuthenticated: false} as VerifyPayload;
         }
@@ -30,7 +30,7 @@ export const authVerify = createAsyncThunk(
 export const authLogOut = createAsyncThunk(
     "auth/log-out",
     async () => {
-        const response = await fetch(`${baseUrl}/sessions/log-out`, {method: "POST", credentials: "include"});
+        const response = await fetch(`${baseUrl}/log-out`, {method: "POST", credentials: "include"});
         if (!response.ok) {
             throw Error();
         }

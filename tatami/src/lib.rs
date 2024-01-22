@@ -10,21 +10,17 @@ use tower_http::trace::TraceLayer;
 
 pub use crate::config::Config;
 use crate::prelude::*;
-use crate::session::cookie::cookie_secret_from_seed;
 use crate::state::AppState;
 
-mod api;
 mod auth;
 mod config;
 mod crypto;
 mod error;
+mod handle;
 mod prelude;
-mod session;
-mod settings;
 mod state;
 mod user;
 mod valid;
-mod verify;
 
 #[cfg(test)]
 mod test_utils;
@@ -56,7 +52,7 @@ pub async fn get_app<S>(config: &Config) -> Router<S> {
         .create_pool(Some(deadpool_redis::Runtime::Tokio1))
         .expect("Can't create cache pool");
 
-    let cookie_secret = cookie_secret_from_seed(config.secret_key.clone());
+    let cookie_secret = auth::cookie::cookie_secret_from_seed(config.secret_key.clone());
 
     let state = AppState {
         db_pool,
@@ -79,10 +75,7 @@ fn root_router<S>(state: AppState) -> Router<S> {
         get(|| async { Redirect::permanent("/assets/favicon.ico") }),
     );
     let app = app.route("/healthz", get(healthz));
-
-    let app = app.nest("/api", api::router(state.clone()));
-    let app = app.nest("/sessions", session::route::router(state.clone()));
-
+    let app = app.merge(handle::router(state.clone()));
     let app = app.layer(axum::middleware::from_fn_with_state(
         state.clone(),
         crate::auth::record_visit,

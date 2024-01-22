@@ -3,11 +3,11 @@ use axum::Json;
 use axum_extra::extract::PrivateCookieJar;
 use serde_json::{json, Value};
 
-use crate::auth::issue_access_token;
+use crate::auth::{cookie, issue_access_token};
 use crate::prelude::*;
-use crate::session::cookie;
 use crate::state::AppState;
-use crate::user::model::UserDeclaration;
+use crate::user;
+use crate::user::UserDeclaration;
 use crate::valid::Valid;
 
 pub async fn sign_up(
@@ -16,7 +16,7 @@ pub async fn sign_up(
     declaration: Valid<UserDeclaration>,
 ) -> Result<(PrivateCookieJar, Json<Value>)> {
     let password = declaration.0.password.clone();
-    let user = crate::user::model::create(&state.db_pool, declaration).await?;
+    let user = user::create(&state.db_pool, declaration).await?;
 
     let access_token = issue_access_token(&state, user.username, password).await?;
     let cookie = cookie::bake(cookie::ACCESS_TOKEN, access_token, time::Duration::days(14));

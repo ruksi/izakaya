@@ -1,21 +1,18 @@
-use axum::routing::{delete, get, post};
+use axum::routing::{get, post};
 use axum::Router;
-
-use create::create;
-use destroy::destroy;
-use list::list;
-use log_in::log_in;
-use log_out::log_out;
-use sign_up::sign_up;
 
 use crate::state::AppState;
 
-mod create;
-mod destroy;
-mod list;
+use self::log_in::log_in;
+use self::log_out::log_out;
+use self::sign_up::sign_up;
+use self::verify::verify;
+
+pub mod api;
 mod log_in;
 mod log_out;
 mod sign_up;
+mod verify;
 
 #[cfg(test)]
 mod tests;
@@ -23,11 +20,10 @@ mod tests;
 pub fn router<S>(state: AppState) -> Router<S> {
     Router::new()
         // TODO: delete route should work with "session id" but we don't have that yet?
-        .route("/", get(list))
-        .route("/", post(create))
-        .route("/", delete(destroy))
         .route("/sign-up", post(sign_up))
         .route("/log-in", post(log_in))
         .route("/log-out", post(log_out))
+        .route("/verify", get(verify))
+        .nest("/api", api::router(state.clone()))
         .with_state(state)
 }

@@ -95,6 +95,7 @@ impl Issue {
         }
     }
 
+    #[allow(dead_code)]
     pub fn with_message<T: Into<String>>(mut self, message: T) -> Self {
         self.message = Some(message.into());
         self

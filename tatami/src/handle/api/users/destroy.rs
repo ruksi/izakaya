@@ -5,13 +5,13 @@ use uuid::Uuid;
 
 use crate::prelude::*;
 use crate::state::AppState;
-use crate::user::model;
+use crate::user;
 
 pub async fn destroy(
     State(state): State<AppState>,
     Path(user_id): Path<Uuid>,
 ) -> Result<Json<Value>> {
-    model::destroy(&state.db_pool, user_id).await?;
+    user::destroy(&state.db_pool, user_id).await?;
     Ok(Json(json!({"status": "ok"})))
 }
 
@@ -20,10 +20,9 @@ mod tests {
     use axum::http::StatusCode;
     use axum_test::TestServer;
 
+    use crate::handle::api::users::router;
     use crate::test_utils::mock_state;
-    use crate::user::model;
-    use crate::user::model::UserDeclaration;
-    use crate::user::route::router;
+    use crate::user::UserDeclaration;
 
     use super::*;
 
@@ -33,7 +32,7 @@ mod tests {
         let server = TestServer::new(router(state.clone())).unwrap();
 
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        let user = model::create(&state.db_pool, declaration).await.unwrap();
+        let user = user::create(&state.db_pool, declaration).await.unwrap();
         server
             .delete(format!("/{}", user.user_id).as_str())
             .await

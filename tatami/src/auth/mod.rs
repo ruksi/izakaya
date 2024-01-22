@@ -6,6 +6,7 @@ pub use revoke_access_token::revoke_access_token;
 pub use visitor::Visitor;
 
 mod cache_keys;
+pub mod cookie;
 mod issue_access_token;
 mod record_visit;
 mod require_login;

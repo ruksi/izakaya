@@ -4,16 +4,16 @@ use uuid::Uuid;
 
 use crate::prelude::*;
 use crate::state::AppState;
-use crate::user::model;
-use crate::user::model::UserAmendment;
+use crate::user;
+use crate::user::{User, UserAmendment};
 use crate::valid::Valid;
 
 pub async fn amend(
     State(state): State<AppState>,
     Path(user_id): Path<Uuid>,
     amendment: Valid<UserAmendment>,
-) -> Result<Json<model::User>> {
-    let user = model::amend(&state.db_pool, user_id, amendment).await?;
+) -> Result<Json<User>> {
+    let user = user::amend(&state.db_pool, user_id, amendment).await?;
     Ok(Json(user))
 }
 
@@ -22,9 +22,10 @@ mod tests {
     use axum_test::TestServer;
     use serde_json::json;
 
+    use crate::handle::api::users::router;
     use crate::test_utils::mock_state;
-    use crate::user::model::UserDeclaration;
-    use crate::user::route::router;
+    use crate::user;
+    use crate::user::{User, UserDeclaration};
 
     use super::*;
 
@@ -34,7 +35,7 @@ mod tests {
         let server = TestServer::new(router(state.clone())).unwrap();
 
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        let user = model::create(&state.db_pool, declaration).await?;
+        let user = user::create(&state.db_pool, declaration).await?;
 
         let user = server
             .patch(format!("/{}", user.user_id).as_str())
@@ -43,10 +44,10 @@ mod tests {
                 "username": "bobby",
             }))
             .await
-            .json::<model::User>();
+            .json::<User>();
         assert_eq!(user.username, "bobby");
 
-        let user = model::describe(&state.db_pool, user.user_id).await?;
+        let user = user::describe(&state.db_pool, user.user_id).await?;
         assert_eq!(user.unwrap().username, "bobby");
 
         Ok(())

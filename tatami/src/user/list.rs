@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use crate::user::model::User;
+use crate::user::User;
 
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
 pub struct UserFilter {
@@ -30,7 +30,8 @@ pub async fn list(db: &sqlx::PgPool, filter: UserFilter) -> Result<Vec<User>> {
 #[cfg(test)]
 mod tests {
     use crate::prelude::*;
-    use crate::user::model::{create, UserDeclaration};
+    use crate::user;
+    use crate::user::UserDeclaration;
 
     use super::*;
 
@@ -52,7 +53,7 @@ mod tests {
         assert_eq!(list(&pool, john_filter.clone()).await?.len(), 0);
 
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        create(&pool, declaration).await?;
+        user::create(&pool, declaration).await?;
 
         assert_eq!(list(&pool, UserFilter::default()).await?.len(), 1);
         assert_eq!(list(&pool, bob_filter.clone()).await?.len(), 1);
@@ -60,7 +61,7 @@ mod tests {
         assert_eq!(list(&pool, john_filter.clone()).await?.len(), 0);
 
         let declaration = UserDeclaration::new_valid("alice", "alice@example.com", "p4ssw0rd")?;
-        create(&pool, declaration).await?;
+        user::create(&pool, declaration).await?;
 
         assert_eq!(list(&pool, UserFilter::default()).await?.len(), 2);
         assert_eq!(list(&pool, bob_filter.clone()).await?.len(), 1);
@@ -68,7 +69,7 @@ mod tests {
         assert_eq!(list(&pool, john_filter.clone()).await?.len(), 0);
 
         let declaration = UserDeclaration::new_valid("john", "john@example.com", "p4ssw0rd")?;
-        create(&pool, declaration).await?;
+        user::create(&pool, declaration).await?;
 
         assert_eq!(list(&pool, UserFilter::default()).await?.len(), 3);
         assert_eq!(list(&pool, bob_filter.clone()).await?.len(), 1);

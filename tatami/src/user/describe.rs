@@ -1,7 +1,7 @@
 use uuid::Uuid;
 
 use crate::prelude::*;
-use crate::user::model::User;
+use crate::user::User;
 
 pub async fn describe(db: &sqlx::PgPool, user_id: Uuid) -> Result<Option<User>> {
     let result = sqlx::query!(
@@ -24,13 +24,15 @@ pub async fn describe(db: &sqlx::PgPool, user_id: Uuid) -> Result<Option<User>> 
 
 #[cfg(test)]
 mod tests {
+    use crate::user;
+    use crate::user::UserDeclaration;
+
     use super::*;
-    use crate::user::model::{create, UserDeclaration};
 
     #[sqlx::test]
     async fn describe_works(pool: sqlx::PgPool) -> Result<()> {
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        let bob = create(&pool, declaration).await?;
+        let bob = user::create(&pool, declaration).await?;
         let re_bob = describe(&pool, bob.user_id).await?.unwrap();
         assert_eq!(bob, re_bob);
         Ok(())

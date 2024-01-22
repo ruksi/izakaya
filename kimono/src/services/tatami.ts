@@ -16,14 +16,14 @@ const tatami = createApi({
         // auth...
         signUp: build.query({
             query: (params: { username: string, email: string, password: string }) => ({
-                url: "/sessions/sign-up",
+                url: "/sign-up",
                 method: "POST",
                 body: params,
             }),
         }),
         logIn: build.query({
             query: (params: { username_or_email: string, password: string }) => ({
-                url: "/sessions/log-in",
+                url: "/log-in",
                 method: "POST",
                 body: params,
             }),

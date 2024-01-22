@@ -4,10 +4,8 @@ use axum::{Extension, Json};
 use axum_extra::extract::PrivateCookieJar;
 use serde_json::json;
 
-use crate::auth::revoke_access_token;
-use crate::auth::Visitor;
+use crate::auth::{cookie, revoke_access_token, Visitor};
 use crate::prelude::*;
-use crate::session::cookie;
 use crate::state::AppState;
 
 pub async fn log_out(

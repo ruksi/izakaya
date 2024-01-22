@@ -3,8 +3,8 @@ use uuid::Uuid;
 use validator::Validate;
 
 use crate::prelude::*;
-use crate::user::model;
-use crate::user::model::User;
+use crate::user;
+use crate::user::User;
 use crate::valid::Valid;
 
 #[derive(Deserialize, Validate, Default, Debug, PartialEq, Eq)]
@@ -33,7 +33,7 @@ pub async fn amend(
     Valid(amendment): Valid<UserAmendment>,
 ) -> Result<User> {
     if amendment == UserAmendment::default() {
-        let maybe_user = model::describe(db, user_id).await?;
+        let maybe_user = user::describe(db, user_id).await?;
         return match maybe_user {
             Some(user) => Ok(user),
             None => Err(Error::NotFound),
@@ -63,17 +63,17 @@ mod tests {
     use axum::http::StatusCode;
     use serde_json::json;
 
-    use crate::user::model::{amend, create, describe, UserDeclaration};
+    use crate::user::UserDeclaration;
 
     use super::*;
 
     #[sqlx::test]
     async fn amend_works(pool: sqlx::PgPool) -> Result<()> {
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        let bob = create(&pool, declaration).await?;
+        let bob = user::create(&pool, declaration).await?;
 
         let declaration = UserDeclaration::new_valid("alice", "alice@example.com", "p4ssw0rd")?;
-        let alice = create(&pool, declaration).await?;
+        let alice = user::create(&pool, declaration).await?;
 
         let amendment = UserAmendment {
             username: Some("bobby".into()),
@@ -83,10 +83,10 @@ mod tests {
         assert_eq!(bobby.user_id, bob.user_id);
         assert_eq!(bobby.username, "bobby");
 
-        let re_bobby = describe(&pool, bob.user_id).await?.unwrap();
+        let re_bobby = user::describe(&pool, bob.user_id).await?.unwrap();
         assert_eq!(bobby, re_bobby);
 
-        let re_alice = describe(&pool, alice.user_id).await?.unwrap();
+        let re_alice = user::describe(&pool, alice.user_id).await?.unwrap();
         assert_eq!(re_alice.username, "alice");
 
         // nothing to change 🤷

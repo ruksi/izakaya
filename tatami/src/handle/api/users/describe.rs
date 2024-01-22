@@ -4,13 +4,14 @@ use uuid::Uuid;
 
 use crate::prelude::*;
 use crate::state::AppState;
-use crate::user::model;
+use crate::user;
+use crate::user::User;
 
 pub async fn describe(
     State(state): State<AppState>,
     Path(user_id): Path<Uuid>,
-) -> Result<Json<model::User>> {
-    let user = model::describe(&state.db_pool, user_id).await?;
+) -> Result<Json<User>> {
+    let user = user::describe(&state.db_pool, user_id).await?;
     match user {
         Some(user) => Ok(Json(user)),
         None => Err(Error::NotFound),
@@ -23,9 +24,9 @@ mod tests {
     use axum_test::TestServer;
     use serde_json::json;
 
+    use crate::handle::api::users::router;
     use crate::test_utils::mock_state;
-    use crate::user::model::UserDeclaration;
-    use crate::user::route::router;
+    use crate::user::UserDeclaration;
 
     use super::*;
 
@@ -39,11 +40,11 @@ mod tests {
         response.assert_json(&json!({"message": "The thing doesn't exist"}));
 
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        let user = model::create(&state.db_pool, declaration).await.unwrap();
+        let user = user::create(&state.db_pool, declaration).await.unwrap();
         let fetched_user = server
             .get(format!("/{}", user.user_id).as_str())
             .await
-            .json::<model::User>();
+            .json::<User>();
         assert_eq!(user, fetched_user);
 
         Ok(())

@@ -15,7 +15,7 @@ async fn browser_authentication_flow(pool: sqlx::PgPool) -> Result<()> {
         .route("/sign-up", post(sign_up))
         .route("/log-in", post(log_in))
         .route("/log-out", post(log_out))
-        .route("/api/verify", get(crate::verify::verify))
+        .route("/verify", get(verify))
         .layer(axum::middleware::from_fn_with_state(
             state.clone(),
             crate::auth::record_visit,
@@ -25,7 +25,7 @@ async fn browser_authentication_flow(pool: sqlx::PgPool) -> Result<()> {
     let server = TestServer::new_with_config(mock_app, config).unwrap();
 
     // you start unauthorized
-    server.get("/api/verify").await.assert_status_unauthorized();
+    server.get("/verify").await.assert_status_unauthorized();
 
     // you can sign up and get automatically logged in
     server
@@ -33,14 +33,14 @@ async fn browser_authentication_flow(pool: sqlx::PgPool) -> Result<()> {
         .json(&json!({"username": "bob", "email": "bob@example.com", "password": "bobIsBest"}))
         .await
         .assert_status_ok();
-    let response = server.get("/api/verify").await;
+    let response = server.get("/verify").await;
     response.assert_status_ok();
     let response_json = response.json::<Value>();
     assert!(uuid::Uuid::parse_str(response_json.get("userId").unwrap().as_str().unwrap()).is_ok());
 
     // you can log out
     server.post("/log-out").await.assert_status_ok();
-    server.get("/api/verify").await.assert_status_unauthorized();
+    server.get("/verify").await.assert_status_unauthorized();
 
     // you can log in
     server
@@ -48,7 +48,7 @@ async fn browser_authentication_flow(pool: sqlx::PgPool) -> Result<()> {
         .json(&json!({"username_or_email": "bob", "password": "bobIsBest"}))
         .await
         .assert_status_ok();
-    let response = server.get("/api/verify").await;
+    let response = server.get("/verify").await;
     response.assert_status_ok();
     let response_json = response.json::<Value>();
     assert!(uuid::Uuid::parse_str(response_json.get("userId").unwrap().as_str().unwrap()).is_ok());
@@ -57,7 +57,7 @@ async fn browser_authentication_flow(pool: sqlx::PgPool) -> Result<()> {
     server.post("/log-out").await.assert_status_ok();
     server.post("/log-out").await.assert_status_ok();
     server.post("/log-out").await.assert_status_ok();
-    server.get("/api/verify").await.assert_status_unauthorized();
+    server.get("/verify").await.assert_status_unauthorized();
 
     Ok(())
 }

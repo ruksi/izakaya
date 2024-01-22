@@ -7,9 +7,7 @@ use axum::response::Response;
 use axum_extra::extract::PrivateCookieJar;
 use uuid::Uuid;
 
-use crate::auth;
-use crate::auth::Visitor;
-use crate::session::cookie;
+use crate::auth::{access_token_key, cookie, Visitor};
 use crate::state::AppState;
 
 pub async fn record_visit(
@@ -32,7 +30,7 @@ pub async fn record_visit(
     if let Some(bearer) = bearer {
         if let Ok(mut conn) = state.cache_pool.get().await {
             let session = deadpool_redis::redis::cmd("HGETALL")
-                .arg(auth::access_token_key(bearer))
+                .arg(access_token_key(bearer))
                 .query_async::<_, HashMap<String, String>>(&mut conn)
                 .await
                 .unwrap_or_default();
@@ -55,7 +53,7 @@ pub async fn record_visit(
             if access_token != "<deleted>" {
                 if let Ok(mut conn) = state.cache_pool.get().await {
                     let session = deadpool_redis::redis::cmd("HGETALL")
-                        .arg(auth::access_token_key(&access_token))
+                        .arg(access_token_key(&access_token))
                         .query_async::<_, HashMap<String, String>>(&mut conn)
                         .await
                         .unwrap_or_default();

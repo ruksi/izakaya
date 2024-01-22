@@ -3,7 +3,7 @@ use validator::Validate;
 
 use crate::crypto;
 use crate::prelude::*;
-use crate::user::model::User;
+use crate::user::User;
 use crate::valid::Valid;
 
 #[derive(Deserialize, Validate, Debug, Clone, PartialEq, Eq)]

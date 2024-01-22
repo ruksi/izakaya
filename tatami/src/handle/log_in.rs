@@ -3,9 +3,8 @@ use axum::Json;
 use axum_extra::extract::cookie::PrivateCookieJar;
 use serde_json::{json, Value};
 
-use crate::auth::issue_access_token;
+use crate::auth::{cookie, issue_access_token};
 use crate::prelude::*;
-use crate::session::cookie;
 use crate::state::AppState;
 
 #[derive(serde::Deserialize, Debug)]

@@ -23,21 +23,23 @@ pub async fn destroy(db: &sqlx::PgPool, user_id: Uuid) -> Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use crate::user::model::{create, describe, UserDeclaration};
     use axum::http::StatusCode;
+
+    use crate::user;
+    use crate::user::UserDeclaration;
 
     use super::*;
 
     #[sqlx::test]
     async fn destroy_works(pool: sqlx::PgPool) -> Result<()> {
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        let bob = create(&pool, declaration).await?;
+        let bob = user::create(&pool, declaration).await?;
         let declaration = UserDeclaration::new_valid("alice", "alice@example.com", "p4ssw0rd")?;
-        let alice = create(&pool, declaration).await?;
+        let alice = user::create(&pool, declaration).await?;
 
         destroy(&pool, bob.user_id).await?;
-        assert!(describe(&pool, bob.user_id).await?.is_none());
-        assert!(describe(&pool, alice.user_id).await?.is_some());
+        assert!(user::describe(&pool, bob.user_id).await?.is_none());
+        assert!(user::describe(&pool, alice.user_id).await?.is_some());
         Ok(())
     }
 

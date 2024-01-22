@@ -4,17 +4,18 @@ use axum_test::TestServer;
 use serde_json::{json, Value};
 
 use crate::prelude::*;
-use crate::session::route::*;
 use crate::test_utils::mock_state;
-use crate::user::model;
-use crate::user::model::UserDeclaration;
+use crate::user;
+use crate::user::UserDeclaration;
+
+use super::*;
 
 #[sqlx::test]
 async fn bearer_authentication_flow(pool: sqlx::PgPool) -> Result<()> {
     let state = mock_state(pool).await;
     let db = &state.db_pool;
     let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "bobIsBest")?;
-    model::create(db, declaration).await?;
+    user::create(db, declaration).await?;
 
     let server = TestServer::new(router(state.clone()).layer(
         axum::middleware::from_fn_with_state(state.clone(), crate::auth::record_visit),

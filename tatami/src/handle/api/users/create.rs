@@ -3,15 +3,15 @@ use axum::Json;
 
 use crate::prelude::*;
 use crate::state::AppState;
-use crate::user::model;
-use crate::user::model::UserDeclaration;
+use crate::user;
+use crate::user::{User, UserDeclaration};
 use crate::valid::Valid;
 
 pub async fn create(
     State(state): State<AppState>,
     declaration: Valid<UserDeclaration>,
-) -> Result<Json<model::User>> {
-    let user = model::create(&state.db_pool, declaration).await?;
+) -> Result<Json<User>> {
+    let user = user::create(&state.db_pool, declaration).await?;
     Ok(Json(user))
 }
 
@@ -21,8 +21,8 @@ mod tests {
     use serde_json::json;
     use uuid::Uuid;
 
+    use crate::handle::api::users::router;
     use crate::test_utils::mock_state;
-    use crate::user::route::router;
 
     use super::*;
 
@@ -40,7 +40,7 @@ mod tests {
             }))
             .await;
 
-        let user = response.json::<model::User>();
+        let user = response.json::<User>();
         assert_eq!(user.username, "bob");
         assert_ne!(user.user_id, Uuid::nil());
     }
