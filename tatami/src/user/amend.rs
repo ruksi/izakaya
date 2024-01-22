@@ -22,16 +22,16 @@ impl UserAmendment {
         let declaration = Self {
             username: username.map(Into::into),
         };
-        declaration.validate()?;
-        Ok(Valid(declaration))
+        Ok(Valid::new(declaration)?)
     }
 }
 
 pub async fn amend(
     db: &sqlx::PgPool,
     user_id: Uuid,
-    Valid(amendment): Valid<UserAmendment>,
+    amendment: Valid<UserAmendment>,
 ) -> Result<User> {
+    let amendment = amendment.into_inner();
     if amendment == UserAmendment::default() {
         let maybe_user = user::describe(db, user_id).await?;
         return match maybe_user {
@@ -75,11 +75,8 @@ mod tests {
         let declaration = UserDeclaration::new_valid("alice", "alice@example.com", "p4ssw0rd")?;
         let alice = user::create(&pool, declaration).await?;
 
-        let amendment = UserAmendment {
-            username: Some("bobby".into()),
-        };
-        amendment.validate()?;
-        let bobby = amend(&pool, bob.user_id, Valid(amendment)).await?;
+        let amendment = UserAmendment::new_valid(Some("bobby"))?;
+        let bobby = amend(&pool, bob.user_id, amendment).await?;
         assert_eq!(bobby.user_id, bob.user_id);
         assert_eq!(bobby.username, "bobby");
 
@@ -91,8 +88,7 @@ mod tests {
 
         // nothing to change 🤷
         let amendment = UserAmendment::default();
-        amendment.validate()?;
-        let am_bobby = amend(&pool, bob.user_id, Valid(amendment)).await?;
+        let am_bobby = amend(&pool, bob.user_id, Valid::new(amendment)?).await?;
         assert_eq!(bobby, am_bobby);
 
         // invalid change
@@ -110,11 +106,8 @@ mod tests {
             }));
 
         // bad change to an existing username
-        let amendment = UserAmendment {
-            username: Some("bobby".into()),
-        };
-        amendment.validate()?;
-        amend(&pool, alice.user_id, Valid(amendment))
+        let amendment = UserAmendment::new_valid(Some("bobby"))?;
+        amend(&pool, alice.user_id, amendment)
             .await
             .unwrap_err()
             .assert_status(StatusCode::BAD_REQUEST)

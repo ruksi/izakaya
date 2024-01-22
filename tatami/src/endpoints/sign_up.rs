@@ -15,7 +15,9 @@ pub async fn sign_up(
     mut jar: PrivateCookieJar,
     declaration: Valid<UserDeclaration>,
 ) -> Result<(PrivateCookieJar, Json<Value>)> {
-    let password = declaration.0.password.clone();
+    // we need the password after consume to create the access token
+    let password = declaration.inner_as_ref().password.clone();
+
     let user = user::create(&state.db_pool, declaration).await?;
 
     let access_token = issue_access_token(&state, user.username, password).await?;

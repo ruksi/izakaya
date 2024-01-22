@@ -27,15 +27,12 @@ impl UserDeclaration {
             email: email.into(),
             password: password.into(),
         };
-        declaration.validate()?;
-        Ok(Valid(declaration))
+        Ok(Valid::new(declaration)?)
     }
 }
 
-pub async fn create(db: &sqlx::PgPool, Valid(declaration): Valid<UserDeclaration>) -> Result<User> {
-    // we _could_ validate it again, but it's already marked as being valid
-    // declaration.validate()?;
-
+pub async fn create(db: &sqlx::PgPool, declaration: Valid<UserDeclaration>) -> Result<User> {
+    let declaration = declaration.into_inner();
     let password_hash = crypto::hash_password(declaration.password).await?;
 
     let mut tx = db.begin().await?;
