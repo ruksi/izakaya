@@ -17,22 +17,20 @@ pub async fn create(
 
 #[cfg(test)]
 mod tests {
-    use axum_test::TestServer;
     use serde_json::json;
     use uuid::Uuid;
 
-    use crate::endpoints::api::users::router;
-    use crate::test_utils::mock_state;
+    use crate::test_utils::{as_website_admin, mock_server};
 
     use super::*;
 
     #[sqlx::test]
-    async fn create_handler_works(pool: sqlx::PgPool) {
-        let state = mock_state(pool).await;
-        let server = TestServer::new(router(state.clone())).unwrap();
+    async fn works(db: sqlx::PgPool) -> Result<()> {
+        let server = mock_server(&db).await;
+        as_website_admin(&db, &server).await?;
 
         let response = server
-            .post("/")
+            .post("/api/users")
             .json(&json!({
                 "username": "bob",
                 "email": "bob@example.com",
@@ -40,17 +38,20 @@ mod tests {
             }))
             .await;
 
+        response.assert_status_ok();
         let user = response.json::<User>();
         assert_eq!(user.username, "bob");
         assert_ne!(user.user_id, Uuid::nil());
+        Ok(())
     }
 
     #[sqlx::test]
-    async fn create_handler_handles_validation_errors(pool: sqlx::PgPool) {
-        let state = mock_state(pool).await;
-        let server = TestServer::new(router(state.clone())).unwrap();
+    async fn fails_on_validation_errors(db: sqlx::PgPool) -> Result<()> {
+        let server = mock_server(&db).await;
+        as_website_admin(&db, &server).await?;
+
         server
-            .post("/")
+            .post("/api/users")
             .json(&json!({
                 "username": "john doe",
                 "email": "john@example.com",
@@ -69,5 +70,6 @@ mod tests {
                     }]
                 }
             }));
+        Ok(())
     }
 }

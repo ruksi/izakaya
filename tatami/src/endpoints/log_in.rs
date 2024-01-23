@@ -18,7 +18,13 @@ pub async fn log_in(
     mut jar: PrivateCookieJar,
     Json(body): Json<LogInBody>,
 ) -> Result<(PrivateCookieJar, Json<Value>)> {
-    let access_token = issue_access_token(&state, body.username_or_email, body.password).await?;
+    let access_token = issue_access_token(
+        &state,
+        body.username_or_email,
+        body.password,
+        Some(time::Duration::days(14) + time::Duration::minutes(1)),
+    )
+    .await?;
     let cookie = cookie::bake(cookie::ACCESS_TOKEN, access_token, time::Duration::days(14));
     jar = jar.add(cookie);
 

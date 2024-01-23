@@ -19,26 +19,24 @@ pub async fn amend(
 
 #[cfg(test)]
 mod tests {
-    use axum_test::TestServer;
     use serde_json::json;
 
-    use crate::endpoints::api::users::router;
-    use crate::test_utils::mock_state;
+    use crate::test_utils::{as_website_admin, mock_server};
     use crate::user;
     use crate::user::{User, UserDeclaration};
 
     use super::*;
 
     #[sqlx::test]
-    async fn amend_route_works(pool: sqlx::PgPool) -> Result<()> {
-        let state = mock_state(pool).await;
-        let server = TestServer::new(router(state.clone())).unwrap();
+    async fn works(db: sqlx::PgPool) -> Result<()> {
+        let server = mock_server(&db).await;
+        as_website_admin(&db, &server).await?;
 
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        let user = user::create(&state.db_pool, declaration).await?;
+        let user = user::create(&db, declaration).await?;
 
         let user = server
-            .patch(format!("/{}", user.user_id).as_str())
+            .patch(format!("/api/users/{}", user.user_id).as_str())
             .content_type(&"application/json")
             .json(&json!({
                 "username": "bobby",
@@ -47,7 +45,7 @@ mod tests {
             .json::<User>();
         assert_eq!(user.username, "bobby");
 
-        let user = user::describe(&state.db_pool, user.user_id).await?;
+        let user = user::describe(&db, user.user_id).await?;
         assert_eq!(user.unwrap().username, "bobby");
 
         Ok(())

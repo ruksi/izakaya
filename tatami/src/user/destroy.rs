@@ -31,21 +31,21 @@ mod tests {
     use super::*;
 
     #[sqlx::test]
-    async fn destroy_works(pool: sqlx::PgPool) -> Result<()> {
+    async fn works(db: sqlx::PgPool) -> Result<()> {
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        let bob = user::create(&pool, declaration).await?;
+        let bob = user::create(&db, declaration).await?;
         let declaration = UserDeclaration::new_valid("alice", "alice@example.com", "p4ssw0rd")?;
-        let alice = user::create(&pool, declaration).await?;
+        let alice = user::create(&db, declaration).await?;
 
-        destroy(&pool, bob.user_id).await?;
-        assert!(user::describe(&pool, bob.user_id).await?.is_none());
-        assert!(user::describe(&pool, alice.user_id).await?.is_some());
+        destroy(&db, bob.user_id).await?;
+        assert!(user::describe(&db, bob.user_id).await?.is_none());
+        assert!(user::describe(&db, alice.user_id).await?.is_some());
         Ok(())
     }
 
     #[sqlx::test]
-    async fn destroy_fails_it_not_found(pool: sqlx::PgPool) -> Result<()> {
-        let err = destroy(&pool, Uuid::new_v4()).await.unwrap_err();
+    async fn fails_if_not_found(db: sqlx::PgPool) -> Result<()> {
+        let err = destroy(&db, Uuid::new_v4()).await.unwrap_err();
         assert_eq!(err.response_tuple().0, StatusCode::NOT_FOUND);
         Ok(())
     }

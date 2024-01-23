@@ -1,6 +1,7 @@
 use rand::Rng;
+use redis;
 
-use crate::auth::{access_token_key, access_token_list_key, crypto};
+use crate::auth::{crypto, session_key, session_list_key};
 use crate::prelude::*;
 use crate::state::AppState;
 
@@ -8,6 +9,7 @@ pub async fn issue_access_token(
     state: &AppState,
     username_or_email: String,
     password: String,
+    expire: Option<time::Duration>,
 ) -> Result<String> {
     let result = sqlx::query!(
         // language=SQL
@@ -34,27 +36,29 @@ pub async fn issue_access_token(
     // for session identifiers if the random generator is secure enough.
     // Let's generate 64 bytes of randomness, just to be sure as I'm
     // not 100% sure what is used to generate the numbers on the server. 🤷
-    let token: String = rand::thread_rng()
+    let access_token: String = rand::thread_rng()
         .sample_iter(&rand::distributions::Alphanumeric)
         .take(64)
         .map(char::from)
         .collect();
 
-    let mut cache_conn = state.cache_pool.get().await?;
+    let mut redis = state.cache_pool.get().await?;
 
-    deadpool_redis::redis::cmd("HSET")
-        .arg(&[
-            access_token_key(token.clone()),
-            "user_id".into(),
-            record.user_id.into(),
-        ])
-        .query_async::<_, ()>(&mut cache_conn)
-        .await?;
+    let session_key = session_key(access_token.clone());
+    let session_list_key = session_list_key(record.user_id);
 
-    deadpool_redis::redis::cmd("RPUSH")
-        .arg(&[access_token_list_key(record.user_id), token.clone()])
-        .query_async::<_, ()>(&mut cache_conn)
-        .await?;
+    let mut commands = redis::pipe()
+        .hset(session_key.clone(), "user_id", record.user_id.to_string())
+        .rpush(session_list_key, access_token.clone())
+        .to_owned();
 
-    Ok(token)
+    if let Some(expire) = expire {
+        commands = commands
+            .expire(session_key.clone(), expire.whole_seconds())
+            .to_owned();
+    }
+
+    commands.query_async(&mut redis).await?;
+
+    Ok(access_token)
 }

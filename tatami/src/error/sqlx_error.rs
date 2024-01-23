@@ -92,13 +92,13 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn validation_database_errors_work(pool: sqlx::PgPool) -> Result<()> {
+    async fn validation_database_errors_work(db: sqlx::PgPool) -> Result<()> {
         sqlx::query!(
             // language=SQL
             r#"insert into "user" (username, password_hash) values ($1, 'lol') returning user_id;"#,
             "bob",
         )
-        .fetch_one(&pool)
+        .fetch_one(&db)
         .await
         .unwrap();
 
@@ -107,7 +107,7 @@ mod tests {
             r#"insert into "user" (username, password_hash) values ($1, 'lol') returning user_id;"#,
             "bob",
         )
-        .fetch_one(&pool)
+        .fetch_one(&db)
         .await
         .unwrap_err();
 

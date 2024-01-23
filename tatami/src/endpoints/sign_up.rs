@@ -17,10 +17,14 @@ pub async fn sign_up(
 ) -> Result<(PrivateCookieJar, Json<Value>)> {
     // we need the password after consume to create the access token
     let password = declaration.inner_as_ref().password.clone();
-
     let user = user::create(&state.db_pool, declaration).await?;
-
-    let access_token = issue_access_token(&state, user.username, password).await?;
+    let access_token = issue_access_token(
+        &state,
+        user.username,
+        password,
+        Some(time::Duration::days(14) + time::Duration::minutes(1)),
+    )
+    .await?;
     let cookie = cookie::bake(cookie::ACCESS_TOKEN, access_token, time::Duration::days(14));
     jar = jar.add(cookie);
 

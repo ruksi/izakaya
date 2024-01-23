@@ -1,28 +1,11 @@
-use axum::routing::{get, post};
-use axum::Router;
-use axum_test::{TestServer, TestServerConfig};
 use serde_json::{json, Value};
 
 use crate::prelude::*;
-use crate::test_utils::mock_state;
-
-use super::*;
+use crate::test_utils::mock_server;
 
 #[sqlx::test]
-async fn browser_authentication_flow(pool: sqlx::PgPool) -> Result<()> {
-    let state = mock_state(pool).await;
-    let mock_app = Router::new()
-        .route("/sign-up", post(sign_up))
-        .route("/log-in", post(log_in))
-        .route("/log-out", post(log_out))
-        .route("/verify", get(verify))
-        .layer(axum::middleware::from_fn_with_state(
-            state.clone(),
-            crate::auth::record_visit,
-        ))
-        .with_state(state.clone());
-    let config = TestServerConfig::builder().save_cookies().build(); // <- automatically use cookies
-    let server = TestServer::new_with_config(mock_app, config).unwrap();
+async fn browser_authentication_flow(db: sqlx::PgPool) -> Result<()> {
+    let server = mock_server(&db).await;
 
     // you start unauthorized
     server.get("/verify").await.assert_status_unauthorized();

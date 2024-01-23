@@ -30,17 +30,17 @@ mod tests {
     use super::*;
 
     #[sqlx::test]
-    async fn describe_works(pool: sqlx::PgPool) -> Result<()> {
-        let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        let bob = user::create(&pool, declaration).await?;
-        let re_bob = describe(&pool, bob.user_id).await?.unwrap();
-        assert_eq!(bob, re_bob);
+    async fn works_if_nothing_is_found(db: sqlx::PgPool) -> Result<()> {
+        assert!(describe(&db, Uuid::new_v4()).await?.is_none());
         Ok(())
     }
 
     #[sqlx::test]
-    async fn describe_can_succeed_but_find_nothing(pool: sqlx::PgPool) -> Result<()> {
-        assert!(describe(&pool, Uuid::new_v4()).await?.is_none());
+    async fn works(db: sqlx::PgPool) -> Result<()> {
+        let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
+        let bob = user::create(&db, declaration).await?;
+        let re_bob = describe(&db, bob.user_id).await?.unwrap();
+        assert_eq!(bob, re_bob);
         Ok(())
     }
 }

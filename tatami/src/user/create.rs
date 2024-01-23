@@ -86,15 +86,15 @@ mod tests {
     use super::*;
 
     #[sqlx::test]
-    async fn create_works(pool: sqlx::PgPool) -> Result<()> {
+    async fn works(db: sqlx::PgPool) -> Result<()> {
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        let bob = create(&pool, declaration).await?;
+        let bob = create(&db, declaration).await?;
 
         let declaration = UserDeclaration::new_valid("4lice", "alice@example.com", "p4ssw0rd")?;
-        let alice = create(&pool, declaration).await?;
+        let alice = create(&db, declaration).await?;
 
         let declaration = UserDeclaration::new_valid("John-Doe", "john@example.com", "p4ssw0rd")?;
-        let john = create(&pool, declaration).await?;
+        let john = create(&db, declaration).await?;
 
         assert_eq!(bob.username, "bob");
         assert_eq!(alice.username, "4lice");
@@ -107,14 +107,14 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn create_rejects_existing_username(pool: sqlx::PgPool) -> Result<()> {
+    async fn fails_on_existing_username(db: sqlx::PgPool) -> Result<()> {
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        create(&pool, declaration).await?;
+        create(&db, declaration).await?;
 
         for username in ["bob", "Bob"] {
             let declaration =
                 UserDeclaration::new_valid(username, "robert@example.com", "p4ssw0rd")?;
-            let err = create(&pool, declaration).await.unwrap_err();
+            let err = create(&db, declaration).await.unwrap_err();
             err.assert_json(json!({
                 "message": "Validation failed",
                 "details": {
@@ -129,12 +129,12 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn create_rejects_existing_email(pool: sqlx::PgPool) -> Result<()> {
+    async fn fails_on_existing_email(db: sqlx::PgPool) -> Result<()> {
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        create(&pool, declaration).await?;
+        create(&db, declaration).await?;
         for email in ["bob@example.com", "BOB@example.com"] {
             let declaration = UserDeclaration::new_valid("robert", email, "p4ssw0rd")?;
-            let err = create(&pool, declaration).await.unwrap_err();
+            let err = create(&db, declaration).await.unwrap_err();
             err.assert_json(json!({
                 "message": "Validation failed",
                 "details": {
@@ -149,7 +149,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn create_rejects_invalid_email() -> Result<()> {
+    async fn fails_on_invalid_email() -> Result<()> {
         for email in ["", " ", "bob", "@bob", "bob@gmail.com ", " bob@gmail.com"] {
             let err = UserDeclaration::new_valid("bob", email, "p4ssw0rd").unwrap_err();
             err.assert_json(json!({
@@ -166,7 +166,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn create_rejects_invalid_username() -> Result<()> {
+    async fn fails_on_invalid_username() -> Result<()> {
         for username in ["John Doe", "John_Doe", "JohnDoe!", "-doe", "doe-"] {
             let err =
                 UserDeclaration::new_valid(username, "doe@example.com", "p4ssw0rd").unwrap_err();
@@ -185,7 +185,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn create_rejects_short_username() -> Result<()> {
+    async fn fails_on_short_usernames() -> Result<()> {
         for username in ["", "a", "jk"] {
             let err =
                 UserDeclaration::new_valid(username, "a@example.com", "p4ssw0rd").unwrap_err();

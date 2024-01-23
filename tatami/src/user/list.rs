@@ -36,7 +36,7 @@ mod tests {
     use super::*;
 
     #[sqlx::test]
-    async fn list_works(pool: sqlx::PgPool) -> Result<()> {
+    async fn works(db: sqlx::PgPool) -> Result<()> {
         let bob_filter = UserFilter {
             username: Some("bob".into()),
         };
@@ -47,34 +47,34 @@ mod tests {
             username: Some("JoHn".into()),
         };
 
-        assert_eq!(list(&pool, UserFilter::default()).await?.len(), 0);
-        assert_eq!(list(&pool, bob_filter.clone()).await?.len(), 0);
-        assert_eq!(list(&pool, alice_filter.clone()).await?.len(), 0);
-        assert_eq!(list(&pool, john_filter.clone()).await?.len(), 0);
+        assert_eq!(list(&db, UserFilter::default()).await?.len(), 0);
+        assert_eq!(list(&db, bob_filter.clone()).await?.len(), 0);
+        assert_eq!(list(&db, alice_filter.clone()).await?.len(), 0);
+        assert_eq!(list(&db, john_filter.clone()).await?.len(), 0);
 
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        user::create(&pool, declaration).await?;
+        user::create(&db, declaration).await?;
 
-        assert_eq!(list(&pool, UserFilter::default()).await?.len(), 1);
-        assert_eq!(list(&pool, bob_filter.clone()).await?.len(), 1);
-        assert_eq!(list(&pool, alice_filter.clone()).await?.len(), 0);
-        assert_eq!(list(&pool, john_filter.clone()).await?.len(), 0);
+        assert_eq!(list(&db, UserFilter::default()).await?.len(), 1);
+        assert_eq!(list(&db, bob_filter.clone()).await?.len(), 1);
+        assert_eq!(list(&db, alice_filter.clone()).await?.len(), 0);
+        assert_eq!(list(&db, john_filter.clone()).await?.len(), 0);
 
         let declaration = UserDeclaration::new_valid("alice", "alice@example.com", "p4ssw0rd")?;
-        user::create(&pool, declaration).await?;
+        user::create(&db, declaration).await?;
 
-        assert_eq!(list(&pool, UserFilter::default()).await?.len(), 2);
-        assert_eq!(list(&pool, bob_filter.clone()).await?.len(), 1);
-        assert_eq!(list(&pool, alice_filter.clone()).await?.len(), 1);
-        assert_eq!(list(&pool, john_filter.clone()).await?.len(), 0);
+        assert_eq!(list(&db, UserFilter::default()).await?.len(), 2);
+        assert_eq!(list(&db, bob_filter.clone()).await?.len(), 1);
+        assert_eq!(list(&db, alice_filter.clone()).await?.len(), 1);
+        assert_eq!(list(&db, john_filter.clone()).await?.len(), 0);
 
         let declaration = UserDeclaration::new_valid("john", "john@example.com", "p4ssw0rd")?;
-        user::create(&pool, declaration).await?;
+        user::create(&db, declaration).await?;
 
-        assert_eq!(list(&pool, UserFilter::default()).await?.len(), 3);
-        assert_eq!(list(&pool, bob_filter.clone()).await?.len(), 1);
-        assert_eq!(list(&pool, alice_filter.clone()).await?.len(), 1);
-        assert_eq!(list(&pool, john_filter.clone()).await?.len(), 1);
+        assert_eq!(list(&db, UserFilter::default()).await?.len(), 3);
+        assert_eq!(list(&db, bob_filter.clone()).await?.len(), 1);
+        assert_eq!(list(&db, alice_filter.clone()).await?.len(), 1);
+        assert_eq!(list(&db, john_filter.clone()).await?.len(), 1);
 
         Ok(())
     }

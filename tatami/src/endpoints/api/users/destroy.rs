@@ -17,30 +17,30 @@ pub async fn destroy(
 
 #[cfg(test)]
 mod tests {
-    use axum::http::StatusCode;
-    use axum_test::TestServer;
-
-    use crate::endpoints::api::users::router;
-    use crate::test_utils::mock_state;
+    use crate::test_utils::{as_website_admin, mock_server};
     use crate::user::UserDeclaration;
 
     use super::*;
 
     #[sqlx::test]
-    async fn destroy_works(pool: sqlx::PgPool) -> Result<()> {
-        let state = mock_state(pool).await;
-        let server = TestServer::new(router(state.clone())).unwrap();
+    async fn works(db: sqlx::PgPool) -> Result<()> {
+        let server = mock_server(&db).await;
+        as_website_admin(&db, &server).await?;
 
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        let user = user::create(&state.db_pool, declaration).await.unwrap();
+        let user = user::create(&db, declaration).await.unwrap();
         server
-            .delete(format!("/{}", user.user_id).as_str())
+            .get(format!("/api/users/{}", user.user_id).as_str())
+            .await
+            .assert_status_ok();
+        server
+            .delete(format!("/api/users/{}", user.user_id).as_str())
             .await
             .assert_json(&json!({"status": "ok"}));
-
-        let response = server.get(format!("/{}", user.user_id).as_str()).await;
-        response.assert_status(StatusCode::NOT_FOUND);
-        // response.assert_text("User not found");
+        server
+            .get(format!("/api/users/{}", user.user_id).as_str())
+            .await
+            .assert_status_not_found();
 
         Ok(())
     }

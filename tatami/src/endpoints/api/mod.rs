@@ -12,5 +12,7 @@ pub fn router(state: AppState) -> Router<AppState> {
         .nest("/users", users::router(state.clone()))
         .nest("/my", my::router(state.clone()))
         // everything under /api (defined above) requires authentication (defined below)
-        .route_layer(axum::middleware::from_fn(crate::auth::require_login))
+        .route_layer(axum::middleware::from_fn(
+            crate::auth::middleware::require_login,
+        ))
 }

@@ -68,27 +68,27 @@ mod tests {
     use super::*;
 
     #[sqlx::test]
-    async fn amend_works(pool: sqlx::PgPool) -> Result<()> {
+    async fn works(db: sqlx::PgPool) -> Result<()> {
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        let bob = user::create(&pool, declaration).await?;
+        let bob = user::create(&db, declaration).await?;
 
         let declaration = UserDeclaration::new_valid("alice", "alice@example.com", "p4ssw0rd")?;
-        let alice = user::create(&pool, declaration).await?;
+        let alice = user::create(&db, declaration).await?;
 
         let amendment = UserAmendment::new_valid(Some("bobby"))?;
-        let bobby = amend(&pool, bob.user_id, amendment).await?;
+        let bobby = amend(&db, bob.user_id, amendment).await?;
         assert_eq!(bobby.user_id, bob.user_id);
         assert_eq!(bobby.username, "bobby");
 
-        let re_bobby = user::describe(&pool, bob.user_id).await?.unwrap();
+        let re_bobby = user::describe(&db, bob.user_id).await?.unwrap();
         assert_eq!(bobby, re_bobby);
 
-        let re_alice = user::describe(&pool, alice.user_id).await?.unwrap();
+        let re_alice = user::describe(&db, alice.user_id).await?.unwrap();
         assert_eq!(re_alice.username, "alice");
 
         // nothing to change 🤷
         let amendment = UserAmendment::default();
-        let am_bobby = amend(&pool, bob.user_id, Valid::new(amendment)?).await?;
+        let am_bobby = amend(&db, bob.user_id, Valid::new(amendment)?).await?;
         assert_eq!(bobby, am_bobby);
 
         // invalid change
@@ -107,7 +107,7 @@ mod tests {
 
         // bad change to an existing username
         let amendment = UserAmendment::new_valid(Some("bobby"))?;
-        amend(&pool, alice.user_id, amendment)
+        amend(&db, alice.user_id, amendment)
             .await
             .unwrap_err()
             .assert_status(StatusCode::BAD_REQUEST)

@@ -5,9 +5,10 @@ use axum::http::header::AUTHORIZATION;
 use axum::middleware::Next;
 use axum::response::Response;
 use axum_extra::extract::PrivateCookieJar;
+use redis::AsyncCommands;
 use uuid::Uuid;
 
-use crate::auth::{access_token_key, cookie, Visitor};
+use crate::auth::{cookie, session_key, Visitor};
 use crate::state::AppState;
 
 pub async fn record_visit(
@@ -56,13 +57,12 @@ async fn get_visitor<T: Into<String>>(
     };
     let access_token = access_token.into();
 
-    let Ok(mut conn) = state.cache_pool.get().await else {
+    let Ok(mut redis) = state.cache_pool.get().await else {
         return None;
     };
 
-    let session = deadpool_redis::redis::cmd("HGETALL")
-        .arg(access_token_key(&access_token))
-        .query_async::<_, HashMap<String, String>>(&mut conn)
+    let session: HashMap<String, String> = redis
+        .hgetall(session_key(&access_token))
         .await
         .unwrap_or_default();
 

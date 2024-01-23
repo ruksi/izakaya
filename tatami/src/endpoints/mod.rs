@@ -33,7 +33,7 @@ pub fn router<S>(state: AppState) -> Router<S> {
         .nest("/api", api::router(state.clone()))
         .layer(axum::middleware::from_fn_with_state(
             state.clone(),
-            crate::auth::record_visit,
+            crate::auth::middleware::record_visit,
         ))
         .with_state(state)
 }
