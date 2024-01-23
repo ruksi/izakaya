@@ -72,10 +72,6 @@ fn root_router<S>(state: AppState) -> Router<S> {
         get(|| async { Redirect::permanent("/assets/favicon.ico") }),
     );
     let app = app.merge(endpoints::router(state.clone()));
-    let app = app.layer(axum::middleware::from_fn_with_state(
-        state.clone(),
-        crate::auth::record_visit,
-    ));
 
     let app = app.layer(
         TraceLayer::new_for_http()

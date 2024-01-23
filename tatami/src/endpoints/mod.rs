@@ -31,5 +31,9 @@ pub fn router<S>(state: AppState) -> Router<S> {
         .route("/log-out", post(log_out))
         .route("/verify", get(verify))
         .nest("/api", api::router(state.clone()))
+        .layer(axum::middleware::from_fn_with_state(
+            state.clone(),
+            crate::auth::record_visit,
+        ))
         .with_state(state)
 }
