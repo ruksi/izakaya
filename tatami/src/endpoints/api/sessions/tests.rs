@@ -70,19 +70,18 @@ async fn bearer_authentication_flow(pool: sqlx::PgPool) -> Result<()> {
         .assert_status_ok();
 
     // shows both sessions
-    let sessions_json = server
+    let sessions = server
         .get("/")
         .add_header(
             AUTHORIZATION,
             HeaderValue::from_str(format!("Bearer {}", token2).as_str()).unwrap(),
         )
         .await
-        .json::<Value>();
-    let sessions = sessions_json.get("sessions").unwrap().as_array().unwrap();
+        .json::<Vec<list::Session>>();
     assert_eq!(sessions.len(), 2);
     assert!(sessions
         .iter()
-        .all(|session| session.as_str().unwrap().len() == 8));
+        .all(|session| session.access_token_prefix.len() == 8));
 
     // logout with a valid token is the same
     server
@@ -95,15 +94,14 @@ async fn bearer_authentication_flow(pool: sqlx::PgPool) -> Result<()> {
         .assert_status_ok();
 
     // the session is gone
-    let sessions_json = server
+    let sessions = server
         .get("/")
         .add_header(
             AUTHORIZATION,
             HeaderValue::from_str(format!("Bearer {}", token2).as_str()).unwrap(),
         )
         .await
-        .json::<Value>();
-    let sessions = sessions_json.get("sessions").unwrap().as_array().unwrap();
+        .json::<Vec<list::Session>>();
     assert_eq!(sessions.len(), 1);
 
     // again is fine and responds the same
