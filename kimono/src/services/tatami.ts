@@ -30,11 +30,17 @@ const tatami = createApi({
         }),
 
         // api...
-        getMyUser: build.query({query: () => "/api/my/user"}),
+        getMyUser: build.query<User, void>({query: () => "/api/users/me"}),
         getUsers: build.query({query: () => "/api/users"}),
         getUser: build.query({query: userId => `/api/users/${userId}`}),
     }),
 });
+
+// dunno where this belongs yet 🤷
+interface User {
+    user_id: string;
+    username: string;
+}
 
 // export const {
 //     useGetUsersQuery,

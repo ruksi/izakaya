@@ -35,34 +35,6 @@ export default function LogIn() {
                             ? <FormAlert title="Login Failed" error={error} isLoading={isLoading}/>
                             : null}
 
-                        {/*{isError || (isLoading && error) ? (*/}
-                        {/*    <Alert variant="danger">*/}
-                        {/*        <div className="text-danger">Login Failed</div>*/}
-                        {/*        {error?.status == 401*/}
-                        {/*            ? (*/}
-                        {/*                <div>*/}
-                        {/*                    Incorrect credentials,*/}
-                        {/*                    please try again or <Link to="/sign-up">sign up</Link>*/}
-                        {/*                </div>*/}
-                        {/*            )*/}
-                        {/*            : (*/}
-                        {/*                <div>*/}
-                        {/*                    Please try again later*/}
-                        {/*                </div>*/}
-                        {/*            )}*/}
-                        {/*        <div className="small text-secondary">*/}
-                        {/*            {error?.status*/}
-                        {/*                ? `${error.status} `*/}
-                        {/*                : null}*/}
-                        {/*            {error?.data*/}
-                        {/*                ? `${error?.data}`*/}
-                        {/*                : null}*/}
-                        {/*            &nbsp;*/}
-                        {/*            {isLoading ? "Retrying..." : null}*/}
-                        {/*        </div>*/}
-                        {/*    </Alert>*/}
-                        {/*) : null}*/}
-
                         <Card className="my-2 my-sm-4" bg="dark">
 
                             <Card.Header>
@@ -74,7 +46,7 @@ export default function LogIn() {
                             <Card.Body>
                                 <div className="p-sm-2">
 
-                                    <Form.Group className="mb-3" controlId="username-or-email">
+                                    <Form.Group className="mb-3" controlId="username_or_email">
                                         <Form.Label id="identity-label">
                                             Username <span className="text-secondary small">or Email</span>
                                         </Form.Label>

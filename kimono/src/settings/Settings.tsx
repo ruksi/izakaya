@@ -4,7 +4,7 @@ import tatami from "../services/tatami.ts";
 
 export function Settings() {
 
-    const {data: user} = tatami.endpoints.getMyUser.useQuery({});
+    const {data: user} = tatami.endpoints.getMyUser.useQuery();
 
     return (
         <Container className="py-3">
@@ -13,8 +13,8 @@ export function Settings() {
                 <h2>Profile</h2>
                 <div>
                     <label className="me-1">User ID:</label>
-                    {user?.userId
-                        ? user.userId
+                    {user?.user_id
+                        ? user.user_id
                         : <Placeholder aria-hidden="true" bg="secondary" style={{width: 295}}/>}
                 </div>
                 <div>
