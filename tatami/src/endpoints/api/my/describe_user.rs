@@ -7,7 +7,7 @@ use crate::error::Error;
 use crate::state::AppState;
 use crate::user;
 
-pub async fn describe_myself(
+pub async fn describe_user(
     State(state): State<AppState>,
     Extension(visitor): Extension<Visitor>,
 ) -> crate::error::Result<Json<Value>> {

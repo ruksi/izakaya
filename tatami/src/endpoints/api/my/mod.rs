@@ -1,14 +1,14 @@
 use axum::routing::get;
 use axum::Router;
 
-use describe_myself::describe_myself;
+use describe_user::describe_user;
 
 use crate::state::AppState;
 
-mod describe_myself;
+mod describe_user;
 
 pub fn router<S>(state: AppState) -> Router<S> {
     Router::new()
-        .route("/profile", get(describe_myself))
+        .route("/user", get(describe_user))
         .with_state(state)
 }
