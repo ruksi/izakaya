@@ -38,19 +38,16 @@ pub async fn list_sessions(
 #[cfg(test)]
 mod tests {
     use axum::http::StatusCode;
-    use axum_test::{TestServer, TestServerConfig};
     use serde_json::json;
 
     use crate::endpoints::api::my::list_sessions::MySession;
-    use crate::endpoints::router;
     use crate::prelude::*;
-    use crate::test_utils::mock_state;
+    use crate::test_utils::mock_server;
     use crate::user::{self, UserDeclaration};
 
     #[sqlx::test]
     async fn listing_own_sessions_requires_auth(pool: sqlx::PgPool) -> Result<()> {
-        let state = mock_state(pool).await;
-        let server = TestServer::new(router(state.clone())).unwrap();
+        let server = mock_server(&pool).await;
         let response = server.get("/api/my/sessions").await;
         response.assert_status(StatusCode::UNAUTHORIZED);
         Ok(())
@@ -58,12 +55,9 @@ mod tests {
 
     #[sqlx::test]
     async fn listing_own_sessions_works(pool: sqlx::PgPool) -> Result<()> {
-        let state = mock_state(pool).await;
-        let config = TestServerConfig::builder().save_cookies().build(); // <- automatically use cookies
-        let server = TestServer::new_with_config(router(state.clone()), config).unwrap();
-
+        let server = mock_server(&pool).await;
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
-        user::create(&state.db_pool, declaration).await?;
+        user::create(&pool, declaration).await?;
         server
             .post("/log-in")
             .json(&json!({"username_or_email": "bob", "password": "p4ssw0rd"}))
