@@ -13,7 +13,6 @@ pub async fn list(
     let user_id = visitor.get_user_id_or_respond_unauthorized()?;
 
     let mut cache_conn = state.cache_pool.get().await?;
-
     let tokens: Vec<String> = deadpool_redis::redis::cmd("LRANGE")
         .arg(&[access_token_list_key(user_id), "0".into(), "-1".into()])
         .query_async(&mut cache_conn)
