@@ -25,6 +25,16 @@ export default function SignUp() {
         signUp({email: email, username: username, password: password});
     }, [signUp, email, username, password]);
 
+    const onEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setEmail(value);
+
+        const prefix = value.split("@")[0];
+        if (username == "" || prefix.startsWith(username)) {
+            setUsername(prefix);
+        }
+    }, [setEmail, setUsername, username]);
+
     return (
         <Container>
 
@@ -54,7 +64,7 @@ export default function SignUp() {
                                             isInvalid={isErroneous("email", error)}
                                             type="email"
                                             value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
+                                            onChange={onEmailChange}
                                         />
                                         <FormGroupFeedback field="email" error={error}/>
                                     </Form.Group>
