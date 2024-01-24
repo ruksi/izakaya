@@ -2,10 +2,14 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use validator::ValidationError;
 
+const MIN_LENGTH: usize = 3;
+const MAX_LENGTH: usize = 32;
+
 pub fn username(username: &str) -> Result<(), ValidationError> {
-    if username.len() < 3 {
+    if username.len() < MIN_LENGTH || username.len() > MAX_LENGTH {
         let mut err = ValidationError::new("length");
-        err.add_param("min".into(), &3);
+        err.add_param("min".into(), &MIN_LENGTH);
+        err.add_param("max".into(), &MAX_LENGTH);
         return Err(err);
     }
 

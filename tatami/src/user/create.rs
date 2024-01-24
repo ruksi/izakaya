@@ -195,6 +195,7 @@ mod tests {
                     "username": [{
                         "code": "length",
                         "params": {
+                            "max": 32,
                             "min": 3,
                             "value": username,
                         },
