@@ -4,7 +4,7 @@ use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use crate::auth::{session_list_key, Visitor};
+use crate::auth::{session_list_key, CurrentUser};
 use crate::state::AppState;
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -14,9 +14,9 @@ pub struct Session {
 
 pub async fn list(
     State(state): State<AppState>,
-    Extension(visitor): Extension<Visitor>,
+    Extension(current_user): Extension<CurrentUser>,
 ) -> crate::error::Result<Json<Value>> {
-    let user_id = visitor.get_user_id_or_respond_unauthorized()?;
+    let user_id = current_user.user_id;
 
     let mut redis = state.cache_pool.get().await?;
     let tokens: Vec<String> = redis.lrange(session_list_key(user_id), 0, -1).await?;

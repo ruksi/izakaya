@@ -1,18 +1,17 @@
+use axum::Extension;
 use axum::extract::Request;
 use axum::middleware::Next;
 use axum::response::Response;
-use axum::Extension;
 
-use crate::auth::Visitor;
+use crate::auth::{CurrentUser, Visitor};
 use crate::prelude::*;
 
 pub async fn require_login(
     Extension(visitor): Extension<Visitor>,
-    request: Request,
+    mut request: Request,
     next: Next,
 ) -> Result<Response> {
-    if visitor.is_anonymous() {
-        return Err(Error::Unauthorized);
-    }
+    let current_user = CurrentUser::from_visitor(visitor)?;
+    request.extensions_mut().insert(current_user);
     Ok(next.run(request).await)
 }
