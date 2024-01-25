@@ -12,8 +12,6 @@ function createBaseQuery() {
 const tatami = createApi({
     baseQuery: createBaseQuery(),
     endpoints: (build) => ({
-
-        // auth...
         signUp: build.query({
             query: (params: { username: string, email: string, password: string }) => ({
                 url: "/sign-up",
@@ -29,17 +27,23 @@ const tatami = createApi({
             }),
         }),
 
-        // api...
         getMyUser: build.query<User, void>({query: () => "/api/users/me"}),
-        getUsers: build.query({query: () => "/api/users"}),
-        getUser: build.query({query: userId => `/api/users/${userId}`}),
+        getMySessions: build.query<Session[], void>({query: () => "/api/sessions"}),
+
+        // getUsers: build.query({query: () => "/api/users"}),
+        // getUser: build.query({query: userId => `/api/users/${userId}`}),
     }),
 });
 
-// dunno where this belongs yet 🤷
-interface User {
+// don't know where these belong yet. 🤷
+export interface User {
     user_id: string;
     username: string;
+}
+
+export interface Session {
+    access_token_prefix: string;
+    used_at?: string;
 }
 
 // export const {
