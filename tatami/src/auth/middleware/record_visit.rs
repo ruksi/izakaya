@@ -6,6 +6,7 @@ use axum::middleware::Next;
 use axum::response::Response;
 use axum_extra::extract::PrivateCookieJar;
 use redis::AsyncCommands;
+use time::format_description::well_known::Rfc3339;
 use uuid::Uuid;
 
 use crate::auth::{cookie, session_key, Visitor};
@@ -42,6 +43,30 @@ pub async fn record_visit(
         if let Some(found_visitor) = get_visitor(&state, cookie_token).await {
             visitor = found_visitor;
         }
+    }
+
+    if visitor.user_id.is_some() {
+        // update the last usage time of the session in the background
+        // TODO: this might leave useless session hashes in Redis e.g. on logout,
+        //       what happens is that the log out handler deletes the session hash
+        //       but the following background tasks creates it again with a new `used_at`
+        //       not a major issue as the session will be missing `user_id` to actually be used,
+        //       but useless Redis bloat anyway
+        let move_session_key = session_key(visitor.access_token.as_ref().unwrap());
+        let move_pool = state.cache_pool.clone();
+        tokio::spawn(async move {
+            let Ok(mut redis) = move_pool.get().await else {
+                return;
+            };
+            let utc_now = time::OffsetDateTime::now_utc();
+            let Ok(now_text) = utc_now.format(&Rfc3339) else {
+                return;
+            };
+            let _ignore_return_value: i64 = redis
+                .hset(move_session_key, "used_at", now_text)
+                .await
+                .unwrap_or_default();
+        });
     }
 
     request.extensions_mut().insert(visitor);
