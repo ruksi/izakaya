@@ -1,5 +1,5 @@
 import viteLogo from "/vite.svg"
-import React from "react";
+import React, {useEffect} from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/esm/Stack";
@@ -8,6 +8,7 @@ import {Link, Outlet} from "react-router-dom";
 import reactLogo from "../assets/react.svg"
 import {selectIsAuthenticated} from "../auth/slice.ts";
 import {authLogOut, authVerify} from "../auth/thunks.ts";
+import tatami from "../services/tatami.ts";
 import {store} from "../store.ts";
 
 export default function MainLayout({children}: { children?: React.ReactNode }) {
@@ -20,6 +21,15 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
     }
 
     const isAuthenticated = useSelector(selectIsAuthenticated);
+
+    // reset all data after log out
+    // note sure if this is the right place for this, but 🤷
+    // feels like this should be somewhere in Redux side, not React
+    useEffect(() => {
+        if (!isAuthenticated) {
+            store.dispatch(tatami.util.resetApiState());
+        }
+    }, [isAuthenticated]);
 
     return (
         <div className="d-flex flex-column min-vh-100">

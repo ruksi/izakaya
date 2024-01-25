@@ -11,6 +11,7 @@ function createBaseQuery() {
 
 const tatami = createApi({
     baseQuery: createBaseQuery(),
+    tagTypes: ["CurrentUser", "Session"],
     endpoints: (build) => ({
         signUp: build.query({
             query: (params: { username: string, email: string, password: string }) => ({
@@ -27,11 +28,32 @@ const tatami = createApi({
             }),
         }),
 
-        getMyUser: build.query<User, void>({query: () => "/api/users/me"}),
-        getMySessions: build.query<Session[], void>({query: () => "/api/sessions"}),
+        // ["CurrentUser"]
+        getMyUser: build.query<User, void>({
+            query: () => "/api/users/me",
+            providesTags: ["CurrentUser"],
+        }),
 
-        // getUsers: build.query({query: () => "/api/users"}),
-        // getUser: build.query({query: userId => `/api/users/${userId}`}),
+        // ["Session"]
+        createSession: build.mutation<NewSession, { password: string }>({
+            query: ({password}) => ({
+                url: "/api/sessions",
+                method: "POST",
+                body: {password},
+            }),
+            invalidatesTags: ["Session"],
+        }),
+        getMySessions: build.query<Session[], void>({
+            query: () => "/api/sessions",
+            providesTags: ["Session"],
+        }),
+        deleteMySession: build.mutation({
+            query: (params: { access_token_prefix: string }) => ({
+                url: `/api/sessions/${params.access_token_prefix}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Session"],
+        }),
     }),
 });
 
@@ -46,9 +68,12 @@ export interface Session {
     used_at?: string;
 }
 
+export interface NewSession {
+    access_token: string;
+}
+
 // export const {
-//     useGetUsersQuery,
-//     useGetUserQuery,
+//     useCreateSessionMutation,
 // } = tatami;
 
 export default tatami;
