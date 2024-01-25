@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/esm/Stack";
 import {useSelector} from "react-redux";
-import {Link, Outlet} from "react-router-dom";
+import {Outlet, useNavigate} from "react-router-dom";
 import reactLogo from "../assets/react.svg"
 import {selectIsAuthenticated} from "../auth/slice.ts";
 import {authLogOut} from "../auth/thunks.ts";
@@ -13,12 +13,7 @@ import {store} from "../store.ts";
 
 export default function MainLayout({children}: { children?: React.ReactNode }) {
 
-    const logOut = () => {
-        store.dispatch(authLogOut());
-    }
-
     const isAuthenticated = useSelector(selectIsAuthenticated);
-
     // reset all data after log out
     // note sure if this is the right place for this, but 🤷
     // feels like this should be somewhere in Redux side, not React
@@ -28,25 +23,41 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
         }
     }, [isAuthenticated]);
 
+    const navigate = useNavigate();
+
+    const logOut = () => {
+        store.dispatch(authLogOut());
+    }
+
     return (
         <div className="d-flex flex-column min-vh-100">
 
             <header className="bg-body-tertiary">
                 <Container>
                     <Stack direction="horizontal" gap={2} className="p-3">
-                        <Link to={`/`} className="me-auto">Home</Link>
+                        <Button variant="outline-secondary" onClick={() => navigate("/")} className="me-auto">
+                            Home
+                        </Button>
                         {
                             isAuthenticated &&
                             <>
-                                <Link to={`/settings`}>Settings</Link>
-                                <Button variant="link" onClick={logOut}>Log Out</Button>
+                                <Button variant="secondary" onClick={() => navigate("/settings")}>
+                                    Settings
+                                </Button>
+                                <Button variant="outline-secondary" onClick={logOut}>
+                                    Log Out
+                                </Button>
                             </>
                         }
                         {
                             !isAuthenticated &&
                             <>
-                                <Link to={`/log-in`}>Log In</Link>
-                                <Link to={`/sign-up`}>Sign Up</Link>
+                                <Button variant="outline-secondary" onClick={() => navigate("/log-in")}>
+                                    Log In
+                                </Button>
+                                <Button variant="secondary" onClick={() => navigate(`/sign-up`)}>
+                                    Sign Up
+                                </Button>
                             </>
                         }
                     </Stack>
