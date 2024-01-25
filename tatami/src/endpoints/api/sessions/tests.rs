@@ -8,6 +8,10 @@ use crate::test_utils::mock_server;
 use crate::user;
 use crate::user::UserDeclaration;
 
+fn bearer_auth_header(token: &str) -> HeaderValue {
+    HeaderValue::from_str(format!("Bearer {}", token).as_str()).unwrap()
+}
+
 #[sqlx::test]
 async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     let mut server = mock_server(&db).await;
@@ -64,7 +68,7 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
         .await
         .assert_status_ok();
     server
-        .delete("/api/sessions")
+        .delete(format!("/api/sessions/{}", token1).as_str()) // full token instead of prefix 🤷
         .add_header(AUTHORIZATION, bearer_auth_header(token1))
         .await
         .assert_status_ok();
@@ -83,8 +87,4 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     assert_eq!(sessions.len(), 2);
 
     Ok(())
-}
-
-fn bearer_auth_header(token: &str) -> HeaderValue {
-    HeaderValue::from_str(format!("Bearer {}", token).as_str()).unwrap()
 }

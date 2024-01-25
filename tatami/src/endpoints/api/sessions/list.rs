@@ -1,9 +1,10 @@
+use std::collections::HashMap;
+
 use axum::extract::State;
 use axum::{Extension, Json};
 use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::collections::HashMap;
 
 use crate::auth::{session_key, session_list_key, CurrentUser};
 use crate::state::AppState;
@@ -56,7 +57,6 @@ pub async fn list(
 
 #[cfg(test)]
 mod tests {
-    use axum::http::StatusCode;
     use serde_json::json;
 
     use crate::prelude::*;
@@ -68,8 +68,10 @@ mod tests {
     #[sqlx::test]
     async fn fails_without_auth(db: sqlx::PgPool) -> Result<()> {
         let server = mock_server(&db).await;
-        let response = server.get("/api/sessions").await;
-        response.assert_status(StatusCode::UNAUTHORIZED);
+        server
+            .get("/api/sessions")
+            .await
+            .assert_status_unauthorized();
         Ok(())
     }
 

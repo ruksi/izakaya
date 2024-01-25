@@ -24,6 +24,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug)]
 #[allow(dead_code)]
 pub enum Error {
+    BadRequest,
     Unauthorized,
     Forbidden,
     NotFound,
@@ -40,6 +41,10 @@ impl Error {
     pub fn response_tuple(&self) -> (StatusCode, Json<ErrorBody>) {
         use Error::*;
         match self {
+            BadRequest => (
+                StatusCode::BAD_REQUEST,
+                json_message("Bad request, check your parameters"),
+            ),
             Unauthorized => (
                 StatusCode::UNAUTHORIZED,
                 json_message("Authentication required"),

@@ -18,6 +18,6 @@ pub fn router<S>(state: AppState) -> Router<S> {
     Router::new()
         .route("/", get(list))
         .route("/", post(create))
-        .route("/", delete(destroy)) // NB: deletes the session you are currently using
+        .route("/:access_token_prefix", delete(destroy))
         .with_state(state)
 }
