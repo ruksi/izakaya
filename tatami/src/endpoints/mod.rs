@@ -23,7 +23,6 @@ mod tests;
 
 pub fn router<S>(state: AppState) -> Router<S> {
     Router::new()
-        // TODO: delete route should work with "session id" but we don't have that yet?
         .route("/", get(index))
         .route("/healthz", get(healthz))
         .route("/sign-up", post(sign_up))

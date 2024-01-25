@@ -51,7 +51,7 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
         .get("/api/sessions")
         .add_header(AUTHORIZATION, bearer_auth_header(token1))
         .await
-        .json::<Vec<list::Session>>();
+        .json::<Vec<list::PublicSession>>();
     assert_eq!(sessions.len(), 3);
     assert!(sessions
         .iter()
@@ -79,7 +79,7 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
         .get("/api/sessions")
         .add_header(AUTHORIZATION, bearer_auth_header(token2))
         .await
-        .json::<Vec<list::Session>>();
+        .json::<Vec<list::PublicSession>>();
     assert_eq!(sessions.len(), 2);
 
     Ok(())

@@ -16,9 +16,8 @@ mod tests;
 
 pub fn router<S>(state: AppState) -> Router<S> {
     Router::new()
-        // TODO: delete route should work with "session id" but we don't have that yet?
         .route("/", get(list))
         .route("/", post(create))
-        .route("/", delete(destroy))
+        .route("/", delete(destroy)) // NB: deletes the session you are currently using
         .with_state(state)
 }

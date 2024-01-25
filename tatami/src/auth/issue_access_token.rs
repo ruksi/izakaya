@@ -48,6 +48,7 @@ pub async fn issue_access_token(
     let session_list_key = session_list_key(record.user_id);
 
     let mut commands = redis::pipe()
+        .hset(session_key.clone(), "access_token", access_token.clone()) // duplicate info vs. the key but 🤷
         .hset(session_key.clone(), "user_id", record.user_id.to_string())
         .rpush(session_list_key, access_token.clone())
         .to_owned();

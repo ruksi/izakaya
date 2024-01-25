@@ -3,13 +3,15 @@ use axum::{Extension, Json};
 use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use std::collections::HashMap;
 
-use crate::auth::{session_list_key, CurrentUser};
+use crate::auth::{session_key, session_list_key, CurrentUser};
 use crate::state::AppState;
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Session {
+pub struct PublicSession {
     pub access_token_prefix: String,
+    pub used_at: Option<String>,
 }
 
 pub async fn list(
@@ -19,18 +21,37 @@ pub async fn list(
     let user_id = current_user.user_id;
 
     let mut redis = state.cache_pool.get().await?;
-    let tokens: Vec<String> = redis.lrange(session_list_key(user_id), 0, -1).await?;
+    let access_tokens: Vec<String> = redis.lrange(session_list_key(user_id), 0, -1).await?;
+
+    let mut commands = redis::pipe().to_owned();
+    for token in &access_tokens {
+        commands = commands.hgetall(session_key(token)).to_owned();
+    }
+    let sessions: Vec<HashMap<String, String>> = commands.query_async(&mut redis).await?;
+
+    // TODO: we _could_ remove the empty hashes from the Redis list here...
 
     // we don't want to expose the full tokens
-    let sessions: Vec<Session> = tokens
+    let public_sessions: Vec<PublicSession> = sessions
         .into_iter()
-        .map(|token| token[..8].to_string())
-        .map(|prefix| Session {
-            access_token_prefix: prefix,
+        .filter(|session| !session.is_empty())
+        .map(|session| {
+            let access_token_text = session
+                .get("access_token")
+                .map(|t| t.to_string())
+                .unwrap_or_default();
+            let access_token_prefix = access_token_text.chars().take(8).collect::<String>();
+
+            let used_at = session.get("used_at").map(|t| t.to_string());
+
+            PublicSession {
+                access_token_prefix,
+                used_at,
+            }
         })
         .collect();
 
-    Ok(Json(json!(sessions)))
+    Ok(Json(json!(public_sessions)))
 }
 
 #[cfg(test)]
@@ -65,10 +86,24 @@ mod tests {
             .await
             .assert_status_ok();
 
+        server
+            .post("/log-in")
+            .json(&json!({"username_or_email": "bob@example.com", "password": "p4ssw0rd"}))
+            .await
+            .assert_status_ok();
+
+        server
+            .post("/log-in")
+            .json(&json!({"username_or_email": "bob", "password": "p4ssw0rd"}))
+            .await
+            .assert_status_ok();
+
         let response = server.get("/api/sessions").await;
-        let sessions = response.json::<Vec<Session>>();
-        assert_eq!(sessions.len(), 1);
-        assert_eq!(sessions[0].access_token_prefix.len(), 8);
+        let sessions = response.json::<Vec<PublicSession>>();
+        assert_eq!(sessions.len(), 3);
+        assert!(sessions
+            .iter()
+            .all(|session| session.access_token_prefix.len() == 8));
 
         Ok(())
     }
