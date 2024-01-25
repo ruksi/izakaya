@@ -7,15 +7,12 @@ import {useSelector} from "react-redux";
 import {Link, Outlet} from "react-router-dom";
 import reactLogo from "../assets/react.svg"
 import {selectIsAuthenticated} from "../auth/slice.ts";
-import {authLogOut, authVerify} from "../auth/thunks.ts";
+import {authLogOut} from "../auth/thunks.ts";
 import tatami from "../services/tatami.ts";
 import {store} from "../store.ts";
 
 export default function MainLayout({children}: { children?: React.ReactNode }) {
 
-    const verify = () => {
-        store.dispatch(authVerify());
-    }
     const logOut = () => {
         store.dispatch(authLogOut());
     }
@@ -38,7 +35,6 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                 <Container>
                     <Stack direction="horizontal" gap={2} className="p-3">
                         <Link to={`/`} className="me-auto">Home</Link>
-                        <Button onClick={verify} className="ms-auto">Verify</Button>
                         {
                             isAuthenticated &&
                             <>
