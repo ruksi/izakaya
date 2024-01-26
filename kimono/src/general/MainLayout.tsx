@@ -1,11 +1,9 @@
-import viteLogo from "/vite.svg"
 import React, {useEffect} from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/esm/Stack";
 import {useSelector} from "react-redux";
 import {Outlet, useNavigate} from "react-router-dom";
-import reactLogo from "../assets/react.svg"
 import {selectIsAuthenticated} from "../auth/slice.ts";
 import {authLogOut} from "../auth/thunks.ts";
 import tatami from "../services/tatami.ts";
@@ -36,7 +34,7 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                 <Container>
                     <Stack direction="horizontal" gap={2} className="p-3">
                         <Button variant="outline-secondary" onClick={() => navigate("/")} className="me-auto">
-                            Home
+                            <em>Ryokan</em>
                         </Button>
                         {
                             isAuthenticated &&
@@ -68,17 +66,6 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                 {children ? children : null}
                 <Outlet/>
             </main>
-
-            <footer className="bg-body-tertiary text-center">
-                <Container className="p-3">
-                    <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-                        <img src={viteLogo} className="logo" alt="Vite logo"/>
-                    </a>
-                    <a href="https://react.dev" target="_blank" rel="noreferrer">
-                        <img src={reactLogo} className="logo react" alt="React logo"/>
-                    </a>
-                </Container>
-            </footer>
 
         </div>
     )
