@@ -62,7 +62,7 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                 </Container>
             </header>
 
-            <main className="flex-grow-1">
+            <main className="flex-fill d-flex flex-column">
                 {children ? children : null}
                 <Outlet/>
             </main>
