@@ -151,7 +151,7 @@ function Landing() {
                             Register for <span className="text-secondary-emphasis">Ryokan</span> to get
                             a closer look at all the awesome features.
                         </p>
-                        <p className="fst-italic text-secondary">
+                        <p className="fst-italic text-secondary pb-1">
                             You don&apos;t have to use your real email.
                         </p>
                         <Button onClick={() => navigate(`/sign-up`)}>
