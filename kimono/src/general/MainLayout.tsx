@@ -63,7 +63,7 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                                     variant="link"
                                     size="sm"
                                     onClick={() => navigate("/about")}
-                                    className="text-nowrap"
+                                    className="text-nowrap text-decoration-none text-secondary"
                                 >
                                     About
                                 </Button>
