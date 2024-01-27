@@ -1,5 +1,4 @@
 import svgPurpleHeart from "/purple-heart.svg";
-import svgDogFace from "/dog-face.svg"
 import svgRedPaperLantern from "/red-paper-lantern.svg"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
@@ -26,13 +25,22 @@ function Landing() {
         <Container className="py-lg-5 mt-lg-5 py-md-3 my-md-3 py-2 my-2">
 
             <div className="pt-lg-5 mt-lg-5 pt-md-3 mt-md-3 pt-2 mt-2">
-                <div className="display-3 fw-semibold">
-                    Very&nbsp;innovative, such&nbsp;wow&nbsp;
-                    <picture className="d-inline-block" style={{width: "5rem", height: "auto"}}>
-                        <img src={svgDogFace} className="img-fluid" alt="Dog emoji"/>
+                <div className="display-3 fw-semibold d-inline-flex">
+                    <picture
+                        className="d-inline-flex me-4 align-self-center"
+                        style={{
+                            width: "5rem",
+                            height: "auto",
+                            backgroundColor: "rgba(255, 183, 120, 0.7)",
+                            borderRadius: "50%",
+                            boxShadow: "0 0 0.5rem 0.25rem rgba(255, 183, 120, 0.4)",
+                        }}
+                    >
+                        <img src={svgRedPaperLantern} className="img-fluid" alt="Red paper lantern emoji"/>
                     </picture>
+                    Very&nbsp;innovative, such&nbsp;wow&nbsp;
                 </div>
-                <div className="fs-4 text-secondary mt-1 mt-md-2">
+                <div className="fs-4 text-secondary mt-2 mt-md-3">
                     You probably want to have a static marketing site for&nbsp;SEO,&nbsp;though.
                 </div>
             </div>
@@ -172,9 +180,18 @@ function Landing() {
                 </Row>
             </div>
 
-            <Stack className="text-center" gap={1}>
+            <Stack className="text-center" gap={3}>
                 <div>
-                    <picture className="d-inline-block" style={{width: "4rem", height: "auto"}}>
+                    <picture
+                        className="d-inline-block"
+                        style={{
+                            width: "4rem",
+                            height: "auto",
+                            backgroundColor: "rgba(255, 183, 120, 0.6)",
+                            borderRadius: "50%",
+                            boxShadow: "0 0 0.5rem 0.25rem rgba(255, 183, 120, 0.5)",
+                        }}
+                    >
                         <img src={svgRedPaperLantern} className="img-fluid" alt="Red paper lantern emoji"/>
                     </picture>
                 </div>
