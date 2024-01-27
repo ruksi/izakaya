@@ -1,12 +1,12 @@
 import viteLogo from "/vite.svg"
 import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import {useSelector} from "react-redux";
+import {useNavigate} from "react-router-dom";
 import reactLogo from "../assets/react.svg"
 import {selectIsAuthenticated} from "../auth/slice.ts";
 
@@ -16,6 +16,9 @@ export default function Home() {
 }
 
 function Landing() {
+
+    const navigate = useNavigate();
+
     return (
         <Container className="py-lg-5 mt-lg-5 py-md-3 my-md-3 py-2 my-2">
 
@@ -33,12 +36,10 @@ function Landing() {
             pb-lg-5 mb-lg-5 pb-md-4 mb-md-4 pb-3 mb-3
             ">
                 <Row>
-                    <Col xxs={12} md={6} lg={5} xl={4}>
+                    <Col xs={10} md={6} lg={5} xl={4}>
                         <InputGroup>
                             <Form.Control placeholder="email@example.com"/>
-                            <Button variant="primary">
-                                Sign up
-                            </Button>
+                            <Button onClick={() => navigate(`/sign-up`)}>Sign up</Button>
                         </InputGroup>
                     </Col>
                 </Row>
@@ -55,7 +56,7 @@ function Landing() {
                 </figure>
             </div>
 
-            <div className="pt-lg-5 mt-lg-5 pt-md-3 mt-md-3 pt-2 mt-2">
+            <div className="pt-lg-5 mt-lg-5 pt-3 mt-3">
                 <div>
                     <div className="display-5 text-info-emphasis mb-0 mb-md-2">
                         Core Message
@@ -67,33 +68,27 @@ function Landing() {
                 </div>
             </div>
 
-            <div className="py-lg-5 my-lg-5 py-md-3 my-md-3 py-2 my-2">
-                <Card bg="dark">
-                    <Card.Body>
-                        <span className="fs-4 text-secondary">
-                            <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
-                        </span>
-                    </Card.Body>
-                </Card>
+            <div className="py-lg-5 my-lg-5 py-3 my-3">
+                <div className="p-3 bg-body-tertiary border rounded-2">
+                    <span className="fs-4 text-secondary">
+                        <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
+                    </span>
+                </div>
                 <div className="d-flex gap-4 pt-4">
-                    <Card bg="dark">
-                        <Card.Body>
+                    <div className="p-3 bg-body-tertiary border rounded-2">
                         <span className="fs-4 text-secondary">
                             <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
                         </span>
-                        </Card.Body>
-                    </Card>
-                    <Card bg="dark">
-                        <Card.Body>
+                    </div>
+                    <div className="p-3 bg-body-tertiary border rounded-2">
                         <span className="fs-4 text-secondary">
                             <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
                         </span>
-                        </Card.Body>
-                    </Card>
+                    </div>
                 </div>
             </div>
 
-            <div className=" py-lg-5 my-lg-5 py-md-3 my-md-3 py-2 my-2">
+            <div className="pt-lg-5 mt-lg-5 pt-3 mt-3">
                 <div>
                     <div className=" display-5 text-success-emphasis mb-0 mb-md-2">
                         Additional Selling Point
@@ -105,33 +100,27 @@ function Landing() {
                 </div>
             </div>
 
-            <div className="py-lg-5 my-lg-5 py-md-3 my-md-3 py-2 my-2">
+            <div className="py-lg-5 my-lg-5 py-3 my-3">
                 <div className="d-flex gap-4 pb-4">
-                    <Card bg="dark">
-                        <Card.Body>
+                    <div className="p-3 bg-body-tertiary border rounded-2">
                         <span className="fs-4 text-secondary">
                             <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
                         </span>
-                        </Card.Body>
-                    </Card>
-                    <Card bg="dark">
-                        <Card.Body>
+                    </div>
+                    <div className="p-3 bg-body-tertiary border rounded-2">
                         <span className="fs-4 text-secondary">
                             <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
                         </span>
-                        </Card.Body>
-                    </Card>
+                    </div>
                 </div>
-                <Card bg="dark">
-                    <Card.Body>
-                        <span className="fs-4 text-secondary">
-                            <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
-                        </span>
-                    </Card.Body>
-                </Card>
+                <div className="p-3 bg-body-tertiary border rounded-2">
+                    <span className="fs-4 text-secondary">
+                        <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
+                    </span>
+                </div>
             </div>
 
-            <div className=" py-lg-5 my-lg-5 py-md-3 my-md-3 py-2 my-2">
+            <div className="pt-lg-5 mt-lg-5 pt-3 mt-3">
                 <div>
                     <div className=" display-5 text-warning-emphasis mb-0 mb-md-2">
                         More Calls to Action
@@ -143,26 +132,25 @@ function Landing() {
                 </div>
             </div>
 
-            <div className="py-lg-5 my-lg-5 py-md-3 my-md-3 py-2 my-2">
-                <Card bg="dark">
-                    <Card.Body>
+            <div className="py-lg-5 my-lg-5 py-3 my-3">
+                <div className="p-3 bg-body-tertiary border rounded-2">
                         <span className="fs-4 text-secondary">
                             <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
                         </span>
-                    </Card.Body>
-                </Card>
+                </div>
             </div>
 
             <div className=" py-lg-5 my-lg-5 py-md-3 my-md-3 py-2 my-2">
                 <Row>
                     <Col sm={12} md={6} lg={3}>
                         <div className="pb-4 fs-3 fst-italic">Ryokan</div>
-                        <p className="fs-6 text-secondary">
-                            Subscribe to our newsletter for updates and new features.
+                        <p className="fs-6 text-secondary-emphasis">
+                            Register for the service to get a closer look at all the awesome features.
                         </p>
-                        <div>
-                            <Button variant="outline-light">Subscribe</Button>
-                        </div>
+                        <p className="fst-italic text-secondary">
+                            You don&apos;t really need to use your real email.
+                        </p>
+                        <Button onClick={() => navigate(`/sign-up`)}>Sign up</Button>
                     </Col>
                     <Col sm={12} md={6} lg={3}>
                     </Col>
