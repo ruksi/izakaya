@@ -1,9 +1,9 @@
-# Ryokan 🏮🈺
+# Ryokan 🏮
 
-Ryokan is a research / template project for running Rust services on various PaaS providers.
+Ryokan is a research and example project for running Rust services on various PaaS providers.
 
 In essence, this is a mono-repo style Rust project with multiple components that
-are configured to auto-deploy on various PaaS providers. ☁️☁️☁️
+are configured to auto-deploy on different PaaS providers. ☁️☁️☁️
 
 - Render:
     - a static site: https://futon-render.ryokan.dev/
@@ -13,13 +13,6 @@ are configured to auto-deploy on various PaaS providers. ☁️☁️☁️
     - a web app: https://tatami-railway.ryokan.dev/
 
 > 🚧 These services might go offline later after I've finalized the latency / health testing. 🚧
-
-Using Rust workspaces because:
-
-- Allows us to have multiple binaries in the same repository, mono-repo style.
-- These binaries can be anything form web services, to CLIs, to libraries, to cron jobs.
-- Makes all binaries share the same `Cargo.lock` file and thus dependency versions.
-- Binaries are in separate directories for scoped auto deploys.
 
 ## Why?
 
@@ -99,13 +92,20 @@ I haven't liked the direction Heroku is heading for a while now, so looking for 
 
 > Remember to update both `.rtx.toml` and `rust-toolchain` when changing the Rust version!
 
+Ryokan uses Rust workspaces because:
+
+- Allows us to have multiple binaries in the same repository, mono-repo style.
+- These binaries can be anything form web services, to CLIs, to libraries, to cron jobs.
+- Makes all binaries share the same `Cargo.lock` file and thus dependency versions.
+- Binaries are in separate directories for scoped auto deploys.
+
 ### General
 
 ```bash
-rtx install
+rtx install # TODO: upgrade to `mise`
 ```
 
-### 🧘 `tatami` Backend
+### 🛏️ `tatami` Backend
 
 ```bash
 cd tatami
