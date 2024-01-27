@@ -2,6 +2,8 @@ import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
 import useTitle from "./useTitle.ts";
 
+import svgPurpleHeart from "/purple-heart.svg";
+
 export function About() {
     useTitle("About");
     return (
@@ -13,6 +15,13 @@ export function About() {
                     <div>
                         What is this website?&nbsp;
                         <a href="https://github.com/ruksi/ryokan">TL;DR: a Rust+React example project</a>
+                    </div>
+                    <div>
+                        Made with
+                        <div className="d-inline-block mx-1" style={{width: "1.5rem", height: "auto"}}>
+                            <img src={svgPurpleHeart} alt="love" title="love"/>
+                        </div>
+                        by <a href="https://ruk.si/">Ruksi</a>
                     </div>
                     <div>
                         License: <a href="https://github.com/ruksi/ryokan/blob/main/LICENSE">MIT</a>

@@ -1,9 +1,11 @@
+import svgPurpleHeart from "/purple-heart.svg";
 import svgDogFace from "/dog-face.svg"
 import svgRedPaperLantern from "/red-paper-lantern.svg"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
+import Stack from "react-bootstrap/Stack";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
@@ -170,13 +172,20 @@ function Landing() {
                 </Row>
             </div>
 
-            <div className="text-center">
-                <a href="#" target="_blank" rel="noreferrer">
+            <Stack className="text-center" gap={1}>
+                <div>
                     <picture className="d-inline-block" style={{width: "4rem", height: "auto"}}>
                         <img src={svgRedPaperLantern} className="img-fluid" alt="Red paper lantern emoji"/>
                     </picture>
-                </a>
-            </div>
+                </div>
+                <div>
+                    Made with
+                    <div className="d-inline-block mx-1" style={{width: "1.5rem", height: "auto"}}>
+                        <img src={svgPurpleHeart} alt="love" title="love"/>
+                    </div>
+                    by <a href="https://ruk.si/">Ruksi</a>
+                </div>
+            </Stack>
 
         </Container>
     );
