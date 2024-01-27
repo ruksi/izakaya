@@ -60,6 +60,14 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                             !isAuthenticated &&
                             <>
                                 <Button
+                                    variant="link"
+                                    size="sm"
+                                    onClick={() => navigate("/about")}
+                                    className="text-nowrap"
+                                >
+                                    About
+                                </Button>
+                                <Button
                                     variant="outline-secondary"
                                     size="sm"
                                     onClick={() => navigate("/log-in")}

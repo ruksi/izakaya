@@ -1,4 +1,5 @@
-import viteLogo from "/vite.svg"
+import svgDogFace from "/dog-face.svg"
+import svgRedPaperLantern from "/red-paper-lantern.svg"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
@@ -8,7 +9,6 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import {useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import reactLogo from "../assets/react.svg"
 import {selectIsAuthenticated} from "../auth/slice.ts";
 
 export default function Home() {
@@ -25,7 +25,10 @@ function Landing() {
 
             <div className="pt-lg-5 mt-lg-5 pt-md-3 mt-md-3 pt-2 mt-2">
                 <div className="display-3 fw-semibold">
-                    Very&nbsp;innovative, such&nbsp;wow&nbsp;🐶
+                    Very&nbsp;innovative, such&nbsp;wow&nbsp;
+                    <picture className="d-inline-block" style={{width: "5rem", height: "auto"}}>
+                        <img src={svgDogFace} className="img-fluid" alt="Dog emoji"/>
+                    </picture>
                 </div>
                 <div className="fs-4 text-secondary mt-1 mt-md-2">
                     You probably want to have a static marketing site for&nbsp;SEO,&nbsp;though.
@@ -168,11 +171,10 @@ function Landing() {
             </div>
 
             <div className="text-center">
-                <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-                    <img src={viteLogo} className="logo" alt="Vite logo"/>
-                </a>
-                <a href="https://react.dev" target="_blank" rel="noreferrer">
-                    <img src={reactLogo} className="logo react" alt="React logo"/>
+                <a href="#" target="_blank" rel="noreferrer">
+                    <picture className="d-inline-block" style={{width: "4rem", height: "auto"}}>
+                        <img src={svgRedPaperLantern} className="img-fluid" alt="Red paper lantern emoji"/>
+                    </picture>
                 </a>
             </div>
 
