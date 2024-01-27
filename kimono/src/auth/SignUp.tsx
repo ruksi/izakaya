@@ -66,6 +66,7 @@ export default function SignUp() {
                                             type="email"
                                             value={email}
                                             onChange={onEmailChange}
+                                            autoFocus={true}
                                         />
                                         <FormGroupFeedback field="email" error={error}/>
                                     </Form.Group>

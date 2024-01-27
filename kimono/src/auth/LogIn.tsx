@@ -57,6 +57,7 @@ export default function LogIn() {
                                             type="text"
                                             value={usernameOrEmail}
                                             onChange={(e) => setUsernameOrEmail(e.target.value)}
+                                            autoFocus={true}
                                         />
                                     </Form.Group>
 
