@@ -10,10 +10,12 @@ import Row from "react-bootstrap/Row";
 import {Link} from "react-router-dom";
 import {isErroneous} from "../forms/checks.ts";
 import {FormGroupFeedback} from "../forms/FormGroupFeedback.tsx";
-import tatami from "../services/tatami.ts";
 import ButtonSpinnerIf from "../general/ButtonSpinnerIf.tsx";
+import useTitle from "../general/useTitle.ts";
+import tatami from "../services/tatami.ts";
 
 export default function SignUp() {
+    useTitle("Sign Up");
 
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");

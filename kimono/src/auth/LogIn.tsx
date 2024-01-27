@@ -8,12 +8,13 @@ import Stack from "react-bootstrap/esm/Stack";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import {Link} from "react-router-dom";
-
 import {FormAlert} from "../forms/FormAlert.tsx";
-import tatami from "../services/tatami.ts";
 import ButtonSpinnerIf from "../general/ButtonSpinnerIf.tsx";
+import useTitle from "../general/useTitle.ts";
+import tatami from "../services/tatami.ts";
 
 export default function LogIn() {
+    useTitle("Log In");
 
     const [usernameOrEmail, setUsernameOrEmail] = useState("");
     const [password, setPassword] = useState("");
