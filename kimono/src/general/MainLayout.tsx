@@ -30,19 +30,19 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
     return (
         <div className="d-flex flex-column min-vh-100">
 
-            <header className="bg-body-tertiary">
-                <Container>
+            <header className="bg-body-tertiary border-bottom">
+                <HeaderWrapper isAuthenticated={isAuthenticated}>
                     <Stack direction="horizontal" gap={2} className="p-3">
-                        <Button variant="outline-secondary" onClick={() => navigate("/")} className="me-auto">
-                            {isAuthenticated ? <>Dashboard</> : <em>Ryokan</em>}
+                        <Button variant="outline-secondary" size="sm" onClick={() => navigate("/")} className="me-auto">
+                            {isAuthenticated ? <>Dashboard</> : <em>Ryokan?</em>}
                         </Button>
                         {
                             isAuthenticated &&
                             <>
-                                <Button variant="outline-secondary" onClick={() => navigate("/settings")}>
+                                <Button variant="outline-secondary" size="sm" onClick={() => navigate("/settings")}>
                                     Settings
                                 </Button>
-                                <Button variant="outline-secondary" onClick={logOut}>
+                                <Button variant="outline-secondary" size="sm" onClick={logOut}>
                                     Log out
                                 </Button>
                             </>
@@ -50,16 +50,16 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                         {
                             !isAuthenticated &&
                             <>
-                                <Button variant="outline-secondary" onClick={() => navigate("/log-in")}>
+                                <Button variant="outline-secondary" size="sm" onClick={() => navigate("/log-in")}>
                                     Log in
                                 </Button>
-                                <Button variant="secondary" onClick={() => navigate(`/sign-up`)}>
+                                <Button variant="secondary" size="sm" onClick={() => navigate(`/sign-up`)}>
                                     Sign up
                                 </Button>
                             </>
                         }
                     </Stack>
-                </Container>
+                </HeaderWrapper>
             </header>
 
             <main className="flex-fill d-flex flex-column">
@@ -69,4 +69,10 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
 
         </div>
     )
+}
+
+function HeaderWrapper({isAuthenticated, children}: { isAuthenticated: boolean, children?: React.ReactNode }) {
+    return isAuthenticated
+        ? <>{children}</>
+        : <Container>{children}</Container>;
 }

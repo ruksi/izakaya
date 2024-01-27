@@ -144,11 +144,12 @@ function Landing() {
                 <Row>
                     <Col sm={12} md={6} lg={3}>
                         <div className="pb-4 fs-3 fst-italic">Ryokan</div>
-                        <p className="fs-6 text-secondary-emphasis">
-                            Register for the service to get a closer look at all the awesome features.
+                        <p className="fs-6 text-secondary">
+                            Register for <span className="text-secondary-emphasis">Ryokan</span> to get
+                            a closer look at all the awesome features.
                         </p>
                         <p className="fst-italic text-secondary">
-                            You don&apos;t really need to use your real email.
+                            You don&apos;t have to use your real email.
                         </p>
                         <Button onClick={() => navigate(`/sign-up`)}>Sign up</Button>
                     </Col>
@@ -176,11 +177,31 @@ function Landing() {
 
 function Dashboard() {
     return (
-        <Container className=" my-3">
-            <h1>Dashboard</h1>
-            <div>
-                <code># TODO: some boxes</code>
-            </div>
-        </Container>
+        <Row className="me-0">
+            <Col xs={12} md={4} lg={3} xl={2} className="pe-0">
+                <div className="pt-3 bg-body-secondary border-end border-bottom vh-100 overflow-y-scroll">
+                    <code># TODO: some actions? </code>
+                </div>
+            </Col>
+            <Col xs={12} md={8} lg={6} xl={8}>
+                <div className="pt-3">
+                    <div className="fs-5">Feed</div>
+                    <code># TODO: recent activity? </code>
+                </div>
+            </Col>
+            <Col xs={12} md={12} lg={3} xl={2} className="me-0 ps-4 ps-lg-0">
+                <div className="py-3 d-flex flex-column gap-3">
+                    <div className="p-3 bg-body-secondary border rounded-2">
+                        <div className="small">Latest</div>
+                    </div>
+                    <div className="p-3 bg-body-secondary border rounded-2">
+                        <div className="small">Discover</div>
+                    </div>
+                    <div className="p-3 bg-body-secondary border rounded-2">
+                        <div className="small">Explore</div>
+                    </div>
+                </div>
+            </Col>
+        </Row>
     );
 }
