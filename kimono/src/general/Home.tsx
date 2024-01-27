@@ -37,7 +37,7 @@ function Landing() {
                         <InputGroup>
                             <Form.Control placeholder="email@example.com"/>
                             <Button variant="primary">
-                                Sign Up
+                                Sign up
                             </Button>
                         </InputGroup>
                     </Col>

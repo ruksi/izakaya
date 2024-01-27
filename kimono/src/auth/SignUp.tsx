@@ -108,7 +108,7 @@ export default function SignUp() {
                                         className="ms-auto"
                                     >
                                         <ButtonSpinnerIf isLoading={isLoading}>
-                                            Create Account
+                                            Create account
                                         </ButtonSpinnerIf>
                                     </Button>
                                 </Stack>

@@ -144,7 +144,7 @@ function CreateTokenControl({isLoadingSessions}: { isLoadingSessions: boolean })
                             disabled={isLoadingSessions || isLoading}
                             onClick={() => setIsCreating(true)}
                         >
-                            Create API Token
+                            Create API token
                         </Button>
                     )
                 }

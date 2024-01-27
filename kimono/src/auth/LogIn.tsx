@@ -83,7 +83,7 @@ export default function LogIn() {
                                         disabled={isLoading}
                                     >
                                         <ButtonSpinnerIf isLoading={isLoading}>
-                                            Log In
+                                            Log in
                                         </ButtonSpinnerIf>
                                     </Button>
                                 </Stack>

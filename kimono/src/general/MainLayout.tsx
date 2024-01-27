@@ -34,16 +34,16 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                 <Container>
                     <Stack direction="horizontal" gap={2} className="p-3">
                         <Button variant="outline-secondary" onClick={() => navigate("/")} className="me-auto">
-                            <em>Ryokan</em>
+                            {isAuthenticated ? <>Dashboard</> : <em>Ryokan</em>}
                         </Button>
                         {
                             isAuthenticated &&
                             <>
-                                <Button variant="secondary" onClick={() => navigate("/settings")}>
+                                <Button variant="outline-secondary" onClick={() => navigate("/settings")}>
                                     Settings
                                 </Button>
                                 <Button variant="outline-secondary" onClick={logOut}>
-                                    Log Out
+                                    Log out
                                 </Button>
                             </>
                         }
@@ -51,10 +51,10 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                             !isAuthenticated &&
                             <>
                                 <Button variant="outline-secondary" onClick={() => navigate("/log-in")}>
-                                    Log In
+                                    Log in
                                 </Button>
                                 <Button variant="secondary" onClick={() => navigate(`/sign-up`)}>
-                                    Sign Up
+                                    Sign up
                                 </Button>
                             </>
                         }
