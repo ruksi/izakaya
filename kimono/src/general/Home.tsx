@@ -1,5 +1,5 @@
-import svgPurpleHeart from "/purple-heart.svg";
-import svgRedPaperLantern from "/red-paper-lantern.svg"
+import svgPurpleHeart from "../assets/purple-heart.svg"
+import svgRedPaperLantern from "../assets/red-paper-lantern.svg"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";

@@ -1,8 +1,7 @@
 import Container from "react-bootstrap/Container";
 import Stack from "react-bootstrap/Stack";
+import svgPurpleHeart from "../assets/purple-heart.svg";
 import useTitle from "./useTitle.ts";
-
-import svgPurpleHeart from "/purple-heart.svg";
 
 export function About() {
     useTitle("About");
