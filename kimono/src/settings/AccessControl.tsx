@@ -1,3 +1,4 @@
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {useCallback, useEffect, useState} from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -23,7 +24,7 @@ export function AccessControl() {
                     </div>
                     <div className="d-inline-block mt-1">
                         <Button size="sm" variant="secondary" disabled>
-                            Revoke
+                            <FontAwesomeIcon icon="ban" className="me-1"/>Revoke
                         </Button>
                     </div>
                 </div>
@@ -73,7 +74,7 @@ function SessionDisplay({session}: { session: Session }) {
                     )
                     : (
                         <Button size="sm" variant="danger" disabled={isLoading} onClick={onClickRevoke}>
-                            Revoke
+                            <FontAwesomeIcon icon="ban" className="me-1"/>Revoke
                         </Button>
                     )
                 }
@@ -144,7 +145,7 @@ function CreateTokenControl({isLoadingSessions}: { isLoadingSessions: boolean })
                             disabled={isLoadingSessions || isLoading}
                             onClick={() => setIsCreating(true)}
                         >
-                            Create API token
+                            <FontAwesomeIcon icon="plus" className="me-1"/>Create API token
                         </Button>
                     )
                 }
@@ -160,20 +161,23 @@ function NewSessionModal({session, show, onClose}: { session: NewSession, show: 
     return (
         <Modal show={show}>
             <Modal.Header>
-                <Modal.Title>🎉 Your API Token is Ready!</Modal.Title>
+                <Modal.Title>
+                    <FontAwesomeIcon icon="key" className="ms-1 me-3 text-warning"/>
+                    Your API Token is Ready!
+                </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <p>
                     Copy the following token:
                 </p>
-                <pre className="text-wrap"><code>{session.access_token}</code></pre>
+                <pre className="text-wrap text-warning-emphasis"><code>{session.access_token}</code></pre>
                 <p>
                     <strong>Keep this token safe!</strong> You won&apos;t be seeing it again.
                 </p>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={onClose}>
-                    Yes, I copied it
+                    <FontAwesomeIcon icon="thumbs-up" className="me-2"/>Yes, I copied it
                 </Button>
             </Modal.Footer>
         </Modal>

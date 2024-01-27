@@ -1,4 +1,5 @@
 import viteLogo from "/vite.svg"
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
@@ -39,7 +40,9 @@ function Landing() {
                     <Col xs={10} md={6} lg={5} xl={4}>
                         <InputGroup>
                             <Form.Control placeholder="email@example.com"/>
-                            <Button onClick={() => navigate(`/sign-up`)}>Sign up</Button>
+                            <Button onClick={() => navigate(`/sign-up`)}>
+                                <FontAwesomeIcon icon="pen-to-square" className="me-1"/>Sign up
+                            </Button>
                         </InputGroup>
                     </Col>
                 </Row>
@@ -151,7 +154,9 @@ function Landing() {
                         <p className="fst-italic text-secondary">
                             You don&apos;t have to use your real email.
                         </p>
-                        <Button onClick={() => navigate(`/sign-up`)}>Sign up</Button>
+                        <Button onClick={() => navigate(`/sign-up`)}>
+                            <FontAwesomeIcon icon="pen-to-square" className="me-1"/>Sign up
+                        </Button>
                     </Col>
                     <Col sm={12} md={6} lg={3}>
                     </Col>

@@ -1,3 +1,4 @@
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {useCallback, useState} from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -83,7 +84,7 @@ export default function LogIn() {
                                         disabled={isLoading}
                                     >
                                         <ButtonSpinnerIf isLoading={isLoading}>
-                                            Log in
+                                            <FontAwesomeIcon icon="right-from-bracket" className="me-1"/>Log in
                                         </ButtonSpinnerIf>
                                     </Button>
                                 </Stack>

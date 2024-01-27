@@ -1,3 +1,4 @@
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {useEffect} from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
@@ -8,6 +9,12 @@ import {selectIsAuthenticated} from "../auth/slice.ts";
 import {authLogOut} from "../auth/thunks.ts";
 import tatami from "../services/tatami.ts";
 import {store} from "../store.ts";
+
+// TODO: move this somewhere else
+import {library} from "@fortawesome/fontawesome-svg-core"
+import {fas} from "@fortawesome/free-solid-svg-icons"
+
+library.add(fas);
 
 export default function MainLayout({children}: { children?: React.ReactNode }) {
 
@@ -34,27 +41,39 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                 <HeaderWrapper isAuthenticated={isAuthenticated}>
                     <Stack direction="horizontal" gap={2} className="p-3">
                         <Button variant="outline-secondary" size="sm" onClick={() => navigate("/")} className="me-auto">
-                            {isAuthenticated ? <>Dashboard</> : <em>Ryokan?</em>}
+                            {isAuthenticated
+                                ? <>Dashboard</>
+                                : <em>Ryokan?</em>}
                         </Button>
                         {
                             isAuthenticated &&
                             <>
                                 <Button variant="outline-secondary" size="sm" onClick={() => navigate("/settings")}>
-                                    Settings
+                                    <FontAwesomeIcon icon="gear" className="me-1"/>Settings
                                 </Button>
                                 <Button variant="outline-secondary" size="sm" onClick={logOut}>
-                                    Log out
+                                    <FontAwesomeIcon icon="right-from-bracket" className="me-1"/>Log out
                                 </Button>
                             </>
                         }
                         {
                             !isAuthenticated &&
                             <>
-                                <Button variant="outline-secondary" size="sm" onClick={() => navigate("/log-in")}>
-                                    Log in
+                                <Button
+                                    variant="outline-secondary"
+                                    size="sm"
+                                    onClick={() => navigate("/log-in")}
+                                    className="text-nowrap"
+                                >
+                                    <FontAwesomeIcon icon="arrow-right-to-bracket" className="me-1"/>Log in
                                 </Button>
-                                <Button variant="secondary" size="sm" onClick={() => navigate(`/sign-up`)}>
-                                    Sign up
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={() => navigate(`/sign-up`)}
+                                    className="text-nowrap"
+                                >
+                                    <FontAwesomeIcon icon="pen-to-square" className="me-1"/>Sign up
                                 </Button>
                             </>
                         }

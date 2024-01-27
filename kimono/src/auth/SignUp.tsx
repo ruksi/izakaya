@@ -1,3 +1,4 @@
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {useCallback, useState} from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -108,7 +109,7 @@ export default function SignUp() {
                                         className="ms-auto"
                                     >
                                         <ButtonSpinnerIf isLoading={isLoading}>
-                                            Create account
+                                            <FontAwesomeIcon icon="pen-to-square" className="me-1"/>Create account
                                         </ButtonSpinnerIf>
                                     </Button>
                                 </Stack>
