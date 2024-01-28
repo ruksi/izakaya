@@ -47,11 +47,6 @@ pub async fn record_visit(
 
     if visitor.user_id.is_some() {
         // update the last usage time of the session in the background
-        // TODO: this might leave useless session hashes in Redis e.g. on logout,
-        //       what happens is that the log out handler deletes the session hash
-        //       but the following background tasks creates it again with a new `used_at`
-        //       not a major issue as the session will be missing `user_id` to actually be used,
-        //       but useless Redis bloat anyway
         let move_session_key = session_key(visitor.access_token.as_ref().unwrap());
         let move_pool = state.cache_pool.clone();
         tokio::spawn(async move {
@@ -62,10 +57,21 @@ pub async fn record_visit(
             let Ok(now_text) = utc_now.format(&Rfc3339) else {
                 return;
             };
-            let _ignore_return_value: i64 = redis
-                .hset(move_session_key, "used_at", now_text)
+            // be optimistic and assume the session key exists for update
+            let existed: bool = redis::pipe()
+                .exists(&move_session_key)
+                .hset(&move_session_key, "used_at", now_text)
+                .ignore()
+                .query_async(&mut redis)
                 .await
-                .unwrap_or_default();
+                .unwrap_or(true);
+            // but... go back and then delete it if it didn't exist
+            // this should be much more rare case as it means
+            // that the session logged out / key expired right after
+            // accepting the credentials
+            if !existed {
+                let _: () = redis.del(&move_session_key).await.unwrap_or_default();
+            }
         });
     }
 
