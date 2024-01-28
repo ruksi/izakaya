@@ -1,7 +1,7 @@
 use rand::Rng;
 use redis;
 
-use crate::auth::{crypto, session_key, session_list_key};
+use crate::auth::{crypto, session_key, session_set_key};
 use crate::prelude::*;
 use crate::state::AppState;
 
@@ -45,12 +45,12 @@ pub async fn issue_access_token(
     let mut redis = state.cache_pool.get().await?;
 
     let session_key = session_key(access_token.clone());
-    let session_list_key = session_list_key(record.user_id);
+    let session_list_key = session_set_key(record.user_id);
 
     let mut commands = redis::pipe()
         .hset(session_key.clone(), "access_token", access_token.clone()) // duplicate info vs. the key but 🤷
         .hset(session_key.clone(), "user_id", record.user_id.to_string())
-        .rpush(session_list_key, access_token.clone())
+        .sadd(session_list_key, session_key.clone())
         .to_owned();
 
     if let Some(expire) = expire {

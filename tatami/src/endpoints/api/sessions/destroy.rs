@@ -2,7 +2,9 @@ use axum::extract::{Path, State};
 use axum::{Extension, Json};
 use redis::AsyncCommands;
 
-use crate::auth::{revoke_access_token, session_list_key, CurrentUser};
+use crate::auth::{
+    access_token_from_session_key, revoke_access_token, session_key, session_set_key, CurrentUser,
+};
 use crate::prelude::*;
 use crate::state::AppState;
 
@@ -19,13 +21,15 @@ pub async fn destroy(
     let mut redis = state.cache_pool.get().await?;
 
     // find all access tokens of this user
-    let access_tokens: Vec<String> = redis.lrange(session_list_key(user_id), 0, -1).await?;
+    let session_keys: Vec<String> = redis.smembers(session_set_key(user_id)).await?;
 
     // find access tokens with the right prefix, there probably is just one
     // TODO: has a slight "feature" that removes all matching tokens, although matches are unlikely
-    let access_tokens: Vec<String> = access_tokens
+    let session_key_prefix = session_key(access_token_prefix);
+    let access_tokens: Vec<String> = session_keys
         .into_iter()
-        .filter(|token| token.starts_with(&access_token_prefix))
+        .filter(|session| session.starts_with(&session_key_prefix))
+        .map(|session| access_token_from_session_key(&session))
         .collect();
     if access_tokens.is_empty() {
         return Err(Error::NotFound);

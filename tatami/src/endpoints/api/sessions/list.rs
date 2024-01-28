@@ -1,12 +1,10 @@
-use std::collections::HashMap;
-
 use axum::extract::State;
 use axum::{Extension, Json};
-use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use crate::auth::{session_key, session_list_key, CurrentUser};
+use crate::auth::{session_set_key, CurrentUser};
+use crate::scripts::RedisScripts;
 use crate::state::AppState;
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -22,29 +20,18 @@ pub async fn list(
     let user_id = current_user.user_id;
 
     let mut redis = state.cache_pool.get().await?;
-    let access_tokens: Vec<String> = redis.lrange(session_list_key(user_id), 0, -1).await?;
-
-    let mut commands = redis::pipe().to_owned();
-    for token in &access_tokens {
-        commands = commands.hgetall(session_key(token)).to_owned();
-    }
-    let sessions: Vec<HashMap<String, String>> = commands.query_async(&mut redis).await?;
-
-    // TODO: we _could_ remove the empty hashes from the Redis list here...
+    let sessions = redis.smembers_hgetall(session_set_key(user_id)).await?;
 
     // we don't want to expose the full tokens
     let public_sessions: Vec<PublicSession> = sessions
         .into_iter()
-        .filter(|session| !session.is_empty())
         .map(|session| {
             let access_token_text = session
                 .get("access_token")
                 .map(|t| t.to_string())
                 .unwrap_or_default();
             let access_token_prefix = access_token_text.chars().take(8).collect::<String>();
-
             let used_at = session.get("used_at").map(|t| t.to_string());
-
             PublicSession {
                 access_token_prefix,
                 used_at,
@@ -106,6 +93,8 @@ mod tests {
         assert!(sessions
             .iter()
             .all(|session| session.access_token_prefix.len() == 8));
+
+        // TODO: cleanup
 
         Ok(())
     }

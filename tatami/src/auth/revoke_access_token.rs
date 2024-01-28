@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-use crate::auth::{session_key, session_list_key};
+use crate::auth::{session_key, session_set_key};
 use crate::prelude::*;
 use crate::state::AppState;
 
@@ -12,10 +12,10 @@ pub async fn revoke_access_token(
     let mut cache_conn = state.cache_pool.get().await?;
 
     let session_key = session_key(access_token.clone());
-    let session_list_key = session_list_key(user_id);
+    let session_list_key = session_set_key(user_id);
 
     redis::pipe()
-        .lrem(session_list_key, 0, access_token.clone())
+        .srem(session_list_key, &session_key)
         .del(session_key)
         .query_async::<_, ()>(&mut cache_conn)
         .await?;
