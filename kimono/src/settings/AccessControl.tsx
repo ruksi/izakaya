@@ -1,4 +1,5 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {formatDistance, parseISO} from "date-fns";
 import React, {useCallback, useEffect, useState} from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -51,6 +52,13 @@ function SessionDisplay({session}: { session: Session }) {
         setIsDeleting(false);
     }, [setIsDeleting, deleteMySession, session]);
 
+    let lastUsed = <span className="text-secondary">Never</span>;
+    if (session?.used_at) {
+        const at = parseISO(session.used_at);
+        const ago = formatDistance(at, new Date(), {addSuffix: true})
+        lastUsed = <abbr title={session.used_at}>{ago}</abbr>;
+    }
+
     return (
         <div className="d-flex flex-wrap align-items-center">
             <div className="d-inline-block" style={{minWidth: 350}}>
@@ -59,8 +67,8 @@ function SessionDisplay({session}: { session: Session }) {
                     <code>{session.access_token_prefix}...</code>
                 </div>
                 <div>
-                    <label className="text-body-emphasis me-1">Last Used:</label>
-                    {session?.used_at ? session?.used_at : <>-</>}
+                    <label className="text-body-emphasis me-1">Last Use:</label>
+                    {lastUsed}
                 </div>
             </div>
             <div className="d-inline-block mt-1">
