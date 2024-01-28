@@ -10,6 +10,7 @@ use time::format_description::well_known::Rfc3339;
 use uuid::Uuid;
 
 use crate::auth::{cookie, session_key, Visitor};
+use crate::scripts::RedisScripts;
 use crate::state::AppState;
 
 pub async fn record_visit(
@@ -57,21 +58,7 @@ pub async fn record_visit(
             let Ok(now_text) = utc_now.format(&Rfc3339) else {
                 return;
             };
-            // be optimistic and assume the session key exists for update
-            let existed: bool = redis::pipe()
-                .exists(&move_session_key)
-                .hset(&move_session_key, "used_at", now_text)
-                .ignore()
-                .query_async(&mut redis)
-                .await
-                .unwrap_or(true);
-            // but... go back and then delete it if it didn't exist
-            // this should be much more rare case as it means
-            // that the session logged out / key expired right after
-            // accepting the credentials
-            if !existed {
-                let _: () = redis.del(&move_session_key).await.unwrap_or_default();
-            }
+            let _ = redis.hsetx(move_session_key, "used_at", now_text).await;
         });
     }
 
