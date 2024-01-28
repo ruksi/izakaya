@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update \"user\" u\n                set\n                    username = coalesce($1, u.username)\n                where user_id = $2\n                returning user_id, username;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "username",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "82ce37ea2067a5e4dad633bb00a1a82809fd195e53db6fb2805ada88e00e4e7a"
+}

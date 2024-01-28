@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        with deleted as (delete from \"user\" where user_id = $1 returning user_id) \n        select count(user_id) from deleted;\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "46c64d824402fdd2eb20ca4996869f8b2dae8cd5a0a6441f185a67a7ed911b9f"
+}

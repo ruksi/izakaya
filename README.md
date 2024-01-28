@@ -86,7 +86,7 @@ I haven't liked the direction Heroku is heading for a while now, so looking for 
 - Extra:
     - [ ] GitHub Actions CI/CD
     - [ ] AWS Health Check
-    - [ ] `cargo sqlx prepare` 🤔
+    - [x] `cargo sqlx prepare` 🤔
 
 ## Development
 
@@ -126,6 +126,16 @@ cargo sqlx database setup
 
 # revert migrations to the given version
 #cargo sqlx migrate revert --target-version=0
+
+# sqlx runs in offline mode in production as the app itself 
+# runs migrations, but sqlx crashes the build as the database 
+# is not yet in sync... the same issue with CI, so set 
+# `SQLX_OFFLINE=true` on both
+
+# locally, to check that query checks are in sync with the database
+cargo sqlx prepare --check --workspace
+# if not, regenerate them and push to version control
+cargo sqlx prepare --workspace
 
 cargo run
 ```
