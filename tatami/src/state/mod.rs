@@ -39,10 +39,10 @@ mod tests {
         let state = mock_state(&db).await;
         let mut redis = state.cache_pool.get().await?;
         let (from_cache,): (String,) = redis::pipe()
-            .set("deadpool:test_key", "CACHE OK")
+            .set("tatami:tests:test_key", "CACHE OK")
             .ignore()
-            .get("deadpool:test_key")
-            .del("deadpool:test_key")
+            .get("tatami:tests:test_key")
+            .del("tatami:tests:test_key")
             .ignore()
             .query_async(&mut redis)
             .await?;

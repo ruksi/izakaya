@@ -16,6 +16,7 @@ mod config;
 mod endpoints;
 mod error;
 mod prelude;
+mod scripts;
 mod state;
 mod user;
 mod valid;
