@@ -462,7 +462,6 @@ dependencies = [
  "async-trait",
  "deadpool-runtime",
  "num_cpus",
- "serde",
  "tokio",
 ]
 
@@ -474,7 +473,6 @@ checksum = "36f2381b0e993d06a1f6d49f486b33bc4004085bf980340fc05726bacc681fff"
 dependencies = [
  "deadpool",
  "redis",
- "serde",
 ]
 
 [[package]]
@@ -1533,8 +1531,6 @@ dependencies = [
  "percent-encoding",
  "pin-project-lite",
  "ryu",
- "serde",
- "serde_json",
  "sha1_smol",
  "socket2 0.4.10",
  "tokio",
