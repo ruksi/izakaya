@@ -1,15 +1,39 @@
+use std::collections::HashMap;
+
 use once_cell::sync::Lazy;
 
-static HSETX: Lazy<redis::Script> = Lazy::new(|| {
+// set a hash field to value if the hash exists
+static HSET_X: Lazy<redis::Script> = Lazy::new(|| {
     return redis::Script::new(
         // language=Lua
         r#"
-                local hash = KEYS[1];
-                if redis.call('exists', hash) ~= 0 then
-                    return redis.call('hset', hash, unpack(ARGV));
+            local hash = KEYS[1];
+            if redis.call('exists', hash) ~= 0 then
+                return redis.call('hset', hash, unpack(ARGV));
+            end
+            return 0;
+        "#,
+    );
+});
+
+// get key references from a set and return the hashes
+static SMEMBERS_HGETALL: Lazy<redis::Script> = Lazy::new(|| {
+    return redis::Script::new(
+        // language=Lua
+        r#"
+            local set = KEYS[1];
+            local keys = redis.call('smembers', set);
+            local result = {};
+            for _, key in ipairs(keys) do
+                local hash = redis.call('hgetall', key);
+                if #hash > 0 then 
+                    table.insert(result, hash);
+                else
+                    redis.call('srem', set, key);
                 end
-                return 0;
-            "#,
+            end
+            return result;
+        "#,
     );
 });
 
@@ -21,7 +45,7 @@ pub trait RedisScripts {
         F: redis::ToRedisArgs,
         V: redis::ToRedisArgs,
     {
-        HSETX
+        HSET_X
             .key(key)
             .arg(field)
             .arg(value)
@@ -47,7 +71,7 @@ pub trait RedisScripts {
         F2: redis::ToRedisArgs,
         V2: redis::ToRedisArgs,
     {
-        HSETX
+        HSET_X
             .key(key)
             .arg(field1)
             .arg(value1)
@@ -55,6 +79,17 @@ pub trait RedisScripts {
             .arg(value2)
             .invoke_async(self)
             .await
+    }
+
+    async fn smembers_hgetall<K>(
+        &mut self,
+        key: K,
+    ) -> redis::RedisResult<Vec<HashMap<String, String>>>
+    where
+        Self: redis::aio::ConnectionLike + Sized,
+        K: redis::ToRedisArgs,
+    {
+        SMEMBERS_HGETALL.key(key).invoke_async(self).await
     }
 }
 impl RedisScripts for redis::aio::Connection {}
@@ -120,6 +155,60 @@ mod tests {
 
         // cleanup
         redis.del(&key).await?;
+
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn burr(db: sqlx::PgPool) -> Result<()> {
+        let state = mock_state(&db).await;
+        let mut redis = state.cache_pool.get().await?;
+
+        let key1 = "tatami:tests:scripts:foo";
+        let key2 = "tatami:tests:scripts:bar";
+        let key3 = "tatami:tests:scripts:baz";
+        let set_key = "tatami:tests:scripts:all";
+        redis::pipe()
+            .hset(key1, "x", "FOO")
+            .hset(key2, "y", "BAR")
+            .hset(key3, "z", "BAZ")
+            .sadd(set_key, key1)
+            .sadd(set_key, key2)
+            .sadd(set_key, key3)
+            .query_async(&mut redis)
+            .await?;
+
+        let hashes = redis.smembers_hgetall(set_key).await?;
+        assert_eq!(hashes.len(), 3);
+        assert!(hashes
+            .iter()
+            .any(|h| h.get("x") == Some(&"FOO".to_string())));
+        assert!(hashes
+            .iter()
+            .any(|h| h.get("y") == Some(&"BAR".to_string())));
+        assert!(hashes
+            .iter()
+            .any(|h| h.get("z") == Some(&"BAZ".to_string())));
+
+        redis.del(key2).await?;
+        let hashes = redis.smembers_hgetall(set_key).await?;
+        assert_eq!(hashes.len(), 2);
+        assert!(hashes
+            .iter()
+            .any(|h| h.get("x") == Some(&"FOO".to_string())));
+        assert!(hashes
+            .iter()
+            .any(|h| h.get("z") == Some(&"BAZ".to_string())));
+
+        // it also cleaned up the set
+        let keys: Vec<String> = redis.smembers(set_key).await?;
+        assert_eq!(keys.len(), 2);
+
+        redis.del(key1).await?;
+        redis.del(key3).await?;
+
+        let hashes = redis.smembers_hgetall(set_key).await?;
+        assert_eq!(hashes.len(), 0);
 
         Ok(())
     }
