@@ -58,7 +58,7 @@ pub async fn record_visit(
             let Ok(now_text) = utc_now.format(&Rfc3339) else {
                 return;
             };
-            let _ = redis.hsetx(move_session_key, "used_at", now_text).await;
+            let _ = redis.hset_x(move_session_key, "used_at", now_text).await;
         });
     }
 
