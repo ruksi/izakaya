@@ -1,108 +1,103 @@
-# Ryokan 🏮
+# 🏮 Ryokan
 
-Ryokan is a research and example project for running Rust services on various PaaS providers.
+Ryokan is a research and learning project for running Rust services on various PaaS providers.
 
-In essence, this is a mono-repo style Rust project with multiple components that
-are configured to auto-deploy on different PaaS providers. ☁️☁️☁️
+This is a mono-repo with many big components (e.g., frontend, backend) that
+are configured to auto-deploy to different PaaS providers.
+
+> 🚧 These deployments might go offline at any time. 🚧
 
 - Render:
-    - a static site: https://futon-render.ryokan.dev/
-    - a web app: https://tatami-render.ryokan.dev/
+    - static site: https://futon-render.ryokan.dev/
+    - backend: https://tatami-render.ryokan.dev/
+    - web app: -
+    - [setup instructions](./RENDER.md)
 - Railway:
-    - a static site: https://futon-railway.ryokan.dev/
-    - a web app: https://tatami-railway.ryokan.dev/
-
-> 🚧 These services might go offline later after I've finalized the latency / health testing. 🚧
+    - static site: https://futon-railway.ryokan.dev/
+    - backend: https://tatami-railway.ryokan.dev/
+    - web app: https://kimono-railway.ryokan.dev/
 
 ## Why?
 
-Mainly to play around with Rust 🦀 but...
+Mainly to play around with Rust 😊 but...
 
-I haven't liked the direction Heroku is heading for a while now, so looking for alternatives:
+I don't like the direction Heroku has been heading, so looking for alternatives:
 
 - [x] [Heroku](https://www.heroku.com/)
-    - it works, but the free tier is limited and the pricing is just ridiculous
     - no native Rust support, but there is a BuildPack for it
     - no free SSL for the free tier :(
+    - free tier is limited and the pricing is just ridiculous
+    - works, but hurdles with the free tier, and you will migrate away sooner than later
 - [x] [Vercel](https://vercel.com/)
     - doesn't really support Rust, and the focus is heavily on frontend
-    - could work well if paired with Fly.io; but that's too many moving parts for my liking
+    - could work if paired with Fly.io; but that's too many moving parts for my liking
 - [x] [Dokku](https://dokku.com/)
-    - works, but it's not really a managed PaaS if you have to manage it 😅
-- [ ] [Render](https://render.com/)
+    - works, but you have to manage it yourself; I could but don't want to
+- [x] [Render](https://render.com/)
     - intuitive to use and works well in general
     - nice that it basically requires no changes to your repository
     - Rust building for deployment can take 10+ minutes
-        - this was on the lowest paid plan
+        - this was on the lowest _paid_ plan
         - there is some build performance boost if you are on a team plan
     - the free PostgreSQL gets deleted after 90 days, which sounds strange
         - effectively, this means you need to pay at least $14/month for an always-on service
         - the PostgreSQL does have a CIDR firewall, which is really nice 🧱
     - the web UI is OK, not the best, but has a lot of options
     - feels better through the web UI than through the CLI
-- [ ] [Railway](https://railway.app/)
-    - I like the general vibe, like the team rewriting the old Go CLI in Rust
+- [x] [Railway](https://railway.app/)
+    - I like the general vibe
         - you can feel that whoever has made the examples is familiar with Rust
-        - happened to read a couple of blog posts and dig the communication style
+        - happened to read a couple of blog posts and I like the openness
     - their build system on Nixpacks feels solid; and you can build them locally too
         - [supports a lot of languages out-of-the-box](https://docs.railway.app/reference/nixpacks#supported-languages)
-    - builds Rust faster than Render; and seem to automatically cache stuff
+    - Rust builds are fast; and seem to automatically utilize caches
         - from `git push` to receiving traffic: Railway 3 min, Render 7 min
         - on Render this was on the cheapest plan, on Railway this was the free tier
     - private network not being initialized pre-deploy is slightly annoying
         - and even in deploy container, it takes a few seconds to initialize 🤷
     - the web UI is real slick and pretty 💅
-        - even has a minimalistic PostgreSQL editor if a quick production fix is needed
+        - even has a minimalistic database editor if a quick production fix is needed
     - feels just as good to use through the web UI as through the CLI
 - [ ] [Fly.io](https://fly.io/)
-    - very quick response call times even on the free tier
+    - rapid response call times even on the free tier
     - everything feels backend / API focused
     - working through Dockerfiles feels boilerplate-y for simple services
-        - Dockerfile-builds are essential for more complex setups 😆
+        - Dockerfile-builds are essential for more complex setups anyway
     - you can get a free PostgreSQL / Redis, but from a third party (Supabase / Upstash) 🤔
     - no native GitHub integrations; you have to do custom GitHub Actions
     - the web UI feels a bit clunky
     - feels better through the CLI than through the web UI
+    - don't like the general vibe, but probably worth a second look later
 
-## Render
-
-- [x] Environment Groups, a nice addition, shared Env Vars / files between services
-- [x] Web Service works OK but 10 min deploy
-    - [x] Custom domain with HTTPS, worked very smoothly
-    - [x] Online Shell works OK but can be slow without an upgrade
-    - [x] Auto Scaling, sounds OK, CPU/Memory based
-    - [x] Job, sounds OK, trigger one-off command using `curl`
-    - [x] Rollback, works fine, also reverts secrets, etc.
-    - [ ] SSH
-    - [ ] Persistent Disk
-    - [ ] Using a Dockerfile vs. Rust build
-- [x] PostgreSQL works perfectly
-- [x] Redis
-- [x] Static Site, seems straightforward, can build and customize headers / redirects
-- [ ] Cron Job
-- [ ] Private Service
-- [ ] Background Worker
-- [ ] Blueprint
-- Extra:
-    - [ ] GitHub Actions CI/CD
-    - [ ] AWS Health Check
-    - [x] `cargo sqlx prepare` 🤔
+> With all of these PaaS providers; I would still recommend using a managed PostgreSQL from a cloud
+> provider for production.
+> It's just cheaper, and if the region is the same, you won't notice the difference.
 
 ## Development
 
-> Remember to update both `.rtx.toml` and `rust-toolchain` when changing the Rust version!
+Ryokan uses Rust workspaces:
 
-Ryokan uses Rust workspaces because:
-
-- Allows us to have multiple binaries in the same repository, mono-repo style.
-- These binaries can be anything form web services, to CLIs, to libraries, to cron jobs.
+- Allows us to have all deployables in the same repository.
+- Easier to add custom Rust macro crates later.
+- Easier to add additional service and worker binaries, etc. later.
 - Makes all binaries share the same `Cargo.lock` file and thus dependency versions.
-- Binaries are in separate directories for scoped auto deploys.
+- Deployables go to separate directories for directory scoped auto deploys.
+
+> Remember to update both `.rtx.toml` and `rust-toolchain` when changing the Rust version!
 
 ### General
 
+Install the correct versions of the required tools:
+
 ```bash
 rtx install # TODO: upgrade to `mise`
+```
+
+Run these from time to time:
+
+```bash
+cargo clippy --fix
+cargo fmt
 ```
 
 ### 🛏️ `tatami` Backend
@@ -132,25 +127,12 @@ cargo sqlx database setup
 # is not yet in sync... the same issue with CI, so set 
 # `SQLX_OFFLINE=true` on both
 
-# locally, to check that query checks are in sync with the database
+# locally, to check your queries are in sync with the database
 cargo sqlx prepare --check --workspace
-# if not, regenerate them and push to version control
+# if not, regenerate them to `.sqlx/` and push to version control
 cargo sqlx prepare --workspace
 
 cargo run
-```
-
-```bash
-cargo clippy --fix
-cargo fmt
-```
-
-### 👘 `kimono` Frontend
-
-```bash
-cd kimono
-npm install
-npm run dev
 ```
 
 If you need to change the database:
@@ -163,68 +145,10 @@ cargo sqlx migrate revert
 cargo sqlx migrate run
 ```
 
-## "Production"
-
-- Login to [Render](https://render.com/)
-- Connect your GitHub and give access to this repository if not already
-
-### PostgreSQL
-
-- Create a new Render PostgreSQL
-- Configuration:
-    - Name: `ryokan-database`
-    - Database: `ryokan`
-    - User: `ryokan`
-    - PostgreSQL Version: `14`
-
-After the database is created, find the "Internal Database URL" from the dashboard.
-This is the `DATABASE_URL` you need to set in `tatami`'s `.env`.
-
-### Redis
-
-- Create a new Render Redis
-- Configuration:
-    - Name: `ryokan-cache`
-
-After the store is created, find the "Internal Redis URL" from the dashboard.
-This is the `CACHE_URL` you need to set in `tatami`'s `.env`.
-
-### Web Service
-
-`tatami` is an example of a Render Web Service.
-
-- Create a new Render Web Service
-- Select this repository as the source
-- Configuration:
-    - Name: `ryokan-tatami`
-    - Branch: `main`
-        - You could have a separate branch for production, but I don't think it's necessary
-        - Releasing ASAP is a good practice; you should be backwards compatible
-        - And if you find issues, you find the sooner and can improve your review and CI process
-    - Root Directory: `tatami`
-    - Secret Files: `.env`: copy and edit from `./tatami/.env.example`
-    - Health Check Path: `/healthz`
-- Go to https://ryokan-tatami.onrender.com/healthz or whatever
-- After this, the web service will auto deploy when both:
-    - files under the `/tatami` change on the `main` branch
-    - health check responds OK after build
-
-If you need to run commands on the server, you can use the web shell.
+### 👘 `kimono` Frontend
 
 ```bash
-cargo install sqlx-cli --no-default-features --features postgres
-cargo sqlx migrate revert
-# but even just that takes _ages_ so you are probably better of taking
-# database URL from the dashboard and reverting any migrations locally
+cd kimono
+npm install
+npm run dev
 ```
-
-### Details
-
-Render runs or builds the service with `cargo run/build --release`
-[by default](https://docs.render.com/deploy-rocket-rust)
-
-Render expects the service to run at 0.0.0.0:10000
-[by default](https://docs.render.com/web-services#host-and-port-configuration)
-
-There is less need for developer sites as Render
-has [pull request previews](https://docs.render.com/pull-request-previews).
