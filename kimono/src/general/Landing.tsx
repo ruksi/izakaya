@@ -1,4 +1,4 @@
-import {css, cx} from "@emotion/css";
+import {css, cx, keyframes} from "@emotion/css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
@@ -10,6 +10,12 @@ import Stack from "react-bootstrap/Stack";
 import {useNavigate} from "react-router-dom";
 import svgPurpleHeart from "../assets/purple-heart.svg";
 import svgRedPaperLantern from "../assets/red-paper-lantern.svg";
+
+const swing = keyframes({
+    "0%": {transform: "rotate(8deg)"},
+    "50%": {transform: "rotate(-8deg)"},
+    "100%": {transform: "rotate(8deg)"},
+})
 
 const heroLantern = css({
     width: "5rem",
@@ -24,6 +30,7 @@ const footerLantern = css({
     backgroundColor: "rgba(255, 183, 120, 0.6)",
     borderRadius: "50%",
     boxShadow: "0 0 0.5rem 0.25rem rgba(255, 183, 120, 0.5)",
+    animation: `${swing} 4s ease-in-out infinite`,
 });
 const footerHeart = css({width: "1.5rem", height: "auto"});
 
@@ -36,19 +43,19 @@ export function Landing() {
 
             <div className="pt-2 mt-2 pt-md-4 mt-md-4 pt-lg-5 mt-lg-5">
                 <div className="display-3 fw-semibold d-inline-flex">
-                    <picture className={cx("d-inline-flex align-self-center me-3", heroLantern)}>
+                    <picture className={cx("d-inline-flex align-self-center me-4", heroLantern)}>
                         <img src={svgRedPaperLantern} className="img-fluid" alt="Red paper lantern emoji"/>
                     </picture>
-                    Very innovative, such&nbsp;wow
+                    This is Ryokan landing page
                 </div>
                 <div className="fs-4 text-secondary mt-2 mt-md-3">
-                    You probably want to have a static marketing site for&nbsp;SEO,&nbsp;though.
+                    You&apos;d want to have a static marketing site for&nbsp;SEO,&nbsp;though.
                 </div>
             </div>
 
             <div className="
             pt-3 pt-md-4 pt-lg-5
-            pb-4 mb-4 pb-lg-5 mb-lg-5
+            pb-3 mb-3 pb-lg-5 mb-lg-5
             ">
                 <Row>
                     <Col xs={10} md={6} lg={5} xl={4}>
@@ -62,43 +69,43 @@ export function Landing() {
                 </Row>
             </div>
 
-            <div className="py-5 my-5">
+            <div className="py-4 my-4">
                 <figure className="text-center">
                     <blockquote className="blockquote">
                         <p>Social proof is excellent for reassurance.</p>
                     </blockquote>
                     <figcaption className="blockquote-footer text-secondary-emphasis">
-                        Someone Famous in <cite title="Some Company">Some Company</cite>
+                        Bob the Famous in <cite>Big Company</cite>
                     </figcaption>
                 </figure>
             </div>
 
-            <div className="pt-5 mt-5">
+            <div className="pt-1 mt-1 pt-lg-5 mt-lg-5">
                 <div>
                     <div className="display-5 text-info-emphasis mb-0 mb-md-2">
                         Core Message
                     </div>
                     <p className="display-5">
                         This is why you should use this service or product,
-                        and how it will change your life, like, forever.
+                        and how it will change your life forever.
                     </p>
                 </div>
             </div>
-            <div className="py-4 my-4">
+            <div className="pb-5 mb-5 pt-2 mt-2">
                 <div className="p-3 bg-body-tertiary border rounded-2">
                     <span className="fs-4 text-secondary">
-                        <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
+                        <span className="text-body-emphasis">Major Feature</span> helps you do thing we were just talking about above.
                     </span>
                 </div>
                 <div className="d-flex gap-4 pt-4">
                     <div className="p-3 bg-body-tertiary border rounded-2">
                         <span className="fs-4 text-secondary">
-                            <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
+                            <span className="text-body-emphasis">Minor Feature</span> helps you do thing we were just talking about above.
                         </span>
                     </div>
                     <div className="p-3 bg-body-tertiary border rounded-2">
                         <span className="fs-4 text-secondary">
-                            <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
+                            <span className="text-body-emphasis">Minor Feature</span> helps you do thing we were just talking about above.
                         </span>
                     </div>
                 </div>
@@ -107,30 +114,30 @@ export function Landing() {
             <div className="pt-5 mt-5">
                 <div>
                     <div className=" display-5 text-success-emphasis mb-0 mb-md-2">
-                        Additional Selling Point
+                        Additional Benefits
                     </div>
                     <p className=" display-5">
                         You would probably have some inspirational images
-                        and photos all around.
+                        or photographs all around.
                     </p>
                 </div>
             </div>
-            <div className="py-4 my-4">
+            <div className="pb-5 mb-5 pt-2 mt-2">
                 <div className="d-flex gap-4 pb-4">
                     <div className="p-3 bg-body-tertiary border rounded-2">
                         <span className="fs-4 text-secondary">
-                            <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
+                            <span className="text-body-emphasis">Left Benefit</span> helps you do thing we were just talking about above.
                         </span>
                     </div>
                     <div className="p-3 bg-body-tertiary border rounded-2">
                         <span className="fs-4 text-secondary">
-                            <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
+                            <span className="text-body-emphasis">Right Benefit</span> helps you do thing we were just talking about above.
                         </span>
                     </div>
                 </div>
                 <div className="p-3 bg-body-tertiary border rounded-2">
                     <span className="fs-4 text-secondary">
-                        <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
+                        <span className="text-body-emphasis">Big Benefit</span> helps you do thing we were just talking about above.
                     </span>
                 </div>
             </div>
@@ -138,18 +145,18 @@ export function Landing() {
             <div className="pt-5 mt-5">
                 <div>
                     <div className=" display-5 text-warning-emphasis mb-0 mb-md-2">
-                        More Calls to Action
+                        Last Call to Action
                     </div>
                     <p className=" display-5">
-                        You should give a path forward on each view,
-                        most likely to sign up or to subscribe.
+                        You should give a obvious path forward on each viewport,
+                        most likely to sign up.
                     </p>
                 </div>
             </div>
-            <div className="py-4 my-4">
+            <div className="pb-5 mb-5 pt-2 mt-2">
                 <div className="p-3 bg-body-tertiary border rounded-2">
                         <span className="fs-4 text-secondary">
-                            <span className="text-body-emphasis">Core Feature</span> helps you do thing we were just talking about above.
+                            <span className="text-body-emphasis">Motivation</span> to nudge towards the call to action.
                         </span>
                 </div>
             </div>
@@ -163,7 +170,7 @@ export function Landing() {
                             a closer look at all the awesome features.
                         </p>
                         <p className="fst-italic text-secondary pb-1">
-                            You don&apos;t have to use your real email.
+                            You don&apos;t have to use your actual email. They aren&apos;t verified.
                         </p>
                         <Button onClick={() => navigate(`/sign-up`)}>
                             <FontAwesomeIcon icon="pen-to-square" className="me-1"/>Sign up

@@ -43,7 +43,7 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                         <Button variant="outline-secondary" size="sm" onClick={() => navigate("/")} className="me-auto">
                             {isAuthenticated
                                 ? <>Dashboard</>
-                                : <><em>Ryokan?</em></>}
+                                : <><FontAwesomeIcon icon="house"/></>}
                         </Button>
                         {
                             isAuthenticated &&
