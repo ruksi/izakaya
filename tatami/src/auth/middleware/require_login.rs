@@ -1,7 +1,7 @@
-use axum::Extension;
 use axum::extract::Request;
 use axum::middleware::Next;
 use axum::response::Response;
+use axum::Extension;
 
 use crate::auth::{CurrentUser, Visitor};
 use crate::prelude::*;
