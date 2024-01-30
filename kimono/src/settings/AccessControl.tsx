@@ -21,7 +21,7 @@ export function AccessControl() {
                 : <div className="d-flex flex-wrap align-items-center">
                     <div className="d-inline-block" style={{minWidth: 350}}>
                         <div><Placeholder aria-hidden="true" bg="secondary" style={{width: 190}}/></div>
-                        <div><Placeholder aria-hidden="true" bg="secondary" style={{width: 325}}/></div>
+                        <div><Placeholder aria-hidden="true" bg="secondary" style={{width: 225}}/></div>
                     </div>
                     <div className="d-inline-block mt-1">
                         <Button size="sm" variant="secondary" disabled>
@@ -125,7 +125,7 @@ function CreateTokenControl({isLoadingSessions}: { isLoadingSessions: boolean })
         <div className="d-flex flex-wrap align-items-center">
             <div className="d-inline-block" style={{minWidth: 350}}>
                 <div><Placeholder aria-hidden="true" bg="secondary" style={{width: 190}}/></div>
-                <div><Placeholder aria-hidden="true" bg="secondary" style={{width: 325}}/></div>
+                <div><Placeholder aria-hidden="true" bg="secondary" style={{width: 225}}/></div>
             </div>
             <div className="d-inline-block mt-1">
                 {isCreating
