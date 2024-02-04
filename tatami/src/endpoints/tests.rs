@@ -8,7 +8,16 @@ async fn browser_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     let server = mock_server(&db).await;
 
     // you start unauthorized
-    server.get("/verify").await.assert_status_unauthorized();
+    let response = server.get("/verify").await;
+    let response_json = response.json::<Value>();
+    assert_eq!(
+        response_json
+            .get("is_authenticated")
+            .unwrap()
+            .as_bool()
+            .unwrap(),
+        false
+    );
 
     // you can sign up and get automatically logged in
     server
@@ -19,11 +28,20 @@ async fn browser_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     let response = server.get("/verify").await;
     response.assert_status_ok();
     let response_json = response.json::<Value>();
-    assert!(uuid::Uuid::parse_str(response_json.get("userId").unwrap().as_str().unwrap()).is_ok());
+    assert!(uuid::Uuid::parse_str(response_json.get("user_id").unwrap().as_str().unwrap()).is_ok());
 
     // you can log out
     server.post("/log-out").await.assert_status_ok();
-    server.get("/verify").await.assert_status_unauthorized();
+    let response = server.get("/verify").await;
+    let response_json = response.json::<Value>();
+    assert_eq!(
+        response_json
+            .get("is_authenticated")
+            .unwrap()
+            .as_bool()
+            .unwrap(),
+        false
+    );
 
     // you can log in
     server
@@ -34,13 +52,23 @@ async fn browser_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     let response = server.get("/verify").await;
     response.assert_status_ok();
     let response_json = response.json::<Value>();
-    assert!(uuid::Uuid::parse_str(response_json.get("userId").unwrap().as_str().unwrap()).is_ok());
+    assert!(uuid::Uuid::parse_str(response_json.get("user_id").unwrap().as_str().unwrap()).is_ok());
 
     // multiple log-out is fine
     server.post("/log-out").await.assert_status_ok();
     server.post("/log-out").await.assert_status_ok();
     server.post("/log-out").await.assert_status_ok();
-    server.get("/verify").await.assert_status_unauthorized();
+
+    let response = server.get("/verify").await;
+    let response_json = response.json::<Value>();
+    assert_eq!(
+        response_json
+            .get("is_authenticated")
+            .unwrap()
+            .as_bool()
+            .unwrap(),
+        false
+    );
 
     Ok(())
 }

@@ -46,6 +46,7 @@ mod tests {
     use axum::http::header::AUTHORIZATION;
     use axum::http::HeaderValue;
     use axum_test::TestServer;
+    use serde_json::Value;
 
     use crate::auth::issue_access_token;
     use crate::endpoints::router;
@@ -85,16 +86,32 @@ mod tests {
         .await?;
 
         // both work
-        server
+        let response = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token1))
-            .await
-            .assert_status_ok();
-        server
+            .await;
+        let response_json = response.json::<Value>();
+        assert_eq!(
+            response_json
+                .get("is_authenticated")
+                .unwrap()
+                .as_bool()
+                .unwrap(),
+            true
+        );
+        let response = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
-            .await
-            .assert_status_ok();
+            .await;
+        let response_json = response.json::<Value>();
+        assert_eq!(
+            response_json
+                .get("is_authenticated")
+                .unwrap()
+                .as_bool()
+                .unwrap(),
+            true
+        );
 
         let prefix1 = token1.chars().take(8).collect::<String>();
         let prefix2 = token2.chars().take(8).collect::<String>();
@@ -129,16 +146,32 @@ mod tests {
             .assert_status_ok();
 
         // token1 stops working, token2 still works
-        server
+        let response = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token1))
-            .await
-            .assert_status_unauthorized();
-        server
+            .await;
+        let response_json = response.json::<Value>();
+        assert_eq!(
+            response_json
+                .get("is_authenticated")
+                .unwrap()
+                .as_bool()
+                .unwrap(),
+            false
+        );
+        let response = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
-            .await
-            .assert_status_ok();
+            .await;
+        let response_json = response.json::<Value>();
+        assert_eq!(
+            response_json
+                .get("is_authenticated")
+                .unwrap()
+                .as_bool()
+                .unwrap(),
+            true
+        );
 
         // can't double revoke token1
         server
@@ -153,11 +186,19 @@ mod tests {
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
             .await
             .assert_status_ok();
-        server
+        let response = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
-            .await
-            .assert_status_unauthorized();
+            .await;
+        let response_json = response.json::<Value>();
+        assert_eq!(
+            response_json
+                .get("is_authenticated")
+                .unwrap()
+                .as_bool()
+                .unwrap(),
+            false
+        );
 
         Ok(())
     }

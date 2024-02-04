@@ -20,7 +20,7 @@ const authSlice = createSlice({
         builder.addCase(
             authVerify.fulfilled,
             (state, {payload}) => {
-                state.isAuthenticated = payload.isAuthenticated;
+                state.isAuthenticated = payload.is_authenticated;
             },
         );
 
