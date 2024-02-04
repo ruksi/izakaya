@@ -1,23 +1,30 @@
 # 🏮 Ryokan
 
-Ryokan is a research and learning project for running Rust services on various PaaS providers.
+Ryokan is an example project for running Rust services on various PaaS providers.
 
-This is a mono-repo with many big components (e.g., frontend, backend) that
+This is a mono-repo with many big components (e.g., backend, multiple frontends) that
 are configured to auto-deploy to different PaaS providers.
 
 > 🚧 These deployments might go offline at any time. 🚧
 
-- Render:
-    - backend: https://tatami-render.ryokan.dev/
-    - web app: -
-    - [setup instructions](./RENDER.md)
-- Railway:
-    - backend: https://tatami-railway.ryokan.dev/
-    - web app: -
+# Overview
+
+Ryokan components:
+
+* 🛏️ `tatami` backend (Rust)
+* 👘 `kimono` frontend (Vite + React + React Router
+* 👘 `yukata` frontend (NextJS)
+
+They are online at:
+
+|         | Rust backend                                | `NextJS` frontend |
+|---------|---------------------------------------------|-------------------|
+| Render  | [visit](https://tatami-render.ryokan.dev/)  | -                 |
+| Railway | [visit](https://tatami-railway.ryokan.dev/) | -                 |
 
 ## Why?
 
-Mainly to play around with Rust 😊 but...
+Mainly an excuse to play around with Rust 😊 but...
 
 I don't like the direction Heroku has been heading, so looking for alternatives:
 
