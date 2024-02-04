@@ -20,8 +20,11 @@ async fn main() {
     let mut app = tatami::get_app(&config).await;
 
     let mut origins: Vec<HeaderValue> = vec![];
-    if let Some(frontend_url) = config.frontend_url {
-        origins.push(frontend_url.parse().unwrap());
+    if let Some(frontend_urls) = config.frontend_urls {
+        // TODO: this multiple allowed origins smells fishy, do all browsers support this?
+        for frontend_url in frontend_urls {
+            origins.push(frontend_url.parse().unwrap());
+        }
     }
     if !origins.is_empty() {
         app = app.layer(

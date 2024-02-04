@@ -4,7 +4,7 @@ pub struct Config {
     pub database_url: String, // aka. PostgreSQL
     pub cache_url: String,    // aka. Redis
     pub secret_key: String, // a generic seed (64+ character string) used for hashes, salts, and the like
-    pub frontend_url: Option<String>,
+    pub frontend_urls: Option<Vec<String>>,
 }
 
 impl Config {
@@ -19,9 +19,9 @@ impl Config {
 
         let secret_key = std::env::var("SECRET_KEY").expect("SECRET_KEY must be set");
 
-        let frontend_url = std::env::var("FRONTEND_URL")
+        let frontend_urls = std::env::var("FRONTEND_URL")
             .ok()
-            .map(|url| url.trim_end_matches('/').to_string());
+            .map(|url| split_urls(url));
 
         Self {
             port,
@@ -29,11 +29,37 @@ impl Config {
             database_url,
             cache_url,
             secret_key,
-            frontend_url,
+            frontend_urls,
         }
     }
 
     pub fn bind_address(&self) -> String {
         format!("0.0.0.0:{}", self.port)
+    }
+}
+
+pub fn split_urls<T: Into<String>>(text: T) -> Vec<String> {
+    let text = text.into();
+    text.split(',')
+        .map(|url| url.trim().trim_end_matches('/').to_string())
+        .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn frontend_url_parsing_works() {
+        let cases = [
+            ("http://localhost:3000", vec!["http://localhost:3000"]),
+            ("http://localhost:3000/", vec!["http://localhost:3000"]),
+            ("https://a.com/,b.com", vec!["https://a.com", "b.com"]),
+            ("/a.com ,  b.com//", vec!["/a.com", "b.com"]),
+        ];
+        for (case, expected) in cases.into_iter() {
+            let result = split_urls(case);
+            assert_eq!(result, expected);
+        }
     }
 }
