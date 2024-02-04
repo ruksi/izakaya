@@ -1,0 +1,62 @@
+// Bootstrap customization
+
+// variable changes must be done _before_ Bootstrap imports its
+// variables as many of them relate to each other; and as we want to
+// use those well defined colors are our own variables, we'll just
+// pre-define them here with the same values
+
+// zinc
+$white: rgb(250, 250, 250);
+$gray-100: rgb(244, 244, 245);
+$gray-200: rgb(228, 228, 231);
+$gray-300: rgb(212, 212, 216);
+$gray-400: rgb(161, 161, 170);
+$gray-500: rgb(136, 136, 155); // from rgb(113, 113, 122); increased as Google whining about contrast
+$gray-600: rgb(82, 82, 91);
+$gray-700: rgb(63, 63, 70);
+$gray-800: rgb(39, 39, 42);
+$gray-900: rgb(24, 24, 27);
+$black: rgb(9, 9, 11);
+
+// slate
+//$white: #f8fafc;
+//$gray-100: #f1f5f9;
+//$gray-200: #e2e8f0;
+//$gray-300: #cbd5e1;
+//$gray-400: #94a3b8;
+//$gray-500: #64748b;
+//$gray-600: #475569;
+//$gray-700: #334155;
+//$gray-800: #1e293b;
+//$gray-900: #0f172a;
+//$black: #020617;
+
+$blue: rgb(10, 110, 255);
+$indigo: rgb(120, 120, 255);
+$purple: rgb(140, 60, 205);
+$pink: rgb(245, 82, 180);
+$red: rgb(200, 45, 45);
+$orange: rgb(200, 100, 25);
+$yellow: rgb(255, 200, 45);
+$green: rgb(45, 210, 80);
+$teal: rgb(45, 220, 180);
+$cyan: rgb(10, 180, 220);
+
+$primary: $purple;
+$secondary: $gray-500;
+$success: $green;
+$info: $cyan;
+$warning: $yellow;
+$danger: $red;
+$light: $gray-100;
+$dark: $gray-800;
+
+$body-color-dark: $gray-300; // text color
+$input-bg: $gray-900;
+$input-disabled-color: darken($body-color-dark, 20%);
+$input-disabled-bg: lighten($input-bg, 2%);
+$input-disabled-border-color: lighten($input-bg, 10%);
+
+// can also copy-paste the entire definitions from Bootstrap
+// if more customization is needed:
+@import "../../node_modules/bootstrap/scss/bootstrap";

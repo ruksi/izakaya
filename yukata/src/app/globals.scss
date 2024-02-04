@@ -1,0 +1,9 @@
+@import "bootstrap";
+
+// Font Awesome can't auto-add CSS with Next so we do it manually
+@import "../../node_modules/@fortawesome/fontawesome-svg-core/styles.css";
+
+html {
+    overflow-y: scroll;
+    overflow-x: auto;
+}
