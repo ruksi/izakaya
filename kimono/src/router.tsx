@@ -5,8 +5,9 @@ import LogIn from "./auth/LogIn.tsx";
 import SignUp from "./auth/SignUp.tsx";
 import {authVerify} from "./auth/thunks.ts";
 import {About} from "./general/About.tsx";
+import {Dashboard} from "./general/Dashboard.tsx";
 import ErrorPage from "./general/ErrorPage.tsx";
-import Home from "./general/Home.tsx";
+import LandingPage from "./general/LandingPage.tsx";
 import MainLayout from "./general/MainLayout.tsx";
 import {Settings} from "./settings/Settings.tsx";
 import {store} from "./store.ts";
@@ -24,7 +25,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <Home/>,
+                element: <LandingPage/>,
             },
             {
                 path: "about",
@@ -34,6 +35,10 @@ export const router = createBrowserRouter([
             {
                 element: <AuthenticatedOnly/>,
                 children: [
+                    {
+                        path: "dashboard",
+                        element: <Dashboard/>,
+                    },
                     {
                         path: "settings",
                         element: <Settings/>,

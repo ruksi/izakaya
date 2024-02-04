@@ -34,7 +34,7 @@ export default function Home() {
                     This is Ryokan landing page
                 </div>
                 <div className="fs-4 text-secondary mt-2 mt-md-3">
-                    Some pages, like this landing page, are static sites for
+                    Most pages, like this one, are initially static sites for
                     SEO.
                 </div>
             </div>

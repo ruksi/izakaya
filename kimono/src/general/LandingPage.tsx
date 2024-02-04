@@ -12,9 +12,9 @@ import svgPurpleHeart from "../assets/purple-heart.svg";
 import svgRedPaperLantern from "../assets/red-paper-lantern.svg";
 
 const swing = keyframes({
-    "0%": {transform: "rotate(8deg)"},
-    "50%": {transform: "rotate(-8deg)"},
-    "100%": {transform: "rotate(8deg)"},
+    "0%": {transform: "rotate(8deg)", transformOrigin: "top"},
+    "50%": {transform: "rotate(-8deg)", transformOrigin: "top"},
+    "100%": {transform: "rotate(8deg)", transformOrigin: "top"},
 })
 
 const heroLantern = css({
@@ -30,11 +30,12 @@ const footerLantern = css({
     backgroundColor: "rgba(255, 183, 120, 0.6)",
     borderRadius: "50%",
     boxShadow: "0 0 0.5rem 0.25rem rgba(255, 183, 120, 0.5)",
+    willChange: "transform, transform-origin",
     animation: `${swing} 4s ease-in-out infinite`,
 });
 const footerHeart = css({width: "1.5rem", height: "auto"});
 
-export function Landing() {
+export default function LandingPage() {
 
     const navigate = useNavigate();
 

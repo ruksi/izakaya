@@ -6,8 +6,10 @@ import {useAppDispatch, useAppSelector} from "@/data/hooks";
 import tatami from "@/services/tatami";
 import {
     faArrowRightToBracket,
+    faGear,
     faHouse,
     faPenToSquare,
+    faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Link from "next/link";
@@ -104,10 +106,7 @@ export function MainHeader() {
                             size="sm"
                             className="ms-1"
                         >
-                            <FontAwesomeIcon
-                                icon={faPenToSquare}
-                                className="me-1"
-                            />
+                            <FontAwesomeIcon icon={faGear} className="me-1" />
                             Settings
                         </Button>
                     </Link>
@@ -118,7 +117,7 @@ export function MainHeader() {
                         onClick={logOut}
                     >
                         <FontAwesomeIcon
-                            icon={faArrowRightToBracket}
+                            icon={faRightFromBracket}
                             className="me-1"
                         />
                         Log out

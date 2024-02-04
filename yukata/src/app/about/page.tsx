@@ -15,14 +15,11 @@ export default function About() {
                     </div>
                     <div>
                         Made with
-                        <div
-                            className="d-inline-block mx-1"
-                            style={{width: "1.5rem", height: "auto"}}
-                        >
+                        <div className="d-inline-block mx-1">
                             <Image
                                 src={PurpleHeartSVG}
-                                width={32}
-                                height={32}
+                                width={24}
+                                height={24}
                                 alt="a purple heart"
                                 title="love"
                                 priority
