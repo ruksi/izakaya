@@ -8,14 +8,12 @@ are configured to auto-deploy to different PaaS providers.
 > 🚧 These deployments might go offline at any time. 🚧
 
 - Render:
-    - static site: https://futon-render.ryokan.dev/
     - backend: https://tatami-render.ryokan.dev/
     - web app: -
     - [setup instructions](./RENDER.md)
 - Railway:
-    - static site: https://futon-railway.ryokan.dev/
     - backend: https://tatami-railway.ryokan.dev/
-    - web app: https://kimono-railway.ryokan.dev/
+    - web app: -
 
 ## Why?
 
