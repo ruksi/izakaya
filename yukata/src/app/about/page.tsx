@@ -9,7 +9,7 @@ export default function About() {
                 <div>
                     <div>
                         What is this website?&nbsp;
-                        <a href="https://github.com/ruksi/ryokan">
+                        <a href="https://github.com/ruksi/izakaya">
                             TL;DR: a Rust+React example project
                         </a>
                     </div>
@@ -29,7 +29,7 @@ export default function About() {
                     </div>
                     <div>
                         License:{" "}
-                        <a href="https://github.com/ruksi/ryokan/blob/main/LICENSE">
+                        <a href="https://github.com/ruksi/izakaya/blob/main/LICENSE">
                             MIT
                         </a>
                     </div>

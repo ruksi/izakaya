@@ -10,7 +10,7 @@ import "./globals.scss";
 config.autoAddCss = false;
 
 export const metadata: Metadata = {
-    title: "Ryokan",
+    title: "Izakaya",
     description: "Rust, React, PaaS, and more!",
     icons: [{url: "/red-paper-lantern.svg", type: "image/svg+xml"}],
 };

@@ -61,7 +61,7 @@ fn root_router<S>(state: AppState) -> Router<S> {
     let app = Router::new();
 
     // the ServeDir path is relative to where the binary is run,
-    // thus this is assuming working directory is `ryokan/tatami`
+    // thus this is assuming working directory is `izakaya/tatami`
     let app = app.nest_service("/assets", ServeDir::new("./assets"));
 
     let app = app.route(

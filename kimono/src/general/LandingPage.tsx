@@ -47,7 +47,8 @@ export default function LandingPage() {
                     <picture className={cx("d-inline-flex align-self-center me-4", heroLantern)}>
                         <img src={svgRedPaperLantern} className="img-fluid" alt="Red paper lantern emoji"/>
                     </picture>
-                    This is Ryokan landing page
+                    Welcome to Izakaya, take a seat and relax
+
                 </div>
                 <div className="fs-4 text-secondary mt-2 mt-md-3">
                     You&apos;d want to have a static marketing site for&nbsp;SEO,&nbsp;though.
@@ -165,9 +166,9 @@ export default function LandingPage() {
             <div className="py-4 my-4">
                 <Row>
                     <Col sm={12} md={6} lg={3}>
-                        <div className="pb-4 fs-3 fst-italic">Ryokan</div>
+                        <div className="pb-4 fs-3 fst-italic">Izakaya</div>
                         <p className="fs-6 text-secondary">
-                            Register for <span className="text-secondary-emphasis">Ryokan</span> to get
+                            Register for <span className="text-secondary-emphasis">Izakaya</span> to get
                             a closer look at all the awesome features.
                         </p>
                         <p className="fst-italic text-secondary pb-1">

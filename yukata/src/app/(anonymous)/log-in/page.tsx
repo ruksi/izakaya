@@ -21,7 +21,7 @@ export default function LogIn() {
             e.preventDefault();
             logIn({username_or_email: usernameOrEmail, password: password});
         },
-        [logIn, usernameOrEmail, password]
+        [logIn, usernameOrEmail, password],
     );
 
     return (
@@ -61,7 +61,7 @@ export default function LogIn() {
                                             value={usernameOrEmail}
                                             onChange={(e) =>
                                                 setUsernameOrEmail(
-                                                    e.target.value
+                                                    e.target.value,
                                                 )
                                             }
                                             autoFocus={true}
@@ -114,7 +114,7 @@ export default function LogIn() {
 
             <Row className="justify-content-center mt-3 mb-5">
                 <Col className="text-center text-secondary">
-                    New to Ryokan?{" "}
+                    New to Izakaya?{" "}
                     <Link href="/sign-up">Create an account</Link>
                 </Col>
             </Row>

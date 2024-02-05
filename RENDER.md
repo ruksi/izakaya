@@ -1,4 +1,4 @@
-# Ryokan on Render
+# Izakaya on Render
 
 TODO:
 
@@ -33,9 +33,9 @@ TODO:
 
 - Create a new Render PostgreSQL
 - Configuration:
-    - Name: `ryokan-database`
-    - Database: `ryokan`
-    - User: `ryokan`
+    - Name: `izakaya-database`
+    - Database: `izakaya`
+    - User: `izakaya`
     - PostgreSQL Version: `14`
 
 After the database is created, find the "Internal Database URL" from the dashboard.
@@ -45,7 +45,7 @@ This is the `DATABASE_URL` you need to set in `tatami`'s `.env`.
 
 - Create a new Render Redis
 - Configuration:
-    - Name: `ryokan-cache`
+    - Name: `izakaya-cache`
 
 After the store is created, find the "Internal Redis URL" from the dashboard.
 This is the `CACHE_URL` you need to set in `tatami`'s `.env`.
@@ -55,7 +55,7 @@ This is the `CACHE_URL` you need to set in `tatami`'s `.env`.
 - Create a new Render Web Service
 - Select this repository as the source
 - Configuration:
-    - Name: `ryokan-tatami`
+    - Name: `izakaya-tatami`
     - Branch: `main`
         - You could have a separate branch for production, but I don't think it's necessary
         - Releasing ASAP is a good practice; you should be backwards compatible
@@ -63,7 +63,7 @@ This is the `CACHE_URL` you need to set in `tatami`'s `.env`.
     - Root Directory: `tatami`
     - Secret Files: `.env`: copy and edit from `./tatami/.env.example`
     - Health Check Path: `/healthz`
-- Go to https://ryokan-tatami.onrender.com/healthz or whatever
+- Check https://izakaya-tatami.onrender.com/healthz or whatever it is
 - After this, the web service will auto deploy when both:
     - files under the `/tatami` change on the `main` branch
     - health check responds OK after build

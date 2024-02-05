@@ -13,7 +13,7 @@ export function About() {
                 <div>
                     <div>
                         What is this website?&nbsp;
-                        <a href="https://github.com/ruksi/ryokan">TL;DR: a Rust+React example project</a>
+                        <a href="https://github.com/ruksi/izakaya">TL;DR: a Rust+React example project</a>
                     </div>
                     <div>
                         Made with
@@ -23,7 +23,7 @@ export function About() {
                         by <a href="https://ruk.si/">Ruksi</a>
                     </div>
                     <div>
-                        License: <a href="https://github.com/ruksi/ryokan/blob/main/LICENSE">MIT</a>
+                        License: <a href="https://github.com/ruksi/izakaya/blob/main/LICENSE">MIT</a>
                     </div>
                 </div>
 

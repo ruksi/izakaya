@@ -100,7 +100,7 @@ export default function LogIn() {
 
             <Row className="justify-content-center mt-3 mb-5">
                 <Col className="text-center text-secondary">
-                    New to Ryokan? <Link to="/sign-up">Create an account</Link>
+                    New to Izakaya? <Link to="/sign-up">Create an account</Link>
                 </Col>
             </Row>
 

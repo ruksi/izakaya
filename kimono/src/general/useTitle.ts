@@ -5,7 +5,7 @@ function useTitle(title: string) {
         document.title = title;
     }, [title]);
     useEffect(() => () => {
-        document.title = "Ryokan";
+        document.title = "Izakaya";
     }, [])
 }
 

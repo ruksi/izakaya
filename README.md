@@ -1,6 +1,6 @@
-# 🏮 Ryokan
+# 🏮 Izakaya
 
-Ryokan is an example project for running Rust services on various PaaS providers.
+Izakaya is an example project for running Rust services on various PaaS providers.
 
 This is a mono-repo with many big components (e.g., backend, multiple frontends) that
 are configured to auto-deploy to different PaaS providers.
@@ -9,7 +9,7 @@ are configured to auto-deploy to different PaaS providers.
 
 # Overview
 
-Ryokan components:
+Izakaya components:
 
 * 🛏️ `tatami` backend (Rust)
 * 👘 `kimono` frontend (Vite + React + React Router
@@ -17,10 +17,10 @@ Ryokan components:
 
 They are online at:
 
-|         | Rust backend                                | `NextJS` frontend |
-|---------|---------------------------------------------|-------------------|
-| Render  | [visit](https://tatami-render.ryokan.dev/)  | -                 |
-| Railway | [visit](https://tatami-railway.ryokan.dev/) | -                 |
+|         | Rust backend                                 | `NextJS` frontend |
+|---------|----------------------------------------------|-------------------|
+| Render  | [visit](https://tatami-render.izakaya.dev/)  | -                 |
+| Railway | [visit](https://tatami-railway.izakaya.dev/) | -                 |
 
 ## Why?
 
@@ -80,7 +80,7 @@ I don't like the direction Heroku has been heading, so looking for alternatives:
 
 ## Development
 
-Ryokan uses Rust workspaces:
+Izakaya uses Rust workspaces:
 
 - Allows us to have all deployables in the same repository.
 - Easier to add custom Rust macro crates later.

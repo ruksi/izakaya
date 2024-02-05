@@ -31,7 +31,7 @@ export default function Home() {
                             priority
                         />
                     </picture>
-                    This is Ryokan landing page
+                    Welcome to Izakaya, take a seat and relax
                 </div>
                 <div className="fs-4 text-secondary mt-2 mt-md-3">
                     Most pages, like this one, are initially static sites for
@@ -48,7 +48,7 @@ export default function Home() {
                 <Row>
                     <Col xs={10} md={6} lg={5} xl={4}>
                         <InputGroup>
-                            <Form.Control placeholder="email@example.com" />
+                            <Form.Control placeholder="email@example.com"/>
                             <Link href="/sign-up">
                                 <Button>
                                     <FontAwesomeIcon
@@ -175,11 +175,11 @@ export default function Home() {
             <div className="py-4 my-4">
                 <Row>
                     <Col sm={12} md={6} lg={3}>
-                        <div className="pb-4 fs-3 fst-italic">Ryokan</div>
+                        <div className="pb-4 fs-3 fst-italic">Izakaya</div>
                         <p className="fs-6 text-secondary">
                             Register for{" "}
                             <span className="text-secondary-emphasis">
-                                Ryokan
+                                Izakaya
                             </span>{" "}
                             to get a closer look at all the awesome features.
                         </p>
