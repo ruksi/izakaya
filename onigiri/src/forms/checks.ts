@@ -1,7 +1,7 @@
-import {isTatamiError} from "../general/errors.ts";
+import {isBackendError} from "../general/errors.ts";
 
 export function isErroneous(field: string, error: any): boolean {
-    if (!isTatamiError(error)) {
+    if (!isBackendError(error)) {
         return false;
     }
     if (!error.data.details) {

@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-vars */
 
 interface ImportMetaEnv {
-    readonly VITE_TATAMI_URL: string | undefined;
+    readonly VITE_BACKEND_URL: string | undefined;
 }
 
 interface ImportMeta {

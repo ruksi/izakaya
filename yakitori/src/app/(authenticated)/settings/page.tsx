@@ -1,7 +1,7 @@
 "use client";
 
 import {AccessControl} from "@/app/(authenticated)/settings/AccessControl";
-import tatami from "@/services/tatami";
+import backend from "@/services/backend";
 import {Container, Placeholder, Stack} from "react-bootstrap";
 
 export default function Settings() {
@@ -21,7 +21,7 @@ export default function Settings() {
 }
 
 function Profile() {
-    const {data: user} = tatami.endpoints.getMyUser.useQuery();
+    const {data: user} = backend.endpoints.getMyUser.useQuery();
     return (
         <>
             <h2>Profile</h2>

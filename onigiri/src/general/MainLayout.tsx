@@ -10,7 +10,7 @@ import {useSelector} from "react-redux";
 import {Outlet, useNavigate} from "react-router-dom";
 import {selectIsAuthenticated} from "../auth/slice.ts";
 import {authLogOut} from "../auth/thunks.ts";
-import tatami from "../services/tatami.ts";
+import backend from "../services/backend.ts";
 import {store} from "../store.ts";
 
 library.add(fas);
@@ -23,7 +23,7 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
     // feels like this should be somewhere in Redux side, not React
     useEffect(() => {
         if (!isAuthenticated) {
-            store.dispatch(tatami.util.resetApiState());
+            store.dispatch(backend.util.resetApiState());
         }
     }, [isAuthenticated]);
 

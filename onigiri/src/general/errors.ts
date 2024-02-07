@@ -1,8 +1,8 @@
-export function isTatamiError(error: any): error is TatamiError {
-    return (error as TatamiError)?.data?.message !== undefined;
+export function isBackendError(error: any): error is BackendError {
+    return (error as BackendError)?.data?.message !== undefined;
 }
 
-export interface TatamiError {
+export interface BackendError {
     status: number;
     data: ErrorData;
 }

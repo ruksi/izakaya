@@ -3,7 +3,7 @@
 import {selectIsAuthenticated} from "@/auth/slice";
 import {authLogOut} from "@/auth/thunks";
 import {useAppDispatch, useAppSelector} from "@/data/hooks";
-import tatami from "@/services/tatami";
+import backend from "@/services/backend";
 import {
     faArrowRightToBracket,
     faGear,
@@ -25,7 +25,7 @@ export function MainHeader() {
     // feels like this should be somewhere in Redux side, not React
     useEffect(() => {
         if (isAuthenticated === false) {
-            dispatch(tatami.util.resetApiState());
+            dispatch(backend.util.resetApiState());
         }
     }, [isAuthenticated, dispatch]);
 

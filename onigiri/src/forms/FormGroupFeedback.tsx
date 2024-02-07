@@ -1,8 +1,8 @@
-import {isTatamiError} from "../general/errors.ts";
+import {isBackendError} from "../general/errors.ts";
 import {formatMessage} from "./messages.ts";
 
 export function FormGroupFeedback({field, error}: { field: string, error: any }) {
-    if (!isTatamiError(error)) {
+    if (!isBackendError(error)) {
         return null;
     }
     if (!error.data.details) {

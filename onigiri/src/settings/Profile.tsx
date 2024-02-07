@@ -1,8 +1,8 @@
 import Placeholder from "react-bootstrap/Placeholder";
-import tatami from "../services/tatami.ts";
+import backend from "../services/backend.ts";
 
 export function Profile() {
-    const {data: user} = tatami.endpoints.getMyUser.useQuery();
+    const {data: user} = backend.endpoints.getMyUser.useQuery();
     return <>
         <h2>Profile</h2>
         <div>

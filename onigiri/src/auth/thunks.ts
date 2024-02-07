@@ -1,7 +1,7 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {tatamiUrl} from "../utils";
+import {backendUrl} from "../utils";
 
-const baseUrl = tatamiUrl();
+const baseUrl = backendUrl();
 
 interface VerifyPayload {
     is_authenticated: boolean;

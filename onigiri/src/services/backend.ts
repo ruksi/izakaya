@@ -1,15 +1,15 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react"
-import {tatamiUrl} from "../utils.ts";
+import {backendUrl} from "../utils.ts";
 
 function createBaseQuery() {
-    const baseUrl = tatamiUrl();
+    const baseUrl = backendUrl();
     return fetchBaseQuery({
         baseUrl,
         credentials: "include",
     });
 }
 
-const tatami = createApi({
+const backend = createApi({
     baseQuery: createBaseQuery(),
     tagTypes: ["CurrentUser", "Session"],
     endpoints: (build) => ({
@@ -74,6 +74,6 @@ export interface NewSession {
 
 // export const {
 //     useCreateSessionMutation,
-// } = tatami;
+// } = backend;
 
-export default tatami;
+export default backend;

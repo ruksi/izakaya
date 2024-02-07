@@ -1,15 +1,15 @@
-import {tatamiUrl} from "@/utils";
+import {backendUrl} from "@/utils";
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 
 function createBaseQuery() {
-    const baseUrl = tatamiUrl();
+    const baseUrl = backendUrl();
     return fetchBaseQuery({
         baseUrl,
         credentials: "include",
     });
 }
 
-const tatami = createApi({
+const backend = createApi({
     baseQuery: createBaseQuery(),
     tagTypes: ["CurrentUser", "Session"],
     endpoints: (build) => ({
@@ -25,7 +25,7 @@ const tatami = createApi({
             }),
         }),
         logIn: build.query({
-            query: (params: {username_or_email: string; password: string}) => ({
+            query: (params: { username_or_email: string; password: string }) => ({
                 url: "/log-in",
                 method: "POST",
                 body: params,
@@ -39,7 +39,7 @@ const tatami = createApi({
         }),
 
         // ["Session"]
-        createSession: build.mutation<NewSession, {password: string}>({
+        createSession: build.mutation<NewSession, { password: string }>({
             query: ({password}) => ({
                 url: "/api/sessions",
                 method: "POST",
@@ -52,7 +52,7 @@ const tatami = createApi({
             providesTags: ["Session"],
         }),
         deleteMySession: build.mutation({
-            query: (params: {access_token_prefix: string}) => ({
+            query: (params: { access_token_prefix: string }) => ({
                 url: `/api/sessions/${params.access_token_prefix}`,
                 method: "DELETE",
             }),
@@ -78,6 +78,6 @@ export interface NewSession {
 
 // export const {
 //     useCreateSessionMutation,
-// } = tatami;
+// } = backend;
 
-export default tatami;
+export default backend;

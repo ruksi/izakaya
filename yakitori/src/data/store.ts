@@ -1,5 +1,5 @@
 import authSlice from "@/auth/slice";
-import tatami from "@/services/tatami";
+import backend from "@/services/backend";
 import {configureStore} from "@reduxjs/toolkit";
 import {setupListeners} from "@reduxjs/toolkit/query";
 
@@ -7,9 +7,9 @@ export const makeStore = () => {
     const store = configureStore({
         reducer: {
             auth: authSlice.reducer,
-            [tatami.reducerPath]: tatami.reducer,
+            [backend.reducerPath]: backend.reducer,
         },
-        middleware: (defaults) => defaults().concat(tatami.middleware),
+        middleware: (defaults) => defaults().concat(backend.middleware),
     });
     setupListeners(store.dispatch);
     return store;

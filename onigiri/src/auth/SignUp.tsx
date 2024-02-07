@@ -12,7 +12,7 @@ import {isErroneous} from "../forms/checks.ts";
 import {FormGroupFeedback} from "../forms/FormGroupFeedback.tsx";
 import ButtonSpinnerIf from "../general/ButtonSpinnerIf.tsx";
 import useTitle from "../general/useTitle.ts";
-import tatami from "../services/tatami.ts";
+import backend from "../services/backend.ts";
 
 export default function SignUp() {
     useTitle("Sign Up");
@@ -21,7 +21,7 @@ export default function SignUp() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const [signUp, {isLoading, error}] = tatami.endpoints.signUp.useLazyQuery();
+    const [signUp, {isLoading, error}] = backend.endpoints.signUp.useLazyQuery();
 
     const submit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

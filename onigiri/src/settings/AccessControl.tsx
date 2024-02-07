@@ -7,10 +7,10 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Modal from "react-bootstrap/Modal";
 import Placeholder from "react-bootstrap/Placeholder";
 import Stack from "react-bootstrap/Stack";
-import tatami, {NewSession, Session} from "../services/tatami.ts";
+import backend, {NewSession, Session} from "../services/backend.ts";
 
 export function AccessControl() {
-    const {data: sessions, isLoading} = tatami.endpoints.getMySessions.useQuery();
+    const {data: sessions, isLoading} = backend.endpoints.getMySessions.useQuery();
     return <>
         <h2>Access</h2>
         <Stack gap={3}>
@@ -38,7 +38,7 @@ export function AccessControl() {
 }
 
 function SessionDisplay({session}: { session: Session }) {
-    const [deleteMySession, {isLoading}] = tatami.endpoints.deleteMySession.useMutation();
+    const [deleteMySession, {isLoading}] = backend.endpoints.deleteMySession.useMutation();
     const [isDeleting, setIsDeleting] = useState(false);
 
     const onClickRevoke = useCallback(() => {
@@ -97,7 +97,7 @@ function CreateTokenControl({isLoadingSessions}: { isLoadingSessions: boolean })
         isLoading,
         isSuccess,
         reset: resetNewSession,
-    }] = tatami.endpoints.createSession.useMutation();
+    }] = backend.endpoints.createSession.useMutation();
 
     const [isCreating, setIsCreating] = useState(false);
     const [password, setPassword] = useState("");

@@ -2,7 +2,7 @@
 
 import {FormAlert} from "@/form/FormAlert";
 import SpinnerIf from "@/general/SpinnerIf";
-import tatami from "@/services/tatami";
+import backend from "@/services/backend";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Link from "next/link";
@@ -14,7 +14,7 @@ export default function LogIn() {
     const [password, setPassword] = useState("");
 
     const [logIn, {isLoading, isError, error}] =
-        tatami.endpoints.logIn.useLazyQuery();
+        backend.endpoints.logIn.useLazyQuery();
 
     const submit = useCallback(
         (e: React.FormEvent<HTMLFormElement>) => {

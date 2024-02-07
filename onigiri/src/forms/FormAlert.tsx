@@ -1,6 +1,6 @@
 import Alert from "react-bootstrap/Alert";
 import Spinner from "react-bootstrap/Spinner";
-import {Issue, isTatamiError} from "../general/errors.ts";
+import {Issue, isBackendError} from "../general/errors.ts";
 import {formatMessage} from "./messages.ts";
 
 interface FormAlertProps {
@@ -20,7 +20,7 @@ export function FormAlert(
         );
     }
 
-    if (!isTatamiError(error)) {
+    if (!isBackendError(error)) {
         return (
             <Alert variant="danger">
                 <div className="text-danger">

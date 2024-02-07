@@ -3,7 +3,7 @@
 import {isErroneous} from "@/form/checks";
 import {FormGroupFeedback} from "@/form/FormGroupFeedback";
 import SpinnerIf from "@/general/SpinnerIf";
-import tatami from "@/services/tatami";
+import backend from "@/services/backend";
 import {faPenToSquare} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Link from "next/link";
@@ -15,7 +15,7 @@ export default function SignUp() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const [signUp, {isLoading, error}] = tatami.endpoints.signUp.useLazyQuery();
+    const [signUp, {isLoading, error}] = backend.endpoints.signUp.useLazyQuery();
 
     const submit = useCallback(
         (e: React.FormEvent<HTMLFormElement>) => {

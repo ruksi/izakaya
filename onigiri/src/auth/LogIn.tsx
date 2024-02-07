@@ -11,7 +11,7 @@ import {Link} from "react-router-dom";
 import {FormAlert} from "../forms/FormAlert.tsx";
 import ButtonSpinnerIf from "../general/ButtonSpinnerIf.tsx";
 import useTitle from "../general/useTitle.ts";
-import tatami from "../services/tatami.ts";
+import backend from "../services/backend.ts";
 
 export default function LogIn() {
     useTitle("Log In");
@@ -19,7 +19,7 @@ export default function LogIn() {
     const [usernameOrEmail, setUsernameOrEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const [logIn, {isLoading, isError, error}] = tatami.endpoints.logIn.useLazyQuery();
+    const [logIn, {isLoading, isError, error}] = backend.endpoints.logIn.useLazyQuery();
 
     const submit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

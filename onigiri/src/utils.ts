@@ -1,11 +1,11 @@
-export function tatamiUrl(): string {
-    let url = import.meta.env.VITE_TATAMI_URL ?? "";
+export function backendUrl(): string {
+    let url = import.meta.env.VITE_BACKEND_URL ?? "";
     url = url.trim();
     if (url.endsWith("/")) {
         url = url.slice(0, -1);
     }
     if (url === "") {
-        throw new Error("VITE_TATAMI_URL is not set");
+        throw new Error("VITE_BACKEND_URL is not set");
     }
     return url;
 }
