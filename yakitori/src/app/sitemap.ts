@@ -1,8 +1,8 @@
-import {yukataUrl} from "@/utils";
+import {yakitoriUrl} from "@/utils";
 import {MetadataRoute} from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const host = yukataUrl();
+    const host = yakitoriUrl();
     return [
         {
             url: `${host}/`,

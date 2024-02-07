@@ -1,4 +1,4 @@
-import {yukataUrl} from "@/utils";
+import {yakitoriUrl} from "@/utils";
 import {MetadataRoute} from "next";
 
 export default function robots(): MetadataRoute.Robots {
@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: "/",
             disallow: ["/dashboard/", "/settings/"],
         },
-        sitemap: `${yukataUrl()}/sitemap.xml`,
+        sitemap: `${yakitoriUrl()}/sitemap.xml`,
     };
 }
