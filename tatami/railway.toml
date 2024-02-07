@@ -4,14 +4,5 @@ watchPatterns = ["tatami/**"]
 [build.nixpacksPlan.variables]
 NIXPACKS_CARGO_WORKSPACE = "tatami"
 
-# would love to do this, but there is no private network before deploy
-#[build.nixpacksPlan.phases.migrate]
-#dependsOn = ["build"]
-#cmds = [
-#    "cargo install sqlx-cli --no-default-features --features native-tls,postgres",
-#    "sleep 5 && cargo sqlx migrate run --source tatami/migrations",
-#]
-
 [deploy]
-startCommand = "cd tatami && ../bin/tatami"
 healthcheckPath = "/healthz"
