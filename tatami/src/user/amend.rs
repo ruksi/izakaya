@@ -22,7 +22,7 @@ impl UserAmendment {
         let declaration = Self {
             username: username.map(Into::into),
         };
-        Ok(Valid::new(declaration)?)
+        Valid::new(declaration)
     }
 }
 

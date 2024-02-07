@@ -70,20 +70,10 @@ mod tests {
         let user = user::create(&db, declaration).await?;
 
         let expire = Some(time::Duration::seconds(5)); // something short, just in case
-        let token1 = issue_access_token(
-            &state,
-            user.username.clone(),
-            password.clone(),
-            expire.clone(),
-        )
-        .await?;
-        let token2 = issue_access_token(
-            &state,
-            user.username.clone(),
-            password.clone(),
-            expire.clone(),
-        )
-        .await?;
+        let token1 =
+            issue_access_token(&state, user.username.clone(), password.clone(), expire).await?;
+        let token2 =
+            issue_access_token(&state, user.username.clone(), password.clone(), expire).await?;
 
         // both work
         let response = server
@@ -91,27 +81,21 @@ mod tests {
             .add_header(AUTHORIZATION, bearer_auth_header(&token1))
             .await;
         let response_json = response.json::<Value>();
-        assert_eq!(
-            response_json
-                .get("is_authenticated")
-                .unwrap()
-                .as_bool()
-                .unwrap(),
-            true
-        );
+        assert!(response_json
+            .get("is_authenticated")
+            .unwrap()
+            .as_bool()
+            .unwrap());
         let response = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
             .await;
         let response_json = response.json::<Value>();
-        assert_eq!(
-            response_json
-                .get("is_authenticated")
-                .unwrap()
-                .as_bool()
-                .unwrap(),
-            true
-        );
+        assert!(response_json
+            .get("is_authenticated")
+            .unwrap()
+            .as_bool()
+            .unwrap());
 
         let prefix1 = token1.chars().take(8).collect::<String>();
         let prefix2 = token2.chars().take(8).collect::<String>();
@@ -151,27 +135,21 @@ mod tests {
             .add_header(AUTHORIZATION, bearer_auth_header(&token1))
             .await;
         let response_json = response.json::<Value>();
-        assert_eq!(
-            response_json
-                .get("is_authenticated")
-                .unwrap()
-                .as_bool()
-                .unwrap(),
-            false
-        );
+        assert!(!response_json
+            .get("is_authenticated")
+            .unwrap()
+            .as_bool()
+            .unwrap());
         let response = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
             .await;
         let response_json = response.json::<Value>();
-        assert_eq!(
-            response_json
-                .get("is_authenticated")
-                .unwrap()
-                .as_bool()
-                .unwrap(),
-            true
-        );
+        assert!(response_json
+            .get("is_authenticated")
+            .unwrap()
+            .as_bool()
+            .unwrap());
 
         // can't double revoke token1
         server
@@ -191,14 +169,11 @@ mod tests {
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
             .await;
         let response_json = response.json::<Value>();
-        assert_eq!(
-            response_json
-                .get("is_authenticated")
-                .unwrap()
-                .as_bool()
-                .unwrap(),
-            false
-        );
+        assert!(!response_json
+            .get("is_authenticated")
+            .unwrap()
+            .as_bool()
+            .unwrap());
 
         Ok(())
     }

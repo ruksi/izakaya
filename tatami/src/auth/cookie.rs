@@ -33,13 +33,13 @@ pub fn bake<'a>(name: &'static str, value: String, max_age: time::Duration) -> C
     // domain-scoped cookies are only secure if you control all subdomains of the domain.
     let frontend_urls = std::env::var("FRONTEND_URL")
         .ok()
-        .map(|url| crate::config::split_urls(url));
+        .map(crate::config::split_urls);
     if let Some(frontend_urls) = frontend_urls {
         let frontend_url = frontend_urls.first();
         if let Some(frontend_url) = frontend_url {
             // TODO: this wrongly assumes that all frontend URLs are on the same domain,
             //       fix with panic in config parse
-            if let Ok(Some(domain)) = cookie_domain_from(&frontend_url) {
+            if let Ok(Some(domain)) = cookie_domain_from(frontend_url) {
                 builder = builder.domain(domain);
             }
         }

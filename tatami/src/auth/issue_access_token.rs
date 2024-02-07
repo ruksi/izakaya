@@ -1,5 +1,4 @@
 use rand::Rng;
-use redis;
 
 use crate::auth::{crypto, session_key, session_set_key};
 use crate::prelude::*;

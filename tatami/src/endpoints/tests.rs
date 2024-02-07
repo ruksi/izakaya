@@ -10,14 +10,11 @@ async fn browser_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     // you start unauthorized
     let response = server.get("/verify").await;
     let response_json = response.json::<Value>();
-    assert_eq!(
-        response_json
-            .get("is_authenticated")
-            .unwrap()
-            .as_bool()
-            .unwrap(),
-        false
-    );
+    assert!(!response_json
+        .get("is_authenticated")
+        .unwrap()
+        .as_bool()
+        .unwrap());
 
     // you can sign up and get automatically logged in
     server
@@ -34,14 +31,11 @@ async fn browser_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     server.post("/log-out").await.assert_status_ok();
     let response = server.get("/verify").await;
     let response_json = response.json::<Value>();
-    assert_eq!(
-        response_json
-            .get("is_authenticated")
-            .unwrap()
-            .as_bool()
-            .unwrap(),
-        false
-    );
+    assert!(!response_json
+        .get("is_authenticated")
+        .unwrap()
+        .as_bool()
+        .unwrap());
 
     // you can log in
     server
@@ -61,14 +55,11 @@ async fn browser_authentication_flow(db: sqlx::PgPool) -> Result<()> {
 
     let response = server.get("/verify").await;
     let response_json = response.json::<Value>();
-    assert_eq!(
-        response_json
-            .get("is_authenticated")
-            .unwrap()
-            .as_bool()
-            .unwrap(),
-        false
-    );
+    assert!(!response_json
+        .get("is_authenticated")
+        .unwrap()
+        .as_bool()
+        .unwrap());
 
     Ok(())
 }

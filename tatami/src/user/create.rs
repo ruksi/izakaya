@@ -27,7 +27,7 @@ impl UserDeclaration {
             email: email.into(),
             password: password.into(),
         };
-        Ok(Valid::new(declaration)?)
+        Valid::new(declaration)
     }
 }
 

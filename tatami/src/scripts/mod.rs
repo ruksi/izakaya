@@ -4,7 +4,7 @@ use once_cell::sync::Lazy;
 
 // set a hash field to value if the hash exists
 static HSET_X: Lazy<redis::Script> = Lazy::new(|| {
-    return redis::Script::new(
+    redis::Script::new(
         // language=Lua
         r#"
             local hash = KEYS[1];
@@ -13,12 +13,12 @@ static HSET_X: Lazy<redis::Script> = Lazy::new(|| {
             end
             return 0;
         "#,
-    );
+    )
 });
 
 // get key references from a set and return the hashes
 static SMEMBERS_HGETALL: Lazy<redis::Script> = Lazy::new(|| {
-    return redis::Script::new(
+    redis::Script::new(
         // language=Lua
         r#"
             local set = KEYS[1];
@@ -34,7 +34,7 @@ static SMEMBERS_HGETALL: Lazy<redis::Script> = Lazy::new(|| {
             end
             return result;
         "#,
-    );
+    )
 });
 
 pub trait RedisScripts {
@@ -113,18 +113,18 @@ mod tests {
         // doesn't write if the hash doesn't exist
         let change_count = redis.hset_x(&key, "name", "Bob").await?;
         assert_eq!(change_count, 0);
-        let name: Option<String> = redis.hget(&key, "name").await?;
+        let name: Option<String> = redis.hget(key, "name").await?;
         assert!(name.is_none());
 
         // writes if the hash exists
-        redis.hset(&key, "unrelated", "thing").await?;
+        redis.hset(key, "unrelated", "thing").await?;
         let change_count = redis.hset_x(key, "name", "Mark").await?;
         assert_eq!(change_count, 1);
-        let name: String = redis.hget(&key, "name").await?;
+        let name: String = redis.hget(key, "name").await?;
         assert_eq!(name, "Mark");
 
         // cleanup
-        redis.del(&key).await?;
+        redis.del(key).await?;
 
         Ok(())
     }
@@ -139,22 +139,22 @@ mod tests {
         // doesn't write if the hash doesn't exist
         let change_count = redis.hset_xx(&key, "name", "Bob", "age", 22).await?;
         assert_eq!(change_count, 0);
-        let name: Option<String> = redis.hget(&key, "name").await?;
+        let name: Option<String> = redis.hget(key, "name").await?;
         assert!(name.is_none());
-        let age: Option<i8> = redis.hget(&key, "age").await?;
+        let age: Option<i8> = redis.hget(key, "age").await?;
         assert!(age.is_none());
 
         // // writes if the hash exists
-        redis.hset(&key, "unrelated", "thing").await?;
+        redis.hset(key, "unrelated", "thing").await?;
         let change_count = redis.hset_xx(key, "name", "Mark", "age", 33).await?;
         assert_eq!(change_count, 2);
-        let name: String = redis.hget(&key, "name").await?;
+        let name: String = redis.hget(key, "name").await?;
         assert_eq!(name, "Mark");
-        let name: i8 = redis.hget(&key, "age").await?;
+        let name: i8 = redis.hget(key, "age").await?;
         assert_eq!(name, 33);
 
         // cleanup
-        redis.del(&key).await?;
+        redis.del(key).await?;
 
         Ok(())
     }

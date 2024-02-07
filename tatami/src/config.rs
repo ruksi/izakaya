@@ -19,9 +19,7 @@ impl Config {
 
         let secret_key = std::env::var("SECRET_KEY").expect("SECRET_KEY must be set");
 
-        let frontend_urls = std::env::var("FRONTEND_URL")
-            .ok()
-            .map(|url| split_urls(url));
+        let frontend_urls = std::env::var("FRONTEND_URL").ok().map(split_urls);
 
         Self {
             port,

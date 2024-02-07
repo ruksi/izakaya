@@ -75,7 +75,7 @@ impl Error {
 
     #[cfg(test)]
     pub fn assert_json(&self, expected: serde_json::Value) -> &Self {
-        let actual = serde_json::to_value(&self.response_tuple().1 .0).unwrap();
+        let actual = serde_json::to_value(self.response_tuple().1 .0).unwrap();
         assert_eq!(actual, expected);
         self
     }

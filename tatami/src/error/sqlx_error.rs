@@ -11,7 +11,7 @@ use crate::error::error_response::{
 // https://www.postgresql.org/docs/current/errcodes-appendix.html
 pub const UNIQUE_VIOLATION: &str = "23505";
 
-pub fn sqlx_error_to_response_tuple<'a>(err: &'a sqlx::Error) -> (StatusCode, Json<ErrorBody>) {
+pub fn sqlx_error_to_response_tuple(err: &sqlx::Error) -> (StatusCode, Json<ErrorBody>) {
     // check if the error code is our custom SQLSTATE error code
     // if it is, this is a safe, known error to expose to the client
     // if let sqlx::Error::Database(err) = err {
@@ -63,15 +63,14 @@ pub fn sqlx_error_to_response_tuple<'a>(err: &'a sqlx::Error) -> (StatusCode, Js
 }
 
 fn extract_column_name_and_value(pg_detail_text: &str) -> Option<(String, String)> {
-    static RE: Lazy<Regex> = Lazy::new(|| {
-        return Regex::new(r"Key \((?<key>.+)\)=\((?<value>.+)\) already exists").unwrap();
-    });
+    static RE: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r"Key \((?<key>.+)\)=\((?<value>.+)\) already exists").unwrap());
     let Some(caps) = RE.captures(pg_detail_text) else {
         return None;
     };
     let key = caps.name("key").unwrap().as_str().to_owned();
     let value = caps.name("value").unwrap().as_str().to_owned();
-    return Some((key, value));
+    Some((key, value))
 }
 
 #[cfg(test)]

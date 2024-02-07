@@ -50,14 +50,11 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     server.clear_cookies();
     let response = server.get("/verify").await;
     let response_json = response.json::<Value>();
-    assert_eq!(
-        response_json
-            .get("is_authenticated")
-            .unwrap()
-            .as_bool()
-            .unwrap(),
-        false
-    );
+    assert!(!response_json
+        .get("is_authenticated")
+        .unwrap()
+        .as_bool()
+        .unwrap());
 
     // shows both all sessions (cookie[deleted], token1, token2)
     let sessions = server
@@ -76,14 +73,11 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
         .add_header(AUTHORIZATION, bearer_auth_header(token1))
         .await;
     let response_json = response.json::<Value>();
-    assert_eq!(
-        response_json
-            .get("is_authenticated")
-            .unwrap()
-            .as_bool()
-            .unwrap(),
-        true
-    );
+    assert!(response_json
+        .get("is_authenticated")
+        .unwrap()
+        .as_bool()
+        .unwrap());
     server
         .delete(format!("/api/sessions/{}", token1).as_str()) // full token instead of prefix 🤷
         .add_header(AUTHORIZATION, bearer_auth_header(token1))
@@ -94,14 +88,11 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
         .add_header(AUTHORIZATION, bearer_auth_header(token1))
         .await;
     let response_json = response.json::<Value>();
-    assert_eq!(
-        response_json
-            .get("is_authenticated")
-            .unwrap()
-            .as_bool()
-            .unwrap(),
-        false
-    );
+    assert!(!response_json
+        .get("is_authenticated")
+        .unwrap()
+        .as_bool()
+        .unwrap());
 
     // the token1 session is gone
     let sessions = server

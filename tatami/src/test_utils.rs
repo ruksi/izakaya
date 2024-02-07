@@ -11,7 +11,7 @@ use crate::user::UserDeclaration;
 pub async fn as_website_admin(db: &sqlx::PgPool, server: &TestServer) -> Result<()> {
     // TODO: create some kind of a permission system and make andy really an admin
     let declaration = UserDeclaration::new_valid("admin-andy", "andy@example.com", "andyIsBest")?;
-    user::create(&db, declaration).await?;
+    user::create(db, declaration).await?;
     server
         .post("/log-in")
         .json(&json!({"username_or_email": "admin-andy", "password": "andyIsBest"}))
@@ -35,9 +35,9 @@ pub async fn mock_state(db: &sqlx::PgPool) -> AppState {
 
 pub async fn mock_cache_pool() -> deadpool_redis::Pool {
     // TODO: get the test Redis URL from somewhere
-    let pool = deadpool_redis::Config::from_url("redis://localhost:6379/9")
-        .create_pool(Some(deadpool_redis::Runtime::Tokio1))
-        .expect("Failed to create cache pool for tests");
+
     // should be FLUSHDB here?
-    pool
+    deadpool_redis::Config::from_url("redis://localhost:6379/9")
+        .create_pool(Some(deadpool_redis::Runtime::Tokio1))
+        .expect("Failed to create cache pool for tests")
 }

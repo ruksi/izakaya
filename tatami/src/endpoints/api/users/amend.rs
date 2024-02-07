@@ -37,7 +37,7 @@ mod tests {
 
         let user = server
             .patch(format!("/api/users/{}", user.user_id).as_str())
-            .content_type(&"application/json")
+            .content_type("application/json")
             .json(&json!({
                 "username": "bobby",
             }))
