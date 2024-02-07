@@ -1,3 +1,3 @@
 pub async fn index() -> &'static str {
-    "Hello, World!"
+    "Hello, this is 🟧 tatami; https://github.com/ruksi/izakaya"
 }
