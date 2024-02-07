@@ -31,11 +31,10 @@ export default function Home() {
                             priority
                         />
                     </picture>
-                    Welcome to Izakaya, take a seat and relax
+                    This is Izakaya landing page
                 </div>
                 <div className="fs-4 text-secondary mt-2 mt-md-3">
-                    Most pages, like this one, are initially static sites for
-                    SEO.
+                    with Next 14 + App Router
                 </div>
             </div>
 
@@ -48,7 +47,7 @@ export default function Home() {
                 <Row>
                     <Col xs={10} md={6} lg={5} xl={4}>
                         <InputGroup>
-                            <Form.Control placeholder="email@example.com"/>
+                            <Form.Control placeholder="email@example.com" />
                             <Link href="/sign-up">
                                 <Button>
                                     <FontAwesomeIcon

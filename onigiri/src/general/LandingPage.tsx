@@ -47,11 +47,10 @@ export default function LandingPage() {
                     <picture className={cx("d-inline-flex align-self-center me-4", heroLantern)}>
                         <img src={svgRedPaperLantern} className="img-fluid" alt="Red paper lantern emoji"/>
                     </picture>
-                    Welcome to Izakaya, take a seat and relax
-
+                    This is Izakaya landing page
                 </div>
                 <div className="fs-4 text-secondary mt-2 mt-md-3">
-                    You&apos;d want to have a static marketing site for&nbsp;SEO,&nbsp;though.
+                    with Vite + React + React Router
                 </div>
             </div>
 
