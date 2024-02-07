@@ -1,46 +1,61 @@
 # 🟧 `tatami` Backend
 
-Rust backend using Axum and SQLx.
+Rust backend with Axum and SQLx.
+
+## Development
 
 ```bash
 sudo apt update
 sudo apt install postgresql-14
-cargo install sqlx-cli --features postgres
-
-# configure your environment
 cp .env.example .env
 vim .env
-
-# create database and apply migrations
+cargo install sqlx-cli --features postgres
 cargo sqlx database setup
-
-# apply all pending migrations
-#cargo sqlx migrate run
-
-# revert migrations to the given version
-#cargo sqlx migrate revert --target-version=0
-
-# sqlx runs in offline mode in production as the app itself 
-# runs migrations, but sqlx crashes the build as the database 
-# is not yet in sync... the same issue with CI, so set 
-# `SQLX_OFFLINE=true` on both
-
-# locally, to check your queries are in sync with the database
-cargo sqlx prepare --check --workspace
-# if not, regenerate them to `.sqlx/` and push to version control
-cargo sqlx prepare --workspace
-
 cargo run
 ```
 
-If you need to change the database:
+__SQLx should be run in offline mode in production as the server itself runs migrations.__
+But this causes SQLx to crash the build as the database is not yet in sync.
+An approach we use is to set `SQLX_OFFLINE=true` on production and CI.
+
+```bash
+# you should run these only in development:
+
+# check that SQLx offline statements are in sync with the database
+cargo sqlx prepare --check
+
+# generate the SQLx offline statements
+cargo sqlx prepare
+
+# if the offline statements are out of sync, the server won't build in production / CI
+```
+
+Database management:
+
+```bash
+# list migrations
+cargo sqlx migrate info
+# 1/installed uuid extension
+# ...
+# 5/pending   user
+
+# apply all pending migrations
+cargo sqlx migrate run
+
+# apply/revert to the given migration
+cargo sqlx migrate revert --target-version=0
+```
+
+To create a new migration:
 
 ```bash
 cargo sqlx migrate add -r my_migration
-# edit the files...
+vim migrations/*_my_migration.up.sql
+vim migrations/*_my_migration.down.sql
+
+# repeat the following until satisfied
 cargo sqlx migrate run
 cargo sqlx migrate revert
-cargo sqlx migrate run
 ```
 
 Run these from time to time:
