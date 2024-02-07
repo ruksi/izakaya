@@ -42,7 +42,7 @@ export function MainHeader() {
                         aria-labelledby="home-link"
                         size="sm"
                     >
-                        <FontAwesomeIcon icon={faHouse} />
+                        <FontAwesomeIcon icon={faHouse}/>
                     </Button>
                 </Link>
                 {isAuthenticated == true && (
@@ -101,21 +101,12 @@ export function MainHeader() {
             {isAuthenticated == true && (
                 <>
                     <Link href="/settings">
-                        <Button
-                            variant="outline-secondary"
-                            size="sm"
-                            className="ms-1"
-                        >
-                            <FontAwesomeIcon icon={faGear} className="me-1" />
+                        <Button variant="outline-secondary" size="sm">
+                            <FontAwesomeIcon icon={faGear} className="me-1"/>
                             Settings
                         </Button>
                     </Link>
-                    <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        className="ms-1"
-                        onClick={logOut}
-                    >
+                    <Button variant="outline-secondary" size="sm" onClick={logOut}>
                         <FontAwesomeIcon
                             icon={faRightFromBracket}
                             className="me-1"
