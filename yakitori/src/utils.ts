@@ -1,11 +1,11 @@
-export function yakitoriUrl(): string {
-    let url = process.env.NEXT_PUBLIC_YAKITORI_URL ?? "";
+export function selfUrl(): string {
+    let url = process.env.NEXT_PUBLIC_SELF_URL ?? "";
     url = url.trim();
     if (url.endsWith("/")) {
         url = url.slice(0, -1);
     }
     if (url === "") {
-        throw new Error("NEXT_PUBLIC_YAKITORI_URL is not set");
+        throw new Error("NEXT_PUBLIC_SELF_URL is not set");
     }
     return url;
 }
