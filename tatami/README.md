@@ -64,3 +64,33 @@ Run these from time to time:
 cargo clippy --fix
 cargo fmt
 ```
+
+## "Production"
+
+Requirements:
+
+* a [Railway](https://railway.app/) project
+* a PostgreSQL service in that project e.g. `database`
+* a Redis service in that project e.g. `cache`
+* this repository or a fork linked to the Railway project
+
+Steps:
+
+* Add a new service from "GitHub Repository"
+    * Select this repository.
+    * Variables:
+        * `RUST_LOG`: `tatami=debug,tower_http=debug`
+        * `DATABASE_URL`: `${{database.DATABASE_URL}}`
+        * `CACHE_URL`: `${{cache.REDIS_URL}}`
+        * `SECRET_KEY`: generate a random 64 character string
+        * `SQLX_OFFLINE`: `true`
+    * Settings:
+        * Service Name: `🟧 tatami`
+        * Railway Config File: `tatami/railway.toml`
+    * Click "Deploy"
+
+Next Steps:
+
+* Configure public networking for `🟧 tatami` after it runs.
+* Edit `FRONTEND_URL` to include frontends you launch, separated by commas e.g.
+    * `http://localhost:3000,http://localhost:5173`
