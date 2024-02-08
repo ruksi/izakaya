@@ -11,15 +11,18 @@ auto-deploy on the main branch change.
 
 ### Backends
 
-* [`🟧 tatami`](./tatami): Rust + Axum + SQLx
-  [visit](https://tatami.railway.izakaya.dev/)
+* `🟧 tatami`: Rust + Axum + SQLx
+  [code](./tatami),
+  [online](https://tatami.railway.izakaya.dev/)
 
 ### Frontends
 
-* [`🍙 onigiri`](./onigiri): Vite + React + React Router
-  [visit](https://onigiri.railway.izakaya.dev/)
-* [`🍗 yakitori`](./yakitori): Next 14 + App Router
-  [visit](https://yakitori.railway.izakaya.dev/)
+* `🍙 onigiri`: Vite + React + React Router
+  [code](./onigiri),
+  [online](https://onigiri.railway.izakaya.dev/)
+* `🍗 yakitori`: Next 14 + App Router
+  [code](./yakitori),
+  [online](https://yakitori.railway.izakaya.dev/)
 
 ## Why?
 
