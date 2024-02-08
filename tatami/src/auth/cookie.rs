@@ -35,13 +35,8 @@ pub fn bake<'a>(name: &'static str, value: String, max_age: time::Duration) -> C
         .ok()
         .map(crate::config::split_urls);
     if let Some(frontend_urls) = frontend_urls {
-        let frontend_url = frontend_urls.first();
-        if let Some(frontend_url) = frontend_url {
-            // TODO: this wrongly assumes that all frontend URLs are on the same domain,
-            //       fix with panic in config parse
-            if let Ok(Some(domain)) = cookie_domain_from(frontend_url) {
-                builder = builder.domain(domain);
-            }
+        if let Ok(Some(domain)) = cookie_domain_from(&frontend_urls) {
+            builder = builder.domain(domain);
         }
     }
 
@@ -64,35 +59,45 @@ pub fn cookie_secret_from_seed(seed: String) -> Key {
     Key::from(&seeded_random_bytes)
 }
 
-fn cookie_domain_from(text: &str) -> Result<Option<String>, url::ParseError> {
-    let url = url::Url::parse(text)?;
-    let domain = match url.host() {
-        Some(Host::Domain(domain)) => domain.to_string(),
-        Some(Host::Ipv4(ip)) => return Ok(Some(ip.to_string())),
-        Some(Host::Ipv6(ip)) => return Ok(Some(ip.to_string())),
-        None => return Ok(None),
-    };
-    let segments: Vec<&str> = domain
-        .split('.')
-        .filter(|segment| !segment.is_empty())
-        .collect();
+fn cookie_domain_from(urls: &Vec<String>) -> Result<Option<String>, url::ParseError> {
+    let urls = urls
+        .iter()
+        .map(|u| url::Url::parse(u))
+        .collect::<Result<Vec<_>, _>>()?;
 
-    if segments.len() <= 2 {
-        // probably "localhost" or already a registrable domain
-        return Ok(segments.join(".").into());
+    let domains = urls.iter().map(|url| {
+        match url.host() {
+            Some(Host::Domain(domain)) => domain.to_string(),
+            Some(Host::Ipv4(ip)) => ip.to_string(),
+            Some(Host::Ipv6(ip)) => ip.to_string(),
+            None => "".to_string(),
+        }
+    }).collect::<Vec<_>>();
+
+    let segmented = domains.iter().map(|domain| {
+        domain.split('.').rev().collect::<Vec<_>>()
+    }).collect::<Vec<_>>();
+
+    let mut common = segmented[0].clone();
+    for segment in segmented.into_iter().skip(1) {
+        common = common.into_iter()
+            .zip(segment.into_iter())
+            .take_while(|(a, b)| a == b)
+            .map(|(a, _)| a)
+            .collect();
     }
 
-    // this doesn't properly handle domains like "co.uk" or "com.au", but it's good enough for me
-    let cookie_domain = segments
-        .iter()
+    let prefix = common
+        .into_iter()
         .rev()
-        .take(2)
-        .rev()
-        .cloned()
+        .map(|s| s.to_string())
         .collect::<Vec<_>>()
         .join(".");
 
-    Ok(Some(cookie_domain))
+    match prefix.is_empty() {
+        true => Ok(None),
+        false => Ok(Some(prefix)),
+    }
 }
 
 #[cfg(test)]
@@ -100,16 +105,31 @@ mod tests {
     use super::*;
 
     #[test]
-    fn cookie_domain_generation_works() -> Result<(), String> {
+    fn cookie_domain_from_singles() -> Result<(), String> {
         let cases = [
-            ("http://127.0.0.1", "127.0.0.1"),
-            ("http://localhost:5173", "localhost"),
-            ("https://example.com", "example.com"),
-            ("https://sub.example.com/", "example.com"),
+            (vec!["http://127.0.0.1".into()], "127.0.0.1"),
+            (vec!["http://localhost:5173".into()], "localhost"),
+            (vec!["https://example.com".into()], "example.com"),
+            (vec!["https://sub.example.com/".into()], "sub.example.com"),
         ];
-        for (url, expected) in cases.iter() {
-            let result = cookie_domain_from(url).unwrap().unwrap();
+        for (case, expected) in cases.iter() {
+            let result = cookie_domain_from(case).unwrap().unwrap();
             assert_eq!(result, *expected);
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn cookie_domain_from_pairs() -> Result<(), String> {
+        let cases = [
+            (vec!["http://127.0.0.1".into(), "http://localhost".into()], None),
+            (vec!["http://localhost:5173".into(), "http://localhost:3000".into()], Some("localhost".into())),
+            (vec!["https://alpha.example.com".into(), "https://beta.example.com".into()], Some("example.com".into())),
+            (vec!["https://a.b.c.com".into(), "http://z.b.c.com".into()], Some("b.c.com".into())),
+        ];
+        for (case, expected) in cases.into_iter() {
+            let result = cookie_domain_from(&case).unwrap();
+            assert_eq!(result, expected);
         }
         Ok(())
     }
