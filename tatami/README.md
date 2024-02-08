@@ -1,4 +1,4 @@
-# 🟧 `tatami` Backend
+# `🟧 tatami` Backend
 
 Rust backend with Axum and SQLx.
 
