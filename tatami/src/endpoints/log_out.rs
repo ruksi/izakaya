@@ -21,7 +21,7 @@ pub async fn log_out(
     };
 
     revoke_access_token(&state, access_token.clone(), user_id).await?;
-    let cookie = cookie::bake(
+    let cookie = cookie::bake_for_backend(
         cookie::ACCESS_TOKEN,
         access_token,
         state.config.cookie_domain,

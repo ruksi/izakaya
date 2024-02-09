@@ -17,25 +17,36 @@ impl FromRef<AppState> for Key {
 }
 
 // 🍫 + 🥣 + 🌡️ = 🍪
-pub fn bake<'a>(
+
+// Cookies that should only be read by the server.
+pub fn bake_for_backend<'a>(
     name: &'static str,
     value: String,
     domain: Option<String>,
     max_age: time::Duration,
 ) -> Cookie<'a> {
-    let mut builder = Cookie::build((name, value))
-        // these flags are for the _browser_ to enforce
-        .same_site(SameSite::Strict) // use inside the same registrable domain, excluding https://publicsuffix.org/
-        .path("/") // use on all paths (not just the current one)
-        .http_only(true) // forbid reading cookies with JavaScript
-        .secure(true) // forbid sending the cookie over plain HTTP
-        .max_age(max_age); // automatically delete the cookie after this duration
-
+    let mut cookie = Cookie::new(name, value);
+    cookie.set_same_site(SameSite::Strict); // use inside the same top domain, except https://publicsuffix.org/
+    cookie.set_path("/"); // use on all paths (not just the current one)
+    cookie.set_http_only(true); // forbid reading cookies with JavaScript
+    cookie.set_secure(true); // forbid sending the cookie over plain HTTP
+    cookie.set_max_age(max_age); // automatically delete the cookie after this duration
     if let Some(domain) = domain {
-        builder = builder.domain(domain);
+        cookie.set_domain(domain);
     }
+    cookie
+}
 
-    builder.build()
+// Cookies that can be read by the browser JavaScript.
+pub fn bake_for_frontend<'a>(
+    name: &'static str,
+    value: String,
+    domain: Option<String>,
+    max_age: time::Duration,
+) -> Cookie<'a> {
+    let mut cookie = bake_for_backend(name, value, domain, max_age);
+    cookie.set_http_only(false); // allow reading cookies with JavaScript
+    cookie
 }
 
 // To be able to decrypt our private cookies after a server reboot, we must be able to attain the same key.

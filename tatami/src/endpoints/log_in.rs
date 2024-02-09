@@ -25,7 +25,7 @@ pub async fn log_in(
         Some(time::Duration::days(14) + time::Duration::minutes(1)),
     )
     .await?;
-    let cookie = cookie::bake(
+    let cookie = cookie::bake_for_backend(
         cookie::ACCESS_TOKEN,
         access_token,
         state.config.cookie_domain,
