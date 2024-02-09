@@ -65,22 +65,25 @@ fn cookie_domain_from(urls: &Vec<String>) -> Result<Option<String>, url::ParseEr
         .map(|u| url::Url::parse(u))
         .collect::<Result<Vec<_>, _>>()?;
 
-    let domains = urls.iter().map(|url| {
-        match url.host() {
+    let domains = urls
+        .iter()
+        .map(|url| match url.host() {
             Some(Host::Domain(domain)) => domain.to_string(),
             Some(Host::Ipv4(ip)) => ip.to_string(),
             Some(Host::Ipv6(ip)) => ip.to_string(),
             None => "".to_string(),
-        }
-    }).collect::<Vec<_>>();
+        })
+        .collect::<Vec<_>>();
 
-    let segmented = domains.iter().map(|domain| {
-        domain.split('.').rev().collect::<Vec<_>>()
-    }).collect::<Vec<_>>();
+    let segmented = domains
+        .iter()
+        .map(|domain| domain.split('.').rev().collect::<Vec<_>>())
+        .collect::<Vec<_>>();
 
     let mut common = segmented[0].clone();
     for segment in segmented.into_iter().skip(1) {
-        common = common.into_iter()
+        common = common
+            .into_iter()
             .zip(segment.into_iter())
             .take_while(|(a, b)| a == b)
             .map(|(a, _)| a)
@@ -121,6 +124,7 @@ mod tests {
 
     #[test]
     fn cookie_domain_from_pairs() -> Result<(), String> {
+        #[rustfmt::skip]
         let cases = [
             (vec!["http://127.0.0.1".into(), "http://localhost".into()], None),
             (vec!["http://localhost:5173".into(), "http://localhost:3000".into()], Some("localhost".into())),
