@@ -12,7 +12,7 @@ pub struct Config {
     pub cache_url: String,    // aka. Redis
     pub secret_key: String,   // a generic seed (64+ character string) used for hashes, salts, and the like
     pub cookie_secret: axum_extra::extract::cookie::Key,  // used to encrypt "private" cookies
-    pub frontend_urls: Option<Vec<String>>,
+    pub frontend_urls: Vec<String>,
 }
 
 impl Config {
@@ -26,7 +26,7 @@ impl Config {
         let secret_key = std::env::var("SECRET_KEY").expect("SECRET_KEY must be set");
         let cookie_secret = crate::auth::cookie::cookie_secret_from_seed(secret_key.clone());
 
-        let frontend_urls = std::env::var("FRONTEND_URL").ok().map(split_urls);
+        let frontend_urls = split_urls(std::env::var("FRONTEND_URL").unwrap_or_default());
 
         Self {
             port,
@@ -48,7 +48,7 @@ impl Config {
     pub fn new_for_tests() -> Self {
         let secret_key = "v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry".to_string();
         let cookie_secret = crate::auth::cookie::cookie_secret_from_seed(secret_key.clone());
-        let frontend_urls = Some(vec!["http://localhost:3000".to_string()]);
+        let frontend_urls = vec!["http://localhost:3000".to_string()];
         Self {
             port: DEFAULT_PORT.to_string(),
             rust_log: DEFAULT_RUST_LOG.to_string(),

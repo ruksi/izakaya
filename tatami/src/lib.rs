@@ -67,10 +67,8 @@ pub async fn get_app<S: Clone + Send + Sync + 'static>(config: Config) -> Router
     );
 
     let mut origins: Vec<HeaderValue> = vec![];
-    if let Some(frontend_urls) = config.frontend_urls {
-        for frontend_url in frontend_urls {
-            origins.push(frontend_url.parse().unwrap());
-        }
+    for frontend_url in config.frontend_urls {
+        origins.push(frontend_url.parse().unwrap());
     }
     if !origins.is_empty() {
         app = app.layer(
