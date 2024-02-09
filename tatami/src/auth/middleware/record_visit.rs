@@ -21,8 +21,9 @@ pub async fn record_visit(
     // we have an anonymous visitor by default;
     // a stranger on the web, mechanical or organic
     let mut visitor = Visitor {
-        user_id: None,
         access_token: None,
+        session_id: None,
+        user_id: None,
     };
 
     // first check if we can use `Authorization` header to identify them
@@ -84,18 +85,26 @@ async fn get_visitor<T: Into<String>>(
         .await
         .unwrap_or_default();
 
-    let Some(user_id) = session.get("user_id") else {
+    let Some(session_id) = session.get("session_id") else {
+        return None;
+    };
+    let Ok(session_id) = Uuid::parse_str(session_id) else {
+        tracing::error!("failed to parse session session_id: {}", session_id);
         return None;
     };
 
+    let Some(user_id) = session.get("user_id") else {
+        return None;
+    };
     let Ok(user_id) = Uuid::parse_str(user_id) else {
         tracing::error!("failed to parse session user_id: {}", user_id);
         return None;
     };
 
     let visitor = Visitor {
-        user_id: Some(user_id),
         access_token: Some(access_token),
+        session_id: Some(session_id),
+        user_id: Some(user_id),
     };
     Some(visitor)
 }

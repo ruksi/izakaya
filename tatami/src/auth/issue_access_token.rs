@@ -45,8 +45,10 @@ pub async fn issue_access_token(
 
     let session_key = session_key(access_token.clone());
     let session_list_key = session_set_key(record.user_id);
+    let session_id = uuid::Uuid::new_v4();
 
     let mut commands = redis::pipe()
+        .hset(session_key.clone(), "session_id", session_id.to_string())
         .hset(session_key.clone(), "access_token", access_token.clone()) // duplicate info vs. the key but 🤷
         .hset(session_key.clone(), "user_id", record.user_id.to_string())
         .sadd(session_list_key, session_key.clone())

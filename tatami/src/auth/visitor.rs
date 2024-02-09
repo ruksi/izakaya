@@ -6,6 +6,7 @@ use uuid::Uuid;
 
 #[derive(Clone)]
 pub struct Visitor {
-    pub user_id: Option<Uuid>,
     pub access_token: Option<String>,
+    pub session_id: Option<Uuid>,
+    pub user_id: Option<Uuid>,
 }

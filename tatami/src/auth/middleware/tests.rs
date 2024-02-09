@@ -64,6 +64,7 @@ async fn auth_middleware_work_with_bearer_header(db: sqlx::PgPool) {
 
     // make the session token valid
     redis::pipe()
+        .hset(&session_key, "session_id", Uuid::nil().to_string()) // #YOLO
         .hset(&session_key, "user_id", Uuid::nil().to_string()) // #YOLO
         .expire(&session_key, 10)
         .query_async::<_, ()>(&mut redis)
