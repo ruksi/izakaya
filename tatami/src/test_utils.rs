@@ -30,7 +30,8 @@ pub async fn mock_server(db: &sqlx::PgPool) -> TestServer {
 pub async fn mock_state(db: &sqlx::PgPool) -> AppState {
     let cache_pool = mock_cache_pool().await;
     let cookie_secret = axum_extra::extract::cookie::Key::generate();
-    AppState::new(db.clone(), cache_pool, cookie_secret)
+    let config = crate::config::Config::new_for_tests();
+    AppState::new(config, db.clone(), cache_pool, cookie_secret)
 }
 
 pub async fn mock_cache_pool() -> deadpool_redis::Pool {

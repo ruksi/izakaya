@@ -1,6 +1,8 @@
 const DEFAULT_PORT: &str = "8080";
 const DEFAULT_RUST_LOG: &str = "tatami=debug";
 
+#[rustfmt::skip]
+#[derive(Clone)]
 pub struct Config {
     pub port: String,
     pub rust_log: String,
@@ -33,6 +35,21 @@ impl Config {
 
     pub fn bind_address(&self) -> String {
         format!("0.0.0.0:{}", self.port)
+    }
+
+    #[cfg(test)]
+    #[rustfmt::skip]
+    pub fn new_for_tests() -> Self {
+        let secret_key = "v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry".to_string();
+        let frontend_urls = Some(vec!["http://localhost:3000".to_string()]);
+        Self {
+            port: DEFAULT_PORT.to_string(),
+            rust_log: DEFAULT_RUST_LOG.to_string(),
+            database_url: "postgres://yeah-this-wont-work".to_string(),
+            cache_url: "redis://yeah-this-wont-work".to_string(),
+            secret_key,
+            frontend_urls,
+        }
     }
 }
 

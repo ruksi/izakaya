@@ -55,7 +55,7 @@ pub async fn get_app<S: Clone + Send + Sync + 'static>(config: Config) -> Router
 
     let cookie_secret = auth::cookie::cookie_secret_from_seed(config.secret_key.clone());
 
-    let state = AppState::new(db_pool, cache_pool, cookie_secret);
+    let state = AppState::new(config.clone(), db_pool, cache_pool, cookie_secret);
     let mut app = root_router(state);
 
     app = app.layer(
