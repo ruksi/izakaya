@@ -1,5 +1,6 @@
 use axum::routing::{get, post};
 use axum::Router;
+use tower_cookies::CookieManagerLayer;
 
 use crate::state::AppState;
 
@@ -37,5 +38,6 @@ pub fn router<S>(state: AppState) -> Router<S> {
             state.clone(),
             crate::auth::middleware::record_visit,
         ))
+        .layer(CookieManagerLayer::new())
         .with_state(state)
 }

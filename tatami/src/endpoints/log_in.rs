@@ -1,7 +1,7 @@
 use axum::extract::State;
 use axum::Json;
-use axum_extra::extract::cookie::PrivateCookieJar;
 use serde_json::{json, Value};
+use tower_cookies::Cookies;
 
 use crate::auth::{cookie, issue_access_token};
 use crate::prelude::*;
@@ -15,9 +15,9 @@ pub struct LogInBody {
 
 pub async fn log_in(
     State(state): State<AppState>,
-    mut jar: PrivateCookieJar,
+    cookies: Cookies,
     Json(body): Json<LogInBody>,
-) -> Result<(PrivateCookieJar, Json<Value>)> {
+) -> Result<Json<Value>> {
     let access_token = issue_access_token(
         &state,
         body.username_or_email,
@@ -25,13 +25,15 @@ pub async fn log_in(
         Some(time::Duration::days(14) + time::Duration::minutes(1)),
     )
     .await?;
+
     let cookie = cookie::bake_for_backend(
         cookie::ACCESS_TOKEN,
         access_token,
         state.config.cookie_domain,
         time::Duration::days(14),
     );
-    jar = jar.add(cookie);
+    let private_cookies = cookies.private(&state.config.cookie_secret);
+    private_cookies.add(cookie);
 
-    Ok((jar, Json(json!({"status": "ok"}))))
+    Ok(Json(json!({"status": "ok"})))
 }

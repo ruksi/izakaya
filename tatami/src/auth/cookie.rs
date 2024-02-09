@@ -1,20 +1,11 @@
-use axum::extract::FromRef;
-use axum_extra::extract::cookie::{Cookie, Key, SameSite};
 use rand::rngs::StdRng;
 use rand::Rng;
+use tower_cookies::cookie::SameSite;
+use tower_cookies::{Cookie, Key};
 use url::Host;
-
-use crate::state::AppState;
 
 pub const ACCESS_TOKEN: &str = "tatami_access";
 pub const CSRF_TOKEN: &str = "tatami_csrf";
-
-// tell `axum-extra` private cookies where to get their encryption key
-impl FromRef<AppState> for Key {
-    fn from_ref(state: &AppState) -> Self {
-        state.config.cookie_secret.clone()
-    }
-}
 
 // 🍫 + 🥣 + 🌡️ = 🍪
 

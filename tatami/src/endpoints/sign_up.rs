@@ -1,7 +1,7 @@
 use axum::extract::State;
 use axum::Json;
-use axum_extra::extract::PrivateCookieJar;
 use serde_json::{json, Value};
+use tower_cookies::Cookies;
 
 use crate::auth::{cookie, issue_access_token};
 use crate::prelude::*;
@@ -12,9 +12,9 @@ use crate::valid::Valid;
 
 pub async fn sign_up(
     State(state): State<AppState>,
-    mut jar: PrivateCookieJar,
+    cookies: Cookies,
     declaration: Valid<UserDeclaration>,
-) -> Result<(PrivateCookieJar, Json<Value>)> {
+) -> Result<Json<Value>> {
     // we need the password after consume to create the access token
     let password = declaration.inner_as_ref().password.clone();
     let user = user::create(&state.db_pool, declaration).await?;
@@ -31,7 +31,8 @@ pub async fn sign_up(
         state.config.cookie_domain,
         time::Duration::days(14),
     );
-    jar = jar.add(cookie);
+    let private_cookies = cookies.private(&state.config.cookie_secret);
+    private_cookies.add(cookie);
 
-    Ok((jar, Json(json!({"status": "ok"}))))
+    Ok(Json(json!({"status": "ok"})))
 }

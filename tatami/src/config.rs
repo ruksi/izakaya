@@ -11,7 +11,7 @@ pub struct Config {
     pub database_url: String, // aka. PostgreSQL
     pub cache_url: String,    // aka. Redis
     pub secret_key: String,   // a generic seed (64+ character string) used for hashes, salts, and the like
-    pub cookie_secret: axum_extra::extract::cookie::Key,  // used to encrypt "private" cookies
+    pub cookie_secret: tower_cookies::Key,  // used to encrypt "private" cookies
     pub frontend_urls: Vec<String>,
     pub cookie_domain: Option<String>,
 }

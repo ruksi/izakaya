@@ -10,10 +10,8 @@ members = [
 
 # https://lib.rs/crates/axum
 # https://lib.rs/crates/axum-test
-# https://lib.rs/crates/axum-extra
 axum = { version = "0.7.3" }
 axum-test = { version = "14.2.2" }
-axum-extra = { version = "0.9.1", features = ["cookie", "cookie-private"] }
 
 # https://lib.rs/crates/sqlx
 # https://lib.rs/crates/sea-query
@@ -70,8 +68,10 @@ dotenvy = { version = "0.15.7" }
 
 # https://lib.rs/crates/tower
 # https://lib.rs/crates/tower-http
+# https://lib.rs/crates/tower-cookies
 tower = { version = "0.4.13", features = ["util"] }
 tower-http = { version = "0.5.0", features = ["fs", "trace", "cors"] }
+tower-cookies = { version = "0.10.0", features = ["private"] }
 
 # https://lib.rs/crates/tokio
 tokio = { version = "1.35.1", features = ["full"] }

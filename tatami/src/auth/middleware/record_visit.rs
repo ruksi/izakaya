@@ -4,7 +4,6 @@ use axum::extract::{Request, State};
 use axum::http::header::AUTHORIZATION;
 use axum::middleware::Next;
 use axum::response::Response;
-use axum_extra::extract::PrivateCookieJar;
 use redis::AsyncCommands;
 use time::format_description::well_known::Rfc3339;
 use uuid::Uuid;
@@ -15,7 +14,7 @@ use crate::state::AppState;
 
 pub async fn record_visit(
     State(state): State<AppState>,
-    jar: PrivateCookieJar,
+    cookies: tower_cookies::Cookies,
     mut request: Request,
     next: Next,
 ) -> Response {
@@ -38,7 +37,8 @@ pub async fn record_visit(
 
     // second, check if we can use cookies to identify them
     if visitor.user_id.is_none() {
-        let cookie_token = jar
+        let private_cookies = cookies.private(&state.config.cookie_secret);
+        let cookie_token = private_cookies
             .get(cookie::ACCESS_TOKEN)
             .map(|cookie| cookie.value().to_owned());
         if let Some(found_visitor) = get_visitor(&state, cookie_token).await {

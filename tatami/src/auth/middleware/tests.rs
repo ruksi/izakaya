@@ -4,6 +4,7 @@ use axum::{Extension, Json, Router};
 use axum_test::TestServer;
 use redis::AsyncCommands;
 use serde_json::{json, Value};
+use tower_cookies::CookieManagerLayer;
 use uuid::Uuid;
 
 use crate::auth::cache_keys::session_key;
@@ -27,6 +28,7 @@ async fn auth_middleware_work_with_bearer_header(db: sqlx::PgPool) {
             state.clone(),
             record_visit,
         ))
+        .layer(CookieManagerLayer::new())
         .with_state(state.clone());
     let server = TestServer::new(app).unwrap();
 
