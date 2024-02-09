@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use axum::extract::{MatchedPath, Request};
+use axum::extract::Request;
 use axum::http::{header, HeaderValue, Method};
 use axum::response::Redirect;
 use axum::Router;
@@ -63,14 +63,7 @@ pub async fn get_app<S: Clone + Send + Sync + 'static>(config: Config) -> Router
             .make_span_with(|req: &Request| {
                 let method = req.method();
                 let uri = req.uri();
-
-                // this extension is set by axum
-                let matched_path = req
-                    .extensions()
-                    .get::<MatchedPath>()
-                    .map(|matched_path| matched_path.as_str());
-
-                tracing::debug_span!("request", %method, %uri, matched_path)
+                tracing::debug_span!("request", %method, %uri)
             })
             .on_failure(()), // we trace::error the errors ourselves
     );
