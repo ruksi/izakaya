@@ -11,7 +11,7 @@ pub const ACCESS_TOKEN: &str = "Access-Token";
 // tell `axum-extra` private cookies where to get their encryption key
 impl FromRef<AppState> for Key {
     fn from_ref(state: &AppState) -> Self {
-        state.cookie_secret.clone()
+        state.config.cookie_secret.clone()
     }
 }
 

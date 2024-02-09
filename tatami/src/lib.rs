@@ -53,9 +53,7 @@ pub async fn get_app<S: Clone + Send + Sync + 'static>(config: Config) -> Router
         .create_pool(Some(deadpool_redis::Runtime::Tokio1))
         .expect("Can't create cache pool");
 
-    let cookie_secret = auth::cookie::cookie_secret_from_seed(config.secret_key.clone());
-
-    let state = AppState::new(config.clone(), db_pool, cache_pool, cookie_secret);
+    let state = AppState::new(config.clone(), db_pool, cache_pool);
     let mut app = root_router(state);
 
     app = app.layer(

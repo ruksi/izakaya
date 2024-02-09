@@ -3,7 +3,6 @@ pub struct AppState {
     pub config: crate::config::Config,
     pub db_pool: sqlx::pool::Pool<sqlx::Postgres>,
     pub cache_pool: deadpool_redis::Pool,
-    pub cookie_secret: axum_extra::extract::cookie::Key,
 }
 
 impl AppState {
@@ -11,13 +10,11 @@ impl AppState {
         config: crate::config::Config,
         db_pool: sqlx::pool::Pool<sqlx::Postgres>,
         cache_pool: deadpool_redis::Pool,
-        cookie_secret: axum_extra::extract::cookie::Key,
     ) -> Self {
         Self {
             config,
             db_pool,
             cache_pool,
-            cookie_secret,
         }
     }
 }

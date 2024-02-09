@@ -1,3 +1,5 @@
+// Config contains all the global, unchanging settings for the application.
+
 const DEFAULT_PORT: &str = "8080";
 const DEFAULT_RUST_LOG: &str = "tatami=debug";
 
@@ -9,6 +11,7 @@ pub struct Config {
     pub database_url: String, // aka. PostgreSQL
     pub cache_url: String,    // aka. Redis
     pub secret_key: String,   // a generic seed (64+ character string) used for hashes, salts, and the like
+    pub cookie_secret: axum_extra::extract::cookie::Key,  // used to encrypt "private" cookies
     pub frontend_urls: Option<Vec<String>>,
 }
 
@@ -19,7 +22,9 @@ impl Config {
 
         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
         let cache_url = std::env::var("CACHE_URL").expect("CACHE_URL must be set");
+
         let secret_key = std::env::var("SECRET_KEY").expect("SECRET_KEY must be set");
+        let cookie_secret = crate::auth::cookie::cookie_secret_from_seed(secret_key.clone());
 
         let frontend_urls = std::env::var("FRONTEND_URL").ok().map(split_urls);
 
@@ -29,6 +34,7 @@ impl Config {
             database_url,
             cache_url,
             secret_key,
+            cookie_secret,
             frontend_urls,
         }
     }
@@ -41,6 +47,7 @@ impl Config {
     #[rustfmt::skip]
     pub fn new_for_tests() -> Self {
         let secret_key = "v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry".to_string();
+        let cookie_secret = crate::auth::cookie::cookie_secret_from_seed(secret_key.clone());
         let frontend_urls = Some(vec!["http://localhost:3000".to_string()]);
         Self {
             port: DEFAULT_PORT.to_string(),
@@ -48,6 +55,7 @@ impl Config {
             database_url: "postgres://yeah-this-wont-work".to_string(),
             cache_url: "redis://yeah-this-wont-work".to_string(),
             secret_key,
+            cookie_secret,
             frontend_urls,
         }
     }
