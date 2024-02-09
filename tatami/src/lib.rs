@@ -3,8 +3,8 @@ use std::time::Duration;
 use axum::extract::{MatchedPath, Request};
 use axum::http::{header, HeaderValue, Method};
 use axum::response::Redirect;
-use axum::routing::get;
 use axum::Router;
+use axum::routing::get;
 use tokio::time::sleep;
 use tower_http::cors::CorsLayer;
 use tower_http::services::ServeDir;
@@ -58,6 +58,23 @@ pub async fn get_app<S: Clone + Send + Sync + 'static>(config: Config) -> Router
     let state = AppState::new(db_pool, cache_pool, cookie_secret);
     let mut app = root_router(state);
 
+    app = app.layer(
+        TraceLayer::new_for_http()
+            .make_span_with(|req: &Request| {
+                let method = req.method();
+                let uri = req.uri();
+
+                // this extension is set by axum
+                let matched_path = req
+                    .extensions()
+                    .get::<MatchedPath>()
+                    .map(|matched_path| matched_path.as_str());
+
+                tracing::debug_span!("request", %method, %uri, matched_path)
+            })
+            .on_failure(()), // we trace::error the errors ourselves
+    );
+
     let mut origins: Vec<HeaderValue> = vec![];
     if let Some(frontend_urls) = config.frontend_urls {
         for frontend_url in frontend_urls {
@@ -101,23 +118,6 @@ fn root_router<S>(state: AppState) -> Router<S> {
         get(|| async { Redirect::permanent("/assets/favicon.ico") }),
     );
     let app = app.merge(endpoints::router(state.clone()));
-
-    let app = app.layer(
-        TraceLayer::new_for_http()
-            .make_span_with(|req: &Request| {
-                let method = req.method();
-                let uri = req.uri();
-
-                // this extension is set by axum
-                let matched_path = req
-                    .extensions()
-                    .get::<MatchedPath>()
-                    .map(|matched_path| matched_path.as_str());
-
-                tracing::debug_span!("request", %method, %uri, matched_path)
-            })
-            .on_failure(()), // we trace::error the errors ourselves
-    );
 
     app.with_state(state)
 }
