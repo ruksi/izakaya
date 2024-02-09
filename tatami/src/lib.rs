@@ -66,11 +66,15 @@ pub async fn get_app<S: Clone + Send + Sync + 'static>(config: Config) -> Router
             .on_failure(()), // we trace::error the errors ourselves
     );
 
-    let mut origins: Vec<HeaderValue> = vec![];
-    for frontend_url in config.frontend_urls {
-        origins.push(frontend_url.parse().unwrap());
+    match config.frontend_urls.len() {
+        0 => tracing::warn!("CORS disabled, no FRONTEND_URL set"),
+        _ => tracing::info!("CORS enabled for {:?}", config.frontend_urls),
     }
-    if !origins.is_empty() {
+    let mut allowed_origins: Vec<HeaderValue> = vec![];
+    for frontend_url in config.frontend_urls {
+        allowed_origins.push(frontend_url.parse().unwrap());
+    }
+    if !allowed_origins.is_empty() {
         app = app.layer(
             CorsLayer::new()
                 .allow_headers([
@@ -88,7 +92,7 @@ pub async fn get_app<S: Clone + Send + Sync + 'static>(config: Config) -> Router
                     Method::OPTIONS,
                 ])
                 .allow_credentials(true) // allow frontend to send us cookies
-                .allow_origin(origins),
+                .allow_origin(allowed_origins),
         );
     }
 
