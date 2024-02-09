@@ -6,7 +6,7 @@ use url::Host;
 
 use crate::state::AppState;
 
-pub const ACCESS_TOKEN: &str = "Access-Token";
+pub const ACCESS_TOKEN: &str = "tatami_access";
 
 // tell `axum-extra` private cookies where to get their encryption key
 impl FromRef<AppState> for Key {
