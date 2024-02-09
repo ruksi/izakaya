@@ -25,7 +25,12 @@ pub async fn log_in(
         Some(time::Duration::days(14) + time::Duration::minutes(1)),
     )
     .await?;
-    let cookie = cookie::bake(cookie::ACCESS_TOKEN, access_token, time::Duration::days(14));
+    let cookie = cookie::bake(
+        cookie::ACCESS_TOKEN,
+        access_token,
+        state.config.cookie_domain,
+        time::Duration::days(14),
+    );
     jar = jar.add(cookie);
 
     Ok((jar, Json(json!({"status": "ok"}))))

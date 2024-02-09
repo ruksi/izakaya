@@ -20,8 +20,13 @@ pub async fn log_out(
         return Ok((jar, Json(json!({}))));
     };
 
-    revoke_access_token(state, access_token.clone(), user_id).await?;
-    let cookie = cookie::bake(cookie::ACCESS_TOKEN, access_token, time::Duration::ZERO); // i.e. delete it
+    revoke_access_token(&state, access_token.clone(), user_id).await?;
+    let cookie = cookie::bake(
+        cookie::ACCESS_TOKEN,
+        access_token,
+        state.config.cookie_domain,
+        time::Duration::ZERO, // i.e. delete it
+    );
     jar = jar.add(cookie);
 
     Ok((jar, Json(json!({}))))

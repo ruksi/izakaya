@@ -36,7 +36,7 @@ pub async fn destroy(
     }
 
     for access_token in access_tokens {
-        revoke_access_token(state.clone(), access_token, user_id).await?;
+        revoke_access_token(&state, access_token, user_id).await?;
     }
     Ok(Json(()))
 }

@@ -13,6 +13,7 @@ pub struct Config {
     pub secret_key: String,   // a generic seed (64+ character string) used for hashes, salts, and the like
     pub cookie_secret: axum_extra::extract::cookie::Key,  // used to encrypt "private" cookies
     pub frontend_urls: Vec<String>,
+    pub cookie_domain: Option<String>,
 }
 
 impl Config {
@@ -28,6 +29,25 @@ impl Config {
 
         let frontend_urls = split_urls(std::env::var("FRONTEND_URL").unwrap_or_default());
 
+        // as our API server and frontend are on different subdomains, we want to assign cookie
+        // domain to the registrable domain (e.g. "example.com") instead of the current subdomain
+        // so we can share the cookie.
+        // note that this _does_ make the cookie insecure on shared domains like "onrender.com",
+        // domain-scoped cookies are only secure if you control all subdomains of the domain.
+        let mut cookie_domain = None;
+        if frontend_urls.len() > 0 {
+            cookie_domain =
+                crate::auth::cookie::cookie_domain_from(&frontend_urls).unwrap_or_else(|_| {
+                    panic!("FRONTEND_URL contains invalid URLs: {:?}", frontend_urls)
+                });
+            if cookie_domain.is_none() {
+                panic!(
+                    "FRONTEND_URL URLs have no common domain suffix: {:?}",
+                    frontend_urls
+                );
+            }
+        }
+
         Self {
             port,
             rust_log,
@@ -36,6 +56,7 @@ impl Config {
             secret_key,
             cookie_secret,
             frontend_urls,
+            cookie_domain,
         }
     }
 
@@ -49,6 +70,7 @@ impl Config {
         let secret_key = "v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry".to_string();
         let cookie_secret = crate::auth::cookie::cookie_secret_from_seed(secret_key.clone());
         let frontend_urls = vec!["http://localhost:3000".to_string()];
+        let cookie_domain = None;
         Self {
             port: DEFAULT_PORT.to_string(),
             rust_log: DEFAULT_RUST_LOG.to_string(),
@@ -57,6 +79,7 @@ impl Config {
             secret_key,
             cookie_secret,
             frontend_urls,
+            cookie_domain,
         }
     }
 }

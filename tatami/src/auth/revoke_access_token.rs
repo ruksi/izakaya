@@ -5,7 +5,7 @@ use crate::prelude::*;
 use crate::state::AppState;
 
 pub async fn revoke_access_token(
-    state: AppState,
+    state: &AppState,
     access_token: String,
     user_id: Uuid,
 ) -> Result<()> {

@@ -16,7 +16,12 @@ impl FromRef<AppState> for Key {
 }
 
 // 🍫 + 🥣 + 🌡️ = 🍪
-pub fn bake<'a>(name: &'static str, value: String, max_age: time::Duration) -> Cookie<'a> {
+pub fn bake<'a>(
+    name: &'static str,
+    value: String,
+    domain: Option<String>,
+    max_age: time::Duration,
+) -> Cookie<'a> {
     let mut builder = Cookie::build((name, value))
         // these flags are for the _browser_ to enforce
         .same_site(SameSite::Strict) // use inside the same registrable domain, excluding https://publicsuffix.org/
@@ -25,19 +30,8 @@ pub fn bake<'a>(name: &'static str, value: String, max_age: time::Duration) -> C
         .secure(true) // forbid sending the cookie over plain HTTP
         .max_age(max_age); // automatically delete the cookie after this duration
 
-    // TODO: feeling too lazy passing the config down here for now 🦥
-    // as our API server and frontend are on different subdomains, we want to assign cookie
-    // domain to the registrable domain (e.g. "example.com") instead of the current subdomain
-    // so we can share the cookie.
-    // note that this _does_ make the cookie insecure on shared domains like "onrender.com",
-    // domain-scoped cookies are only secure if you control all subdomains of the domain.
-    let frontend_urls = std::env::var("FRONTEND_URL")
-        .ok()
-        .map(crate::config::split_urls);
-    if let Some(frontend_urls) = frontend_urls {
-        if let Ok(Some(domain)) = cookie_domain_from(&frontend_urls) {
-            builder = builder.domain(domain);
-        }
+    if let Some(domain) = domain {
+        builder = builder.domain(domain);
     }
 
     builder.build()
@@ -59,7 +53,7 @@ pub fn cookie_secret_from_seed(seed: String) -> Key {
     Key::from(&seeded_random_bytes)
 }
 
-fn cookie_domain_from(urls: &Vec<String>) -> Result<Option<String>, url::ParseError> {
+pub fn cookie_domain_from(urls: &Vec<String>) -> Result<Option<String>, url::ParseError> {
     let urls = urls
         .iter()
         .map(|u| url::Url::parse(u))
