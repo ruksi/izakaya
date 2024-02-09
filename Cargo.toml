@@ -48,9 +48,15 @@ url = { version = "2.5.0", features = ["serde"] }
 uuid = { version = "1.6.1", features = ["serde", "v4"] }
 
 # https://lib.rs/crates/argon2
+# https://lib.rs/crates/hmac
+# https://lib.rs/crates/sha2
+# https://lib.rs/crates/base64
 # https://lib.rs/crates/rand
 # https://lib.rs/crates/rand_seeder
 argon2 = { version = "0.5.2" }
+hmac = { version = "0.12.1" }
+sha2 = { version = "0.10.8" }
+base64 = { version = "0.21.7" }
 rand = { version = "0.8.5" }
 rand_seeder = { version = "0.2.3" }
 
