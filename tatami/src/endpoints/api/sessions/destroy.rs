@@ -70,9 +70,9 @@ mod tests {
         let user = user::create(&db, declaration).await?;
 
         let expire = Some(time::Duration::seconds(5)); // something short, just in case
-        let token1 =
+        let (token1, _) =
             issue_access_token(&state, user.username.clone(), password.clone(), expire).await?;
-        let token2 =
+        let (token2, _) =
             issue_access_token(&state, user.username.clone(), password.clone(), expire).await?;
 
         // both work

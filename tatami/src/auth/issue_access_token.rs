@@ -1,4 +1,5 @@
 use rand::Rng;
+use uuid::Uuid;
 
 use crate::auth::{crypto, session_key, session_set_key};
 use crate::prelude::*;
@@ -9,7 +10,7 @@ pub async fn issue_access_token(
     username_or_email: String,
     password: String,
     expire: Option<time::Duration>,
-) -> Result<String> {
+) -> Result<(String, Uuid)> {
     let result = sqlx::query!(
         // language=SQL
         r#"select user_id, password_hash
@@ -45,7 +46,7 @@ pub async fn issue_access_token(
 
     let session_key = session_key(access_token.clone());
     let session_list_key = session_set_key(record.user_id);
-    let session_id = uuid::Uuid::new_v4();
+    let session_id = Uuid::new_v4();
 
     let mut commands = redis::pipe()
         .hset(session_key.clone(), "session_id", session_id.to_string())
@@ -62,5 +63,5 @@ pub async fn issue_access_token(
 
     commands.query_async(&mut redis).await?;
 
-    Ok(access_token)
+    Ok((access_token, session_id))
 }

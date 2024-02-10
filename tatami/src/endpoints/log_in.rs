@@ -18,7 +18,7 @@ pub async fn log_in(
     cookies: Cookies,
     Json(body): Json<LogInBody>,
 ) -> Result<Json<Value>> {
-    let access_token = issue_access_token(
+    let (access_token, _session_id) = issue_access_token(
         &state,
         body.username_or_email,
         body.password,

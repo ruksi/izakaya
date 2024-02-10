@@ -24,7 +24,7 @@ pub async fn create(
         return Err(Error::NotFound);
     };
 
-    let access_token = issue_access_token(
+    let (access_token, _session_id) = issue_access_token(
         &state,
         user.username,
         body.password,

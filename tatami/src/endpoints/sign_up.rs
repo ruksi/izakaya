@@ -18,7 +18,7 @@ pub async fn sign_up(
     // we need the password after consume to create the access token
     let password = declaration.inner_as_ref().password.clone();
     let user = user::create(&state.db_pool, declaration).await?;
-    let access_token = issue_access_token(
+    let (access_token, _session_id) = issue_access_token(
         &state,
         user.username,
         password,
