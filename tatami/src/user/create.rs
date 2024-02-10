@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use validator::Validate;
 
-use crate::auth::crypto;
+use crate::auth::hash_password;
 use crate::prelude::*;
 use crate::user::User;
 use crate::valid::Valid;
@@ -33,7 +33,7 @@ impl UserDeclaration {
 
 pub async fn create(db: &sqlx::PgPool, declaration: Valid<UserDeclaration>) -> Result<User> {
     let declaration = declaration.into_inner();
-    let password_hash = crypto::hash_password(declaration.password).await?;
+    let password_hash = hash_password(declaration.password).await?;
 
     let mut tx = db.begin().await?;
 

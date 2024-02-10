@@ -1,7 +1,7 @@
 use rand::Rng;
 use uuid::Uuid;
 
-use crate::auth::{crypto, session_key, session_set_key};
+use crate::auth::{session_key, session_set_key, verify_password};
 use crate::prelude::*;
 use crate::state::AppState;
 
@@ -27,7 +27,7 @@ pub async fn create(
         return Err(Error::Unauthorized);
     };
 
-    let verification = crypto::verify_password(record.password_hash, password).await;
+    let verification = verify_password(record.password_hash, password).await;
     if verification.is_err() {
         return Err(Error::Unauthorized);
     }
