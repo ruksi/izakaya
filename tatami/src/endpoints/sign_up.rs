@@ -3,12 +3,12 @@ use axum::Json;
 use serde_json::{json, Value};
 use tower_cookies::Cookies;
 
-use crate::auth::{cookie, create_session};
+use crate::auth::cookie;
 use crate::prelude::*;
 use crate::state::AppState;
-use crate::user;
 use crate::user::UserDeclaration;
 use crate::valid::Valid;
+use crate::{session, user};
 
 pub async fn sign_up(
     State(state): State<AppState>,
@@ -18,7 +18,7 @@ pub async fn sign_up(
     // we need the password after consume to create the access token
     let password = declaration.inner_as_ref().password.clone();
     let user = user::create(&state.db_pool, declaration).await?;
-    let (access_token, session_id) = create_session(
+    let (access_token, session_id) = session::create(
         &state,
         user.username,
         password,

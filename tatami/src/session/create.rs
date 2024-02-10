@@ -5,7 +5,7 @@ use crate::auth::{crypto, session_key, session_set_key};
 use crate::prelude::*;
 use crate::state::AppState;
 
-pub async fn create_session(
+pub async fn create(
     state: &AppState,
     username_or_email: String,
     password: String,

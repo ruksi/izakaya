@@ -19,6 +19,7 @@ mod endpoints;
 mod error;
 mod prelude;
 mod scripts;
+mod session;
 mod state;
 mod user;
 mod valid;

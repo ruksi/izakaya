@@ -2,8 +2,9 @@ use axum::extract::State;
 use axum::{Extension, Json};
 use serde_json::{json, Value};
 
-use crate::auth::{create_session, CurrentUser};
+use crate::auth::CurrentUser;
 use crate::prelude::*;
+use crate::session;
 use crate::state::AppState;
 use crate::user;
 
@@ -24,7 +25,7 @@ pub async fn create(
         return Err(Error::NotFound);
     };
 
-    let (access_token, _session_id) = create_session(
+    let (access_token, _session_id) = session::create(
         &state,
         user.username,
         body.password,

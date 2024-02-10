@@ -3,8 +3,9 @@ use axum::Json;
 use serde_json::{json, Value};
 use tower_cookies::Cookies;
 
-use crate::auth::{cookie, create_session};
+use crate::auth::cookie;
 use crate::prelude::*;
+use crate::session;
 use crate::state::AppState;
 
 #[derive(serde::Deserialize, Debug)]
@@ -18,7 +19,7 @@ pub async fn log_in(
     cookies: Cookies,
     Json(body): Json<LogInBody>,
 ) -> Result<Json<Value>> {
-    let (access_token, session_id) = create_session(
+    let (access_token, session_id) = session::create(
         &state,
         body.username_or_email,
         body.password,
