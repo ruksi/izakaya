@@ -4,7 +4,7 @@ use axum::response::Response;
 use axum::Extension;
 use tower_cookies::Cookie;
 
-use crate::auth::csrf::{create_csrf_token, is_valid_csrf_token};
+use crate::auth::csrf::is_valid_csrf_token;
 use crate::auth::{cookie, Visitor};
 use crate::prelude::*;
 use crate::state::AppState;
@@ -27,6 +27,8 @@ pub async fn csrf_manager(
     if !request.method().is_safe() {
         let Some(csrf_cookie) = cookies.get(cookie::CSRF_TOKEN) else {
             tracing::debug!("CSRF cookie missing");
+            // also return them a new, valid CSRF token
+            cookies.add(cookie::bake_csrf(&state.config, visitor.session_id));
             return Err(Error::Unauthorized);
         };
         let csrf_cookie_token = csrf_cookie.value();
@@ -42,6 +44,17 @@ pub async fn csrf_manager(
 
         if csrf_cookie_token != csrf_header_token {
             tracing::debug!("CSRF token mismatch");
+
+            if !is_valid_csrf_token(
+                &state.config.csrf_secret,
+                visitor.session_id,
+                csrf_cookie_token,
+            ) {
+                // also, the CSRF token in the cookie was wrong
+                // so return them a new, valid CSRF cookie token
+                cookies.add(cookie::bake_csrf(&state.config, visitor.session_id));
+            }
+
             return Err(Error::Unauthorized);
         }
 
@@ -51,24 +64,15 @@ pub async fn csrf_manager(
             csrf_cookie_token,
         ) {
             tracing::debug!("CSRF token invalid");
-            let cookie =
-                cookie::remove_for_frontend(cookie::CSRF_TOKEN, state.config.cookie_domain);
-            cookies.add(cookie);
+            // also return them a new, valid CSRF token
+            cookies.add(cookie::bake_csrf(&state.config, visitor.session_id));
             return Err(Error::Unauthorized);
         }
     }
 
     // we _could_ move this after "next" but the auth state (`visitor`) might be incorrect
-    let csrf_cookie = cookies.get(cookie::CSRF_TOKEN);
-    if csrf_cookie.is_none() {
-        let csrf_token = create_csrf_token(&state.config.csrf_secret, visitor.session_id);
-        let csrf_cookie = cookie::bake_for_frontend(
-            cookie::CSRF_TOKEN,
-            csrf_token,
-            state.config.cookie_domain,
-            time::Duration::days(14),
-        );
-        cookies.add(csrf_cookie);
+    if cookies.get(cookie::CSRF_TOKEN).is_none() {
+        cookies.add(cookie::bake_csrf(&state.config, visitor.session_id));
     }
 
     Ok(next.run(request).await)

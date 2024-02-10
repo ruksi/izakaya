@@ -1,7 +1,7 @@
 use axum::extract::State;
 use axum::Json;
 use serde_json::{json, Value};
-use tower_cookies::{Cookie, Cookies};
+use tower_cookies::Cookies;
 
 use crate::auth::{cookie, issue_access_token};
 use crate::prelude::*;
@@ -18,7 +18,7 @@ pub async fn sign_up(
     // we need the password after consume to create the access token
     let password = declaration.inner_as_ref().password.clone();
     let user = user::create(&state.db_pool, declaration).await?;
-    let (access_token, _session_id) = issue_access_token(
+    let (access_token, session_id) = issue_access_token(
         &state,
         user.username,
         password,
@@ -35,10 +35,9 @@ pub async fn sign_up(
     let private_cookies = cookies.private(&state.config.cookie_secret);
     private_cookies.add(cookie);
 
-    // destroy the pre-session CSRF cookie
-    // TODO: would probably be better to generate new CSRF token here
-    let cookie = cookie::remove_for_frontend(cookie::CSRF_TOKEN, state.config.cookie_domain);
-    cookies.add(cookie);
+    // the pre-session CSRF cookie won't work with authenticated requests
+    // because of the session ID check, so we need to replace it
+    cookies.add(cookie::bake_csrf(&state.config, Some(session_id)));
 
     Ok(Json(json!({"status": "ok"})))
 }

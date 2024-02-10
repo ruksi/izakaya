@@ -2,7 +2,7 @@ use axum::extract::State;
 use axum::response::IntoResponse;
 use axum::{Extension, Json};
 use serde_json::json;
-use tower_cookies::{Cookie, Cookies};
+use tower_cookies::Cookies;
 
 use crate::auth::{cookie, revoke_access_token, CurrentUser, Visitor};
 use crate::prelude::*;
@@ -26,10 +26,7 @@ pub async fn log_out(
         cookie::ACCESS_TOKEN,
         state.config.cookie_domain.clone(),
     ));
-    cookies.add(cookie::remove_for_frontend(
-        cookie::CSRF_TOKEN,
-        state.config.cookie_domain,
-    ));
+    cookies.add(cookie::bake_csrf(&state.config, None));
 
     Ok(Json(json!({})))
 }
