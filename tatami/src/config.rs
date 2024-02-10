@@ -25,7 +25,7 @@ impl Config {
         let cache_url = std::env::var("CACHE_URL").expect("CACHE_URL must be set");
 
         let secret_key = std::env::var("SECRET_KEY").expect("SECRET_KEY must be set");
-        let cookie_secret = crate::auth::cookie::cookie_secret_from_seed(secret_key.clone());
+        let cookie_secret = crate::auth::cookie::cookie_secret_from_seed(&secret_key);
 
         let frontend_urls = split_urls(std::env::var("FRONTEND_URL").unwrap_or_default());
 
@@ -68,7 +68,7 @@ impl Config {
     #[rustfmt::skip]
     pub fn new_for_tests() -> Self {
         let secret_key = "v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry".to_string();
-        let cookie_secret = crate::auth::cookie::cookie_secret_from_seed(secret_key.clone());
+        let cookie_secret = crate::auth::cookie::cookie_secret_from_seed(&secret_key);
         let frontend_urls = vec!["http://localhost:3000".to_string()];
         let cookie_domain = None;
         Self {
