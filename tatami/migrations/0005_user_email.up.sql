@@ -11,6 +11,10 @@ create table user_email
 );
 call install_updated_at_trigger('user_email');
 
+-- Add a separate index for pattern matching queries.
+-- Usage: select * from user_email where (email collate "ucs_basic") ilike ($1 || '%')
+create index on user_email (email collate "ucs_basic");
+
 alter table "user"
     add column primary_email_id uuid default null,
     add constraint fk_user_primary_email
