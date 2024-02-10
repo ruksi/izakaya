@@ -2,7 +2,7 @@ use axum::extract::State;
 use axum::{Extension, Json};
 use serde_json::{json, Value};
 
-use crate::auth::{issue_access_token, CurrentUser};
+use crate::auth::{create_session, CurrentUser};
 use crate::prelude::*;
 use crate::state::AppState;
 use crate::user;
@@ -24,12 +24,13 @@ pub async fn create(
         return Err(Error::NotFound);
     };
 
-    let (access_token, _session_id) = issue_access_token(
+    let (access_token, _session_id) = create_session(
         &state,
         user.username,
         body.password,
         None, // "API Tokens" never expire for now
     )
     .await?;
+
     Ok(Json(json!({"access_token": access_token})))
 }

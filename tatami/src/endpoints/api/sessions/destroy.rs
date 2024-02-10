@@ -3,7 +3,7 @@ use axum::{Extension, Json};
 use redis::AsyncCommands;
 
 use crate::auth::{
-    access_token_from_session_key, revoke_access_token, session_key, session_set_key, CurrentUser,
+    access_token_from_session_key, destroy_session, session_key, session_set_key, CurrentUser,
 };
 use crate::prelude::*;
 use crate::state::AppState;
@@ -36,7 +36,7 @@ pub async fn destroy(
     }
 
     for access_token in access_tokens {
-        revoke_access_token(&state, access_token, user_id).await?;
+        destroy_session(&state, access_token, user_id).await?;
     }
     Ok(Json(()))
 }
@@ -48,7 +48,7 @@ mod tests {
     use axum_test::TestServer;
     use serde_json::Value;
 
-    use crate::auth::issue_access_token;
+    use crate::auth::create_session;
     use crate::endpoints::router;
     use crate::test_utils::mock_state;
     use crate::user;
@@ -71,9 +71,9 @@ mod tests {
 
         let expire = Some(time::Duration::seconds(5)); // something short, just in case
         let (token1, _) =
-            issue_access_token(&state, user.username.clone(), password.clone(), expire).await?;
+            create_session(&state, user.username.clone(), password.clone(), expire).await?;
         let (token2, _) =
-            issue_access_token(&state, user.username.clone(), password.clone(), expire).await?;
+            create_session(&state, user.username.clone(), password.clone(), expire).await?;
 
         // both work
         let response = server

@@ -4,7 +4,7 @@ use axum::{Extension, Json};
 use serde_json::json;
 use tower_cookies::Cookies;
 
-use crate::auth::{cookie, revoke_access_token, CurrentUser, Visitor};
+use crate::auth::{cookie, destroy_session, CurrentUser, Visitor};
 use crate::prelude::*;
 use crate::state::AppState;
 
@@ -18,7 +18,7 @@ pub async fn log_out(
     if let Ok(current_user) = current_user {
         let access_token = current_user.access_token.clone();
         let user_id = current_user.user_id;
-        revoke_access_token(&state, access_token, user_id).await?;
+        destroy_session(&state, access_token, user_id).await?;
     }
 
     // always remove the session-related cookies
