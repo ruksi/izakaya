@@ -1,4 +1,4 @@
-import {authLogOut, authVerify} from "@/auth/thunks";
+import {authVerify} from "@/auth/thunks";
 import backend from "@/services/backend";
 import {createSlice} from "@reduxjs/toolkit";
 
@@ -20,16 +20,16 @@ const authSlice = createSlice({
             state.isAuthenticated = payload.is_authenticated;
         });
 
-        builder.addCase(authLogOut.fulfilled, (state) => {
-            state.isAuthenticated = false;
-        });
-
         builder.addMatcher(backend.endpoints.signUp.matchFulfilled, (state) => {
             state.isAuthenticated = true;
         });
 
         builder.addMatcher(backend.endpoints.logIn.matchFulfilled, (state) => {
             state.isAuthenticated = true;
+        });
+
+        builder.addMatcher(backend.endpoints.logOut.matchFulfilled, (state) => {
+            state.isAuthenticated = false;
         });
     },
 });

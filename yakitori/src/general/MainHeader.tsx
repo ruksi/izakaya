@@ -1,7 +1,6 @@
 "use client";
 
 import {selectIsAuthenticated} from "@/auth/slice";
-import {authLogOut} from "@/auth/thunks";
 import {useAppDispatch, useAppSelector} from "@/data/hooks";
 import backend from "@/services/backend";
 import {
@@ -13,7 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import {useCallback, useEffect} from "react";
+import {useEffect} from "react";
 import {Button, Placeholder} from "react-bootstrap";
 
 export function MainHeader() {
@@ -29,9 +28,7 @@ export function MainHeader() {
         }
     }, [isAuthenticated, dispatch]);
 
-    const logOut = useCallback(() => {
-        dispatch(authLogOut());
-    }, [dispatch]);
+    const [logOut] = backend.endpoints.logOut.useMutation()
 
     return (
         <>

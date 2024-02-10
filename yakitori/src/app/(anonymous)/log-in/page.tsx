@@ -13,8 +13,7 @@ export default function LogIn() {
     const [usernameOrEmail, setUsernameOrEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const [logIn, {isLoading, isError, error}] =
-        backend.endpoints.logIn.useLazyQuery();
+    const [logIn, {isLoading, isError, error}] = backend.endpoints.logIn.useMutation();
 
     const submit = useCallback(
         (e: React.FormEvent<HTMLFormElement>) => {
