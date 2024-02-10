@@ -1,8 +1,9 @@
-// Config contains all the global, unchanging settings for the application.
+use crate::auth::cookie::{cookie_domain_from, cookie_secret_from_seed};
 
-use crate::auth::cookie::cookie_domain_from;
 const DEFAULT_PORT: &str = "8080";
 const DEFAULT_RUST_LOG: &str = "tatami=debug";
+
+// Config contains all the global, unchanging settings for the application.
 
 #[rustfmt::skip]
 #[derive(Clone)]
@@ -31,7 +32,7 @@ impl Config {
         let cache_url = std::env::var("CACHE_URL").expect("CACHE_URL must be set");
 
         let secret_key = std::env::var("SECRET_KEY").expect("SECRET_KEY must be set");
-        let cookie_secret = crate::auth::cookie::cookie_secret_from_seed(&secret_key);
+        let cookie_secret = cookie_secret_from_seed(&secret_key);
         let csrf_secret = crate::auth::csrf::csrf_secret_from_seed(&secret_key);
 
         let csrf_enabled = true;
@@ -73,7 +74,7 @@ impl Config {
     #[rustfmt::skip]
     pub fn new_for_tests() -> Self {
         let secret_key = "v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry".to_string();
-        let cookie_secret = crate::auth::cookie::cookie_secret_from_seed(&secret_key);
+        let cookie_secret = cookie_secret_from_seed(&secret_key);
         let csrf_secret = crate::auth::csrf::csrf_secret_from_seed(&secret_key);
         let csrf_enabled = false;
         let frontend_urls = vec!["http://localhost:3000".to_string()];
