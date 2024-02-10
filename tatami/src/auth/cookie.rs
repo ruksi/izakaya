@@ -28,6 +28,10 @@ pub fn bake_for_backend<'a>(
     cookie
 }
 
+pub fn remove_for_backend<'a>(name: &'static str, domain: Option<String>) -> Cookie<'a> {
+    bake_for_backend(name, "".to_string(), domain, time::Duration::ZERO)
+}
+
 // Cookies that can be read by the browser JavaScript.
 pub fn bake_for_frontend<'a>(
     name: &'static str,
@@ -38,6 +42,10 @@ pub fn bake_for_frontend<'a>(
     let mut cookie = bake_for_backend(name, value, domain, max_age);
     cookie.set_http_only(false); // allow reading cookies with JavaScript
     cookie
+}
+
+pub fn remove_for_frontend<'a>(name: &'static str, domain: Option<String>) -> Cookie<'a> {
+    bake_for_frontend(name, "".to_string(), domain, time::Duration::ZERO)
 }
 
 // To be able to decrypt our private cookies after a server reboot, we must be able to attain the same key.

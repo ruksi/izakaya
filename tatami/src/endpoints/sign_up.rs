@@ -29,7 +29,7 @@ pub async fn sign_up(
     let cookie = cookie::bake_for_backend(
         cookie::ACCESS_TOKEN,
         access_token,
-        state.config.cookie_domain,
+        state.config.cookie_domain.clone(),
         time::Duration::days(14),
     );
     let private_cookies = cookies.private(&state.config.cookie_secret);
@@ -37,7 +37,8 @@ pub async fn sign_up(
 
     // destroy the pre-session CSRF cookie
     // TODO: would probably be better to generate new CSRF token here
-    cookies.remove(Cookie::from(cookie::CSRF_TOKEN));
+    let cookie = cookie::remove_for_frontend(cookie::CSRF_TOKEN, state.config.cookie_domain);
+    cookies.add(cookie);
 
     Ok(Json(json!({"status": "ok"})))
 }

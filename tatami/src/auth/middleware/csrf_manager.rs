@@ -51,14 +51,8 @@ pub async fn csrf_manager(
             csrf_cookie_token,
         ) {
             tracing::debug!("CSRF token invalid");
-            // Chrome doesn't apply cookies coming from a 401 response
-            // if we just do a `cookies.remove()` 🤷
-            let cookie = cookie::bake_for_frontend(
-                cookie::CSRF_TOKEN,
-                "".to_string(),
-                state.config.cookie_domain,
-                time::Duration::ZERO,
-            );
+            let cookie =
+                cookie::remove_for_frontend(cookie::CSRF_TOKEN, state.config.cookie_domain);
             cookies.add(cookie);
             return Err(Error::Unauthorized);
         }
