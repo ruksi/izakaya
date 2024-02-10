@@ -15,7 +15,7 @@ pub async fn csrf_manager(
     request: Request,
     next: Next,
 ) -> Result<Response> {
-    if should_skip_csrf() {
+    if !state.config.csrf_enabled {
         return Ok(next.run(request).await);
     }
 
@@ -75,15 +75,4 @@ pub async fn csrf_manager(
     }
 
     Ok(next.run(request).await)
-}
-
-fn should_skip_csrf() -> bool {
-    // having this function allows us to skip CSRF checks in tests,
-    // but having this inline will mess my IDE :(
-    // TODO: move to Config so we can override in a few tests
-    #[cfg(test)]
-    {
-        return true;
-    }
-    false
 }
