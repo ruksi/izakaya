@@ -1,5 +1,6 @@
 // Config contains all the global, unchanging settings for the application.
 
+use crate::auth::cookie::cookie_domain_from;
 const DEFAULT_PORT: &str = "8080";
 const DEFAULT_RUST_LOG: &str = "tatami=debug";
 
@@ -37,17 +38,11 @@ impl Config {
 
         let frontend_urls = split_urls(std::env::var("FRONTEND_URL").unwrap_or_default());
 
-        // as our API server and frontend are on different subdomains, we want to assign cookie
-        // domain to the registrable domain (e.g. "example.com") instead of the current subdomain
-        // so we can share the cookie.
-        // note that this _does_ make the cookie insecure on shared domains like "onrender.com",
-        // domain-scoped cookies are only secure if you control all subdomains of the domain.
         let mut cookie_domain = None;
         if frontend_urls.len() > 0 {
-            cookie_domain =
-                crate::auth::cookie::cookie_domain_from(&frontend_urls).unwrap_or_else(|_| {
-                    panic!("FRONTEND_URL contains invalid URLs: {:?}", frontend_urls)
-                });
+            cookie_domain = cookie_domain_from(&frontend_urls).unwrap_or_else(|_| {
+                panic!("FRONTEND_URL contains invalid URLs: {:?}", frontend_urls)
+            });
             if cookie_domain.is_none() {
                 panic!(
                     "FRONTEND_URL URLs have no common domain suffix: {:?}",
