@@ -2,9 +2,9 @@ use axum::extract::State;
 use axum::response::IntoResponse;
 use axum::{Extension, Json};
 use serde_json::json;
-use tower_cookies::Cookies;
+use tower_cookies::{Cookie, Cookies};
 
-use crate::auth::{cookie, revoke_access_token, Visitor};
+use crate::auth::{cookie, revoke_access_token, CurrentUser, Visitor};
 use crate::prelude::*;
 use crate::state::AppState;
 
@@ -13,23 +13,16 @@ pub async fn log_out(
     Extension(visitor): Extension<Visitor>,
     cookies: Cookies,
 ) -> Result<impl IntoResponse> {
-    let Some(access_token) = visitor.access_token else {
-        return Ok(Json(json!({})));
-    };
-    let Some(user_id) = visitor.user_id else {
-        return Ok(Json(json!({})));
-    };
+    // if authenticated user, revoke their access token
+    let current_user = CurrentUser::from_visitor(visitor);
+    if let Ok(current_user) = current_user {
+        let access_token = current_user.access_token.clone();
+        let user_id = current_user.user_id;
+        revoke_access_token(&state, access_token, user_id).await?;
+    }
 
-    revoke_access_token(&state, access_token.clone(), user_id).await?;
-
-    let cookie = cookie::bake_for_backend(
-        cookie::ACCESS_TOKEN,
-        access_token,
-        state.config.cookie_domain,
-        time::Duration::ZERO, // i.e. delete it from the browser
-    );
-    let private_cookies = cookies.private(&state.config.cookie_secret);
-    private_cookies.add(cookie);
+    // always remove the access token cookie
+    cookies.remove(Cookie::from(cookie::ACCESS_TOKEN));
 
     Ok(Json(json!({})))
 }
