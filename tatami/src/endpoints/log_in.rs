@@ -26,14 +26,8 @@ pub async fn log_in(
     )
     .await?;
 
-    let cookie = cookie::bake_for_backend(
-        cookie::ACCESS_TOKEN,
-        access_token,
-        state.config.cookie_domain.clone(),
-        time::Duration::days(14),
-    );
     let private_cookies = cookies.private(&state.config.cookie_secret);
-    private_cookies.add(cookie);
+    private_cookies.add(cookie::bake_access(&state.config, access_token));
 
     // the pre-session CSRF cookie won't work with authenticated requests
     // because of the session ID check, so we need to replace it

@@ -22,10 +22,7 @@ pub async fn log_out(
     }
 
     // always remove the session-related cookies
-    cookies.add(cookie::remove_for_backend(
-        cookie::ACCESS_TOKEN,
-        state.config.cookie_domain.clone(),
-    ));
+    cookies.add(cookie::bake_empty_access(&state.config));
     cookies.add(cookie::bake_csrf(&state.config, None));
 
     Ok(Json(json!({})))
