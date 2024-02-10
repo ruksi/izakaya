@@ -45,9 +45,9 @@ mod tests {
     use axum::http::header::AUTHORIZATION;
     use axum::http::HeaderValue;
     use axum_test::TestServer;
-    use serde_json::Value;
 
     use crate::endpoints::router;
+    use crate::endpoints::verify::Verification;
     use crate::test_utils::mock_state;
     use crate::user::UserDeclaration;
     use crate::{session, user};
@@ -74,26 +74,18 @@ mod tests {
             session::create(&state, user.username.clone(), password.clone(), expire).await?;
 
         // both work
-        let response = server
+        let verification = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token1))
-            .await;
-        let response_json = response.json::<Value>();
-        assert!(response_json
-            .get("is_authenticated")
-            .unwrap()
-            .as_bool()
-            .unwrap());
-        let response = server
+            .await
+            .json::<Verification>();
+        assert!(verification.is_authenticated);
+        let verification = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
-            .await;
-        let response_json = response.json::<Value>();
-        assert!(response_json
-            .get("is_authenticated")
-            .unwrap()
-            .as_bool()
-            .unwrap());
+            .await
+            .json::<Verification>();
+        assert!(verification.is_authenticated);
 
         let prefix1 = token1.chars().take(8).collect::<String>();
         let prefix2 = token2.chars().take(8).collect::<String>();
@@ -128,26 +120,18 @@ mod tests {
             .assert_status_ok();
 
         // token1 stops working, token2 still works
-        let response = server
+        let verification = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token1))
-            .await;
-        let response_json = response.json::<Value>();
-        assert!(!response_json
-            .get("is_authenticated")
-            .unwrap()
-            .as_bool()
-            .unwrap());
-        let response = server
+            .await
+            .json::<Verification>();
+        assert!(!verification.is_authenticated);
+        let verification = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
-            .await;
-        let response_json = response.json::<Value>();
-        assert!(response_json
-            .get("is_authenticated")
-            .unwrap()
-            .as_bool()
-            .unwrap());
+            .await
+            .json::<Verification>();
+        assert!(verification.is_authenticated);
 
         // can't double revoke token1
         server
@@ -162,16 +146,12 @@ mod tests {
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
             .await
             .assert_status_ok();
-        let response = server
+        let verification = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
-            .await;
-        let response_json = response.json::<Value>();
-        assert!(!response_json
-            .get("is_authenticated")
-            .unwrap()
-            .as_bool()
-            .unwrap());
+            .await
+            .json::<Verification>();
+        assert!(!verification.is_authenticated);
 
         Ok(())
     }

@@ -3,6 +3,7 @@ use axum::http::HeaderValue;
 use serde_json::{json, Value};
 
 use crate::endpoints::api::sessions::list;
+use crate::endpoints::verify::Verification;
 use crate::prelude::*;
 use crate::test_utils::mock_server;
 use crate::user;
@@ -48,13 +49,8 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     // clear cookies now that we have the tokens
     server.get("/verify").await.assert_status_ok();
     server.clear_cookies();
-    let response = server.get("/verify").await;
-    let response_json = response.json::<Value>();
-    assert!(!response_json
-        .get("is_authenticated")
-        .unwrap()
-        .as_bool()
-        .unwrap());
+    let verification = server.get("/verify").await.json::<Verification>();
+    assert!(!verification.is_authenticated);
 
     // shows both all sessions (cookie[deleted], token1, token2)
     let sessions = server
@@ -68,31 +64,23 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
         .all(|session| session.access_token_prefix.len() == 8));
 
     // you can delete any of the sessions (token1 here)
-    let response = server
+    let verification = server
         .get("/verify")
         .add_header(AUTHORIZATION, bearer_auth_header(token1))
-        .await;
-    let response_json = response.json::<Value>();
-    assert!(response_json
-        .get("is_authenticated")
-        .unwrap()
-        .as_bool()
-        .unwrap());
+        .await
+        .json::<Verification>();
+    assert!(verification.is_authenticated);
     server
         .delete(format!("/api/sessions/{}", token1).as_str()) // full token instead of prefix 🤷
         .add_header(AUTHORIZATION, bearer_auth_header(token1))
         .await
         .assert_status_ok();
-    let response = server
+    let verification = server
         .get("/verify")
         .add_header(AUTHORIZATION, bearer_auth_header(token1))
-        .await;
-    let response_json = response.json::<Value>();
-    assert!(!response_json
-        .get("is_authenticated")
-        .unwrap()
-        .as_bool()
-        .unwrap());
+        .await
+        .json::<Verification>();
+    assert!(!verification.is_authenticated);
 
     // the token1 session is gone
     let sessions = server
