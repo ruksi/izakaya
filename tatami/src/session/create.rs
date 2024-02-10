@@ -27,7 +27,7 @@ pub async fn create(
         return Err(Error::Unauthorized);
     };
 
-    let verification = verify_password(record.password_hash, password);
+    let verification = verify_password(record.password_hash, password).await;
     if verification.is_err() {
         return Err(Error::Unauthorized);
     }
