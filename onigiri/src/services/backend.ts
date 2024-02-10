@@ -1,11 +1,33 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react"
 import {backendUrl} from "../utils.ts";
 
+function getCookie(name: string): string | null {
+    const valueStartsAt = (name.length + 1);
+    return document.cookie
+        .split(";")
+        .map(c => c.trim())
+        .filter(cookie => {
+            return cookie.substring(0, valueStartsAt) === `${name}=`;
+        })
+        .map(cookie => {
+            return decodeURIComponent(cookie.substring(valueStartsAt));
+        })[0] || null;
+}
+
 function createBaseQuery() {
     const baseUrl = backendUrl();
     return fetchBaseQuery({
         baseUrl,
         credentials: "include",
+        prepareHeaders: (headers, {type}) => {
+            if (type === "mutation") {
+                const token = getCookie("Tatami-CSRF");
+                if (token) {
+                    headers.set("CSRF-Token", token);
+                }
+            }
+            return headers;
+        },
     });
 }
 
@@ -13,18 +35,24 @@ const backend = createApi({
     baseQuery: createBaseQuery(),
     tagTypes: ["CurrentUser", "Session"],
     endpoints: (build) => ({
-        signUp: build.query({
+        signUp: build.mutation({
             query: (params: { username: string, email: string, password: string }) => ({
                 url: "/sign-up",
                 method: "POST",
                 body: params,
             }),
         }),
-        logIn: build.query({
+        logIn: build.mutation({
             query: (params: { username_or_email: string, password: string }) => ({
                 url: "/log-in",
                 method: "POST",
                 body: params,
+            }),
+        }),
+        logOut: build.mutation({
+            query: () => ({
+                url: "/log-out",
+                method: "POST",
             }),
         }),
 

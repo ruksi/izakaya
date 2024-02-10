@@ -1,6 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit"
 import backend from "../services/backend.ts";
-import {authLogOut, authVerify} from "./thunks.ts";
+import {authVerify} from "./thunks.ts";
 
 type AuthState = {
     isAuthenticated: boolean
@@ -24,13 +24,6 @@ const authSlice = createSlice({
             },
         );
 
-        builder.addCase(
-            authLogOut.fulfilled,
-            (state) => {
-                state.isAuthenticated = false;
-            },
-        )
-
         builder.addMatcher(
             backend.endpoints.signUp.matchFulfilled,
             (state) => {
@@ -44,6 +37,13 @@ const authSlice = createSlice({
                 state.isAuthenticated = true;
             },
         );
+
+        builder.addMatcher(
+            backend.endpoints.logOut.matchFulfilled,
+            (state) => {
+                state.isAuthenticated = false;
+            },
+        )
 
     },
 });

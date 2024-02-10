@@ -21,7 +21,7 @@ export default function SignUp() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const [signUp, {isLoading, error}] = backend.endpoints.signUp.useLazyQuery();
+    const [signUp, {isLoading, error}] = backend.endpoints.signUp.useMutation();
 
     const submit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

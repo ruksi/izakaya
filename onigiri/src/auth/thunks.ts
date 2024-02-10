@@ -19,15 +19,3 @@ export const authVerify = createAsyncThunk("auth/verify", async () => {
         user_id: data.user_id,
     } as VerifyPayload;
 });
-
-
-export const authLogOut = createAsyncThunk(
-    "auth/log-out",
-    async () => {
-        const response = await fetch(`${baseUrl}/log-out`, {method: "POST", credentials: "include"});
-        if (!response.ok) {
-            throw Error();
-        }
-        return;
-    },
-)

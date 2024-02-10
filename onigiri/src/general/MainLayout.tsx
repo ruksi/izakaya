@@ -9,7 +9,6 @@ import Stack from "react-bootstrap/esm/Stack";
 import {useSelector} from "react-redux";
 import {Outlet, useNavigate} from "react-router-dom";
 import {selectIsAuthenticated} from "../auth/slice.ts";
-import {authLogOut} from "../auth/thunks.ts";
 import backend from "../services/backend.ts";
 import {store} from "../store.ts";
 
@@ -28,10 +27,7 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
     }, [isAuthenticated]);
 
     const navigate = useNavigate();
-
-    const logOut = () => {
-        store.dispatch(authLogOut());
-    }
+    const [logOut] = backend.endpoints.logOut.useMutation();
 
     return (
         <div className="d-flex flex-column min-vh-100">
