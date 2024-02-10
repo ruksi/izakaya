@@ -4,8 +4,8 @@ use tower_cookies::cookie::SameSite;
 use tower_cookies::{Cookie, Key};
 use url::Host;
 
-pub const ACCESS_TOKEN: &str = "tatami_access";
-pub const CSRF_TOKEN: &str = "tatami_csrf";
+pub const ACCESS_TOKEN: &str = "Tatami-Access";
+pub const CSRF_TOKEN: &str = "Tatami-CSRF";
 
 // 🍫 + 🥣 + 🌡️ = 🍪
 
@@ -122,7 +122,7 @@ mod tests {
     #[test]
     fn cookie_domain_from_pairs() -> Result<(), String> {
         #[rustfmt::skip]
-        let cases = [
+            let cases = [
             (vec!["http://127.0.0.1".into(), "http://localhost".into()], None),
             (vec!["http://localhost:5173".into(), "http://localhost:3000".into()], Some("localhost".into())),
             (vec!["https://alpha.example.com".into(), "https://beta.example.com".into()], Some("example.com".into())),
