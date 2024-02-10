@@ -1,5 +1,6 @@
 use base64::prelude::*;
 use hmac::{Hmac, Mac};
+use rand::prelude::StdRng;
 use rand::{distributions::Alphanumeric, Rng};
 use sha2::Sha256;
 
@@ -63,6 +64,15 @@ fn create_csrf_token_with_salt(
     csrf_token
 }
 
+pub fn csrf_secret_from_seed(seed: &str) -> String {
+    let namespaced_seed = format!("{}.csrf", seed);
+    let rng: StdRng = rand_seeder::Seeder::from(namespaced_seed).make_rng();
+    rng.sample_iter(&Alphanumeric)
+        .take(64)
+        .map(char::from)
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -112,5 +122,23 @@ mod tests {
         for case in cases.into_iter() {
             assert!(!is_valid_csrf_token("secret", None, case));
         }
+    }
+
+    #[test]
+    fn csrf_secret_generation_works() -> Result<(), String> {
+        let key_lol_1 = csrf_secret_from_seed("lol");
+        let key_lol_2 = csrf_secret_from_seed("lol");
+        assert_eq!(key_lol_1, key_lol_2);
+
+        // something that at least looks the part, not really used anywhere
+        let seed = "yCIAKtN9qRpP1pky46vmV3ycbBC8zwKxAFkFmJH7UgZbRh41qkMIawCuC12Afs4g";
+        let key_good_1 = csrf_secret_from_seed(seed);
+        let key_good_2 = csrf_secret_from_seed(seed);
+        assert_eq!(key_good_1, key_good_2);
+
+        // and finally, check that the key pairs are different
+        assert_ne!(key_lol_1, key_good_1);
+
+        Ok(())
     }
 }

@@ -1,7 +1,7 @@
 use axum::extract::State;
 use axum::Json;
 use serde_json::{json, Value};
-use tower_cookies::Cookies;
+use tower_cookies::{Cookie, Cookies};
 
 use crate::auth::{cookie, issue_access_token};
 use crate::prelude::*;
@@ -25,6 +25,7 @@ pub async fn sign_up(
         Some(time::Duration::days(14) + time::Duration::minutes(1)),
     )
     .await?;
+
     let cookie = cookie::bake_for_backend(
         cookie::ACCESS_TOKEN,
         access_token,
@@ -33,6 +34,10 @@ pub async fn sign_up(
     );
     let private_cookies = cookies.private(&state.config.cookie_secret);
     private_cookies.add(cookie);
+
+    // destroy the pre-session CSRF cookie
+    // TODO: would probably be better to generate new CSRF token here
+    cookies.remove(Cookie::from(cookie::CSRF_TOKEN));
 
     Ok(Json(json!({"status": "ok"})))
 }

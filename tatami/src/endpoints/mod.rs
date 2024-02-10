@@ -36,6 +36,10 @@ pub fn router<S>(state: AppState) -> Router<S> {
         .nest("/api", api::router(state.clone()))
         .layer(axum::middleware::from_fn_with_state(
             state.clone(),
+            crate::auth::middleware::csrf_manager,
+        ))
+        .layer(axum::middleware::from_fn_with_state(
+            state.clone(),
             crate::auth::middleware::record_visit,
         ))
         .layer(CookieManagerLayer::new())

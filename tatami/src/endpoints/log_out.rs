@@ -21,8 +21,9 @@ pub async fn log_out(
         revoke_access_token(&state, access_token, user_id).await?;
     }
 
-    // always remove the access token cookie
+    // always remove the session-related cookies
     cookies.remove(Cookie::from(cookie::ACCESS_TOKEN));
+    cookies.remove(Cookie::from(cookie::CSRF_TOKEN));
 
     Ok(Json(json!({})))
 }

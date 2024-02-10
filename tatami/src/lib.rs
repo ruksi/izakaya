@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use axum::extract::Request;
-use axum::http::{header, HeaderValue, Method};
+use axum::http::{header, HeaderName, HeaderValue, Method};
 use axum::response::Redirect;
 use axum::routing::get;
 use axum::Router;
@@ -81,6 +81,7 @@ pub async fn get_app<S: Clone + Send + Sync + 'static>(config: Config) -> Router
                     header::CONTENT_TYPE,
                     header::CONTENT_LENGTH,
                     header::CONTENT_LANGUAGE,
+                    HeaderName::from_static("csrf-token"),
                 ])
                 .allow_methods([
                     Method::GET,

@@ -10,8 +10,11 @@ pub struct Config {
     pub rust_log: String,
     pub database_url: String, // aka. PostgreSQL
     pub cache_url: String,    // aka. Redis
-    pub secret_key: String,   // a generic seed (64+ character string) used for hashes, salts, and the like
+    
+    pub secret_key: String,                 // used to _seed_ the actual secrets
     pub cookie_secret: tower_cookies::Key,  // used to encrypt "private" cookies
+    pub csrf_secret: String,                // used to sign CSRF tokens
+    
     pub frontend_urls: Vec<String>,
     pub cookie_domain: Option<String>,
 }
@@ -26,6 +29,7 @@ impl Config {
 
         let secret_key = std::env::var("SECRET_KEY").expect("SECRET_KEY must be set");
         let cookie_secret = crate::auth::cookie::cookie_secret_from_seed(&secret_key);
+        let csrf_secret = crate::auth::csrf::csrf_secret_from_seed(&secret_key);
 
         let frontend_urls = split_urls(std::env::var("FRONTEND_URL").unwrap_or_default());
 
@@ -55,6 +59,7 @@ impl Config {
             cache_url,
             secret_key,
             cookie_secret,
+            csrf_secret,
             frontend_urls,
             cookie_domain,
         }
@@ -69,6 +74,7 @@ impl Config {
     pub fn new_for_tests() -> Self {
         let secret_key = "v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry-s3cr3t-v3ry".to_string();
         let cookie_secret = crate::auth::cookie::cookie_secret_from_seed(&secret_key);
+        let csrf_secret = crate::auth::csrf::csrf_secret_from_seed(&secret_key);
         let frontend_urls = vec!["http://localhost:3000".to_string()];
         let cookie_domain = None;
         Self {
@@ -78,6 +84,7 @@ impl Config {
             cache_url: "redis://yeah-this-wont-work".to_string(),
             secret_key,
             cookie_secret,
+            csrf_secret,
             frontend_urls,
             cookie_domain,
         }
