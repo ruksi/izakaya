@@ -2,7 +2,6 @@ use axum::extract::{Request, State};
 use axum::middleware::Next;
 use axum::response::Response;
 use axum::Extension;
-use tower_cookies::Cookie;
 
 use crate::auth::csrf::is_valid_csrf_token;
 use crate::auth::{cookie, Visitor};
