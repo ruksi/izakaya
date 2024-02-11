@@ -13,7 +13,7 @@ pub async fn list(State(state): State<AppState>) -> Result<Json<Vec<User>>> {
 
 #[cfg(test)]
 mod tests {
-    use crate::test_utils::{as_website_admin, mock_server};
+    use crate::test_utils::{login, mock_server};
     use crate::user::UserDeclaration;
 
     use super::*;
@@ -21,7 +21,7 @@ mod tests {
     #[sqlx::test]
     async fn works(db: sqlx::PgPool) -> Result<()> {
         let server = mock_server(&db).await;
-        as_website_admin(&db, &server).await?;
+        login::as_admin_user(&db, &server).await?;
 
         let users = server.get("/api/users").await.json::<Vec<User>>();
         assert_eq!(users.len(), 1); // the database admin we created in `as_website_admin`

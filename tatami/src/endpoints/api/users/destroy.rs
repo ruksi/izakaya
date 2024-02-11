@@ -17,7 +17,7 @@ pub async fn destroy(
 
 #[cfg(test)]
 mod tests {
-    use crate::test_utils::{as_website_admin, mock_server};
+    use crate::test_utils::{login, mock_server};
     use crate::user::UserDeclaration;
 
     use super::*;
@@ -25,7 +25,7 @@ mod tests {
     #[sqlx::test]
     async fn works(db: sqlx::PgPool) -> Result<()> {
         let server = mock_server(&db).await;
-        as_website_admin(&db, &server).await?;
+        login::as_admin_user(&db, &server).await?;
 
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
         let user = user::create(&db, declaration).await.unwrap();

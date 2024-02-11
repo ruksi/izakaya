@@ -20,14 +20,14 @@ mod tests {
     use serde_json::json;
     use uuid::Uuid;
 
-    use crate::test_utils::{as_website_admin, mock_server};
+    use crate::test_utils::{login, mock_server};
 
     use super::*;
 
     #[sqlx::test]
     async fn works(db: sqlx::PgPool) -> Result<()> {
         let server = mock_server(&db).await;
-        as_website_admin(&db, &server).await?;
+        login::as_admin_user(&db, &server).await?;
 
         let response = server
             .post("/api/users")
@@ -48,7 +48,7 @@ mod tests {
     #[sqlx::test]
     async fn fails_on_validation_errors(db: sqlx::PgPool) -> Result<()> {
         let server = mock_server(&db).await;
-        as_website_admin(&db, &server).await?;
+        login::as_admin_user(&db, &server).await?;
 
         server
             .post("/api/users")

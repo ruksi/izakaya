@@ -5,9 +5,7 @@ use serde_json::{json, Value};
 use crate::endpoints::api::sessions::list;
 use crate::endpoints::verify::Verification;
 use crate::prelude::*;
-use crate::test_utils::mock_server;
-use crate::user;
-use crate::user::UserDeclaration;
+use crate::test_utils::{login, mock_server};
 
 fn bearer_auth_header(token: &str) -> HeaderValue {
     HeaderValue::from_str(format!("Bearer {}", token).as_str()).unwrap()
@@ -16,15 +14,7 @@ fn bearer_auth_header(token: &str) -> HeaderValue {
 #[sqlx::test]
 async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     let mut server = mock_server(&db).await;
-
-    // create and login with a new user, this saves credentials to the cookies
-    let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "bobIsBest")?;
-    user::create(&db, declaration).await?;
-    server
-        .post("/log-in")
-        .json(&json!({"username_or_email": "bob@example.com", "password": "bobIsBest"}))
-        .await
-        .assert_status_ok();
+    login::as_normal_user(&db, &server).await?;
 
     let response1 = server
         .post("/api/sessions")
@@ -47,7 +37,8 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     assert_ne!(token1, token2);
 
     // clear cookies now that we have the tokens
-    server.get("/verify").await.assert_status_ok();
+    let verification = server.get("/verify").await.json::<Verification>();
+    assert!(verification.is_authenticated);
     server.clear_cookies();
     let verification = server.get("/verify").await.json::<Verification>();
     assert!(!verification.is_authenticated);
