@@ -9,9 +9,18 @@ use crate::user::UserDeclaration;
 
 // create and login as a website admin to get the authentication cookie set
 pub async fn as_website_admin(db: &sqlx::PgPool, server: &TestServer) -> Result<()> {
-    // TODO: create some kind of a permission system and make andy really an admin
     let declaration = UserDeclaration::new_valid("admin-andy", "andy@example.com", "andyIsBest")?;
-    user::create(db, declaration).await?;
+    let user = user::create(db, declaration).await?;
+
+    // we don't have any way to promote superusers yet, so we'll just do it directly
+    sqlx::query!(
+        // language=SQL
+        r#"update "user" set is_superuser = true where user_id = $1"#,
+        user.user_id,
+    )
+    .execute(db)
+    .await?;
+
     server
         .post("/log-in")
         .json(&json!({"username_or_email": "admin-andy", "password": "andyIsBest"}))

@@ -13,7 +13,7 @@ pub async fn create(
 ) -> Result<(String, Uuid)> {
     let result = sqlx::query!(
         // language=SQL
-        r#"select user_id, password_hash
+        r#"select user_id, password_hash, is_superuser
                from "user"
                left join user_email using (user_id)
                where username = $1
@@ -50,8 +50,13 @@ pub async fn create(
 
     let mut commands = redis::pipe()
         .hset(session_key.clone(), "session_id", session_id.to_string())
-        .hset(session_key.clone(), "access_token", access_token.clone()) // duplicate info vs. the key but 🤷
+        .hset(session_key.clone(), "access_token", access_token.clone())
         .hset(session_key.clone(), "user_id", record.user_id.to_string())
+        .hset(
+            session_key.clone(),
+            "is_superuser",
+            record.is_superuser.to_string(),
+        )
         .sadd(session_list_key, session_key.clone())
         .to_owned();
 

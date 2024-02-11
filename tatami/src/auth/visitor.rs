@@ -9,4 +9,5 @@ pub struct Visitor {
     pub access_token: Option<String>,
     pub session_id: Option<Uuid>,
     pub user_id: Option<Uuid>,
+    pub is_superuser: bool,
 }

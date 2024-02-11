@@ -11,6 +11,7 @@ pub struct CurrentUser {
     pub access_token: String,
     pub session_id: Uuid,
     pub user_id: Uuid,
+    pub is_superuser: bool,
 }
 
 impl CurrentUser {
@@ -22,6 +23,7 @@ impl CurrentUser {
             access_token,
             session_id,
             user_id,
+            is_superuser: visitor.is_superuser,
         })
     }
 }

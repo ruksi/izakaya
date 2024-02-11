@@ -24,6 +24,7 @@ pub async fn record_visit(
         access_token: None,
         session_id: None,
         user_id: None,
+        is_superuser: false,
     };
 
     // first check if we can use `Authorization` header to identify them
@@ -105,6 +106,7 @@ async fn get_visitor<T: Into<String>>(
         access_token: Some(access_token),
         session_id: Some(session_id),
         user_id: Some(user_id),
+        is_superuser: session.get("is_superuser").map_or(false, |v| v == "true"),
     };
     Some(visitor)
 }
