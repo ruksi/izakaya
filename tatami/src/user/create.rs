@@ -37,11 +37,12 @@ pub async fn create(db: &sqlx::PgPool, declaration: Valid<UserDeclaration>) -> R
 
     let mut tx = db.begin().await?;
 
-    let user_record = sqlx::query!(
+    let user = sqlx::query_as!(
+        User,
         // language=SQL
         r#"insert into "user" (username, password_hash)
-               values ($1, $2)
-               returning user_id, username;"#,
+            values ($1, $2)
+            returning user_id, username;"#,
         declaration.username,
         password_hash,
     )
@@ -51,9 +52,9 @@ pub async fn create(db: &sqlx::PgPool, declaration: Valid<UserDeclaration>) -> R
     let email_id = sqlx::query_scalar!(
         // language=SQL
         r#"insert into user_email (user_id, email)
-               values ($1, $2)
-               returning email_id;"#,
-        user_record.user_id,
+            values ($1, $2)
+            returning email_id;"#,
+        user.user_id,
         declaration.email,
     )
     .fetch_one(&mut *tx)
@@ -62,28 +63,23 @@ pub async fn create(db: &sqlx::PgPool, declaration: Valid<UserDeclaration>) -> R
     sqlx::query!(
         // language=SQL
         r#"update "user"
-               set primary_email_id = $1
-               where user_id = $2"#,
+            set primary_email_id = $1
+            where user_id = $2"#,
         email_id,
-        user_record.user_id,
+        user.user_id,
     )
     .execute(&mut *tx)
     .await?;
 
     tx.commit().await?;
 
-    let user_model = User {
-        user_id: user_record.user_id,
-        username: user_record.username,
-    };
-    Ok(user_model)
+    Ok(user)
 }
 
 #[cfg(test)]
 mod tests {
-    use serde_json::json;
-
     use super::*;
+    use serde_json::json;
 
     #[sqlx::test]
     async fn works(db: sqlx::PgPool) -> Result<()> {

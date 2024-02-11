@@ -39,23 +39,21 @@ pub async fn amend(
             None => Err(Error::NotFound),
         };
     }
-    let record = sqlx::query!(
+    let user = sqlx::query_as!(
+        User,
         // language=SQL
         r#"update "user" u
-                set
-                    username = coalesce($1, u.username)
-                where user_id = $2
-                returning user_id, username;"#,
+            set
+                username = coalesce($1, u.username)
+            where user_id = $2
+            returning user_id, username;"#,
         amendment.username,
         user_id,
     )
     .fetch_one(db)
     .await?;
 
-    Ok(User {
-        user_id: record.user_id,
-        username: record.username,
-    })
+    Ok(user)
 }
 
 #[cfg(test)]

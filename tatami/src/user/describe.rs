@@ -4,22 +4,15 @@ use crate::prelude::*;
 use crate::user::User;
 
 pub async fn describe(db: &sqlx::PgPool, user_id: Uuid) -> Result<Option<User>> {
-    let result = sqlx::query!(
+    let user = sqlx::query_as!(
+        User,
         // language=SQL
-        r#"select user_id, username
-               from "user"
-               where user_id = $1;"#,
+        r#"select user_id, username from "user" where user_id = $1;"#,
         user_id,
     )
     .fetch_optional(db)
     .await?;
-    match result {
-        Some(record) => Ok(Some(User {
-            user_id: record.user_id,
-            username: record.username,
-        })),
-        None => Ok(None),
-    }
+    Ok(user)
 }
 
 #[cfg(test)]

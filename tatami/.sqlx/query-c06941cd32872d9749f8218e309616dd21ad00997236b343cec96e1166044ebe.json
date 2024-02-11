@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "update \"user\" u\n                set\n                    username = coalesce($1, u.username)\n                where user_id = $2\n                returning user_id, username;",
+  "query": "insert into \"user\" (username, password_hash)\n            values ($1, $2)\n            returning user_id, username;",
   "describe": {
     "columns": [
       {
@@ -17,7 +17,7 @@
     "parameters": {
       "Left": [
         "Text",
-        "Uuid"
+        "Text"
       ]
     },
     "nullable": [
@@ -25,5 +25,5 @@
       false
     ]
   },
-  "hash": "82ce37ea2067a5e4dad633bb00a1a82809fd195e53db6fb2805ada88e00e4e7a"
+  "hash": "c06941cd32872d9749f8218e309616dd21ad00997236b343cec96e1166044ebe"
 }
