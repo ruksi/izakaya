@@ -60,12 +60,10 @@ pub async fn amend(
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::user::UserDeclaration;
     use axum::http::StatusCode;
     use serde_json::json;
-
-    use crate::user::UserDeclaration;
-
-    use super::*;
 
     #[sqlx::test]
     async fn works(db: sqlx::PgPool) -> Result<()> {

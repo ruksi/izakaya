@@ -24,10 +24,9 @@ pub async fn describe(db: &sqlx::PgPool, user_id: Uuid) -> Result<Option<User>> 
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::user;
     use crate::user::UserDeclaration;
-
-    use super::*;
 
     #[sqlx::test]
     async fn works_if_nothing_is_found(db: sqlx::PgPool) -> Result<()> {
