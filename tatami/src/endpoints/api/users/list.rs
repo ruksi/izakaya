@@ -19,7 +19,7 @@ mod tests {
     use super::*;
 
     #[sqlx::test]
-    async fn works(db: sqlx::PgPool) -> Result<()> {
+    async fn works_for_admin_users(db: sqlx::PgPool) -> Result<()> {
         let server = mock_server(&db).await;
         login::as_admin_user(&db, &server).await?;
 
@@ -32,6 +32,14 @@ mod tests {
         let users = server.get("/api/users").await.json::<Vec<User>>();
         assert_eq!(users.len(), 2); // admin and bob
 
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn forbidden_for_normal_users(db: sqlx::PgPool) -> Result<()> {
+        let server = mock_server(&db).await;
+        login::as_normal_user(&db, &server).await?;
+        server.get("/api/users").await.assert_status_forbidden();
         Ok(())
     }
 }
