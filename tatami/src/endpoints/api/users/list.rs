@@ -1,14 +1,16 @@
+use crate::endpoints::api::users::UserOut;
 use axum::extract::State;
 use axum::Json;
 
 use crate::prelude::*;
 use crate::state::AppState;
 use crate::user;
-use crate::user::{User, UserFilter};
+use crate::user::UserFilter;
 
-pub async fn list(State(state): State<AppState>) -> Result<Json<Vec<User>>> {
+pub async fn list(State(state): State<AppState>) -> Result<Json<Vec<UserOut>>> {
     let users = user::list(&state.db_pool, UserFilter::default()).await?;
-    Ok(Json(users))
+    let outbound = users.into_iter().map(Into::into).collect();
+    Ok(Json(outbound))
 }
 
 #[cfg(test)]
@@ -23,13 +25,13 @@ mod tests {
         let server = mock_server(&db).await;
         login::as_admin_user(&db, &server).await?;
 
-        let users = server.get("/api/users").await.json::<Vec<User>>();
+        let users = server.get("/api/users").await.json::<Vec<UserOut>>();
         assert_eq!(users.len(), 1); // the database admin we created in `as_website_admin`
 
         let declaration = UserDeclaration::new_valid("bob", "bob@example.com", "p4ssw0rd")?;
         user::create(&db, declaration).await?;
 
-        let users = server.get("/api/users").await.json::<Vec<User>>();
+        let users = server.get("/api/users").await.json::<Vec<UserOut>>();
         assert_eq!(users.len(), 2); // admin and bob
 
         Ok(())

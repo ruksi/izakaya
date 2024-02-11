@@ -1,28 +1,27 @@
+use crate::endpoints::api::users::UserOut;
 use axum::extract::State;
 use axum::Json;
 
 use crate::prelude::*;
 use crate::state::AppState;
 use crate::user;
-use crate::user::{User, UserDeclaration};
+use crate::user::UserDeclaration;
 use crate::valid::Valid;
 
 pub async fn create(
     State(state): State<AppState>,
     declaration: Valid<UserDeclaration>,
-) -> Result<Json<User>> {
+) -> Result<Json<UserOut>> {
     let user = user::create(&state.db_pool, declaration).await?;
-    Ok(Json(user))
+    Ok(Json(user.into()))
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::test_utils::{login, mock_server};
     use serde_json::json;
     use uuid::Uuid;
-
-    use crate::test_utils::{login, mock_server};
-
-    use super::*;
 
     #[sqlx::test]
     async fn works(db: sqlx::PgPool) -> Result<()> {
@@ -39,7 +38,7 @@ mod tests {
             .await;
 
         response.assert_status_ok();
-        let user = response.json::<User>();
+        let user = response.json::<UserOut>();
         assert_eq!(user.username, "bob");
         assert_ne!(user.user_id, Uuid::nil());
         Ok(())

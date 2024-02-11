@@ -9,7 +9,7 @@ use crate::session;
 use crate::state::AppState;
 
 #[derive(serde::Deserialize, Debug)]
-pub struct LogInBody {
+pub struct LogInIn {
     username_or_email: String,
     password: String,
 }
@@ -17,7 +17,7 @@ pub struct LogInBody {
 pub async fn log_in(
     State(state): State<AppState>,
     cookies: Cookies,
-    Json(body): Json<LogInBody>,
+    Json(body): Json<LogInIn>,
 ) -> Result<Json<Value>> {
     let (access_token, session_id) = session::create(
         &state,

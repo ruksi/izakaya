@@ -2,18 +2,18 @@ use axum::extract::{Path, State};
 use axum::Json;
 use uuid::Uuid;
 
+use crate::endpoints::api::users::UserOut;
 use crate::prelude::*;
 use crate::state::AppState;
 use crate::user;
-use crate::user::User;
 
 pub async fn describe(
     State(state): State<AppState>,
     Path(user_id): Path<Uuid>,
-) -> Result<Json<User>> {
+) -> Result<Json<UserOut>> {
     let user = user::describe(&state.db_pool, user_id).await?;
     match user {
-        Some(user) => Ok(Json(user)),
+        Some(user) => Ok(Json(user.into())),
         None => Err(Error::NotFound),
     }
 }
@@ -44,8 +44,9 @@ mod tests {
         let fetched_user = server
             .get(format!("/api/users/{}", user.user_id).as_str())
             .await
-            .json::<User>();
-        assert_eq!(user, fetched_user);
+            .json::<UserOut>();
+        assert_eq!(user.user_id, fetched_user.user_id);
+        assert_eq!(user.username, fetched_user.username);
 
         Ok(())
     }

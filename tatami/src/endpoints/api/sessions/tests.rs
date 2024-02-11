@@ -3,7 +3,7 @@ use axum::http::HeaderValue;
 use serde_json::{json, Value};
 
 use crate::endpoints::api::sessions::list;
-use crate::endpoints::verify::Verification;
+use crate::endpoints::verify::VerifyOut;
 use crate::prelude::*;
 use crate::test_utils::{login, mock_server};
 
@@ -37,10 +37,10 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     assert_ne!(token1, token2);
 
     // clear cookies now that we have the tokens
-    let verification = server.get("/verify").await.json::<Verification>();
+    let verification = server.get("/verify").await.json::<VerifyOut>();
     assert!(verification.is_authenticated);
     server.clear_cookies();
-    let verification = server.get("/verify").await.json::<Verification>();
+    let verification = server.get("/verify").await.json::<VerifyOut>();
     assert!(!verification.is_authenticated);
 
     // shows both all sessions (cookie[deleted], token1, token2)
@@ -48,7 +48,7 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
         .get("/api/sessions")
         .add_header(AUTHORIZATION, bearer_auth_header(token1))
         .await
-        .json::<Vec<list::PublicSession>>();
+        .json::<Vec<list::ListSessionOut>>();
     assert_eq!(sessions.len(), 3);
     assert!(sessions
         .iter()
@@ -59,7 +59,7 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
         .get("/verify")
         .add_header(AUTHORIZATION, bearer_auth_header(token1))
         .await
-        .json::<Verification>();
+        .json::<VerifyOut>();
     assert!(verification.is_authenticated);
     server
         .delete(format!("/api/sessions/{}", token1).as_str()) // full token instead of prefix 🤷
@@ -70,7 +70,7 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
         .get("/verify")
         .add_header(AUTHORIZATION, bearer_auth_header(token1))
         .await
-        .json::<Verification>();
+        .json::<VerifyOut>();
     assert!(!verification.is_authenticated);
 
     // the token1 session is gone
@@ -78,7 +78,7 @@ async fn bearer_authentication_flow(db: sqlx::PgPool) -> Result<()> {
         .get("/api/sessions")
         .add_header(AUTHORIZATION, bearer_auth_header(token2))
         .await
-        .json::<Vec<list::PublicSession>>();
+        .json::<Vec<list::ListSessionOut>>();
     assert_eq!(sessions.len(), 2);
 
     Ok(())

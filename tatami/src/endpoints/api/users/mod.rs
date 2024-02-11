@@ -7,8 +7,11 @@ use describe::*;
 use describe_myself::*;
 use destroy::*;
 use list::*;
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::state::AppState;
+use crate::user::User;
 
 mod amend;
 mod create;
@@ -27,4 +30,19 @@ pub fn router<S>(state: AppState) -> Router<S> {
         ))
         .route("/me", get(describe_myself))
         .with_state(state)
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct UserOut {
+    pub user_id: Uuid,
+    pub username: String,
+}
+
+impl From<User> for UserOut {
+    fn from(user: User) -> Self {
+        Self {
+            user_id: user.user_id,
+            username: user.username,
+        }
+    }
 }

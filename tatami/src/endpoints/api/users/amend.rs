@@ -1,3 +1,4 @@
+use crate::endpoints::api::users::UserOut;
 use axum::extract::{Path, State};
 use axum::Json;
 use uuid::Uuid;
@@ -5,16 +6,16 @@ use uuid::Uuid;
 use crate::prelude::*;
 use crate::state::AppState;
 use crate::user;
-use crate::user::{User, UserAmendment};
+use crate::user::UserAmendment;
 use crate::valid::Valid;
 
 pub async fn amend(
     State(state): State<AppState>,
     Path(user_id): Path<Uuid>,
     amendment: Valid<UserAmendment>,
-) -> Result<Json<User>> {
+) -> Result<Json<UserOut>> {
     let user = user::amend(&state.db_pool, user_id, amendment).await?;
-    Ok(Json(user))
+    Ok(Json(user.into()))
 }
 
 #[cfg(test)]
@@ -23,7 +24,7 @@ mod tests {
 
     use crate::test_utils::{login, mock_server};
     use crate::user;
-    use crate::user::{User, UserDeclaration};
+    use crate::user::UserDeclaration;
 
     use super::*;
 
@@ -42,7 +43,7 @@ mod tests {
                 "username": "bobby",
             }))
             .await
-            .json::<User>();
+            .json::<UserOut>();
         assert_eq!(user.username, "bobby");
 
         let user = user::describe(&db, user.user_id).await?;

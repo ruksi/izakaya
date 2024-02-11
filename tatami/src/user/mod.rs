@@ -1,3 +1,4 @@
+use sqlx::FromRow;
 use uuid::Uuid;
 
 pub use amend::*;
@@ -12,7 +13,7 @@ mod describe;
 mod destroy;
 mod list;
 
-#[derive(sqlx::FromRow, serde::Serialize, serde::Deserialize, Debug, PartialEq, Eq)]
+#[derive(FromRow, Debug, PartialEq, Eq)]
 pub struct User {
     pub user_id: Uuid,
     pub username: String,

@@ -47,7 +47,7 @@ mod tests {
     use axum_test::TestServer;
 
     use crate::endpoints::router;
-    use crate::endpoints::verify::Verification;
+    use crate::endpoints::verify::VerifyOut;
     use crate::test_utils::mock_state;
     use crate::user::UserDeclaration;
     use crate::{session, user};
@@ -78,13 +78,13 @@ mod tests {
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token1))
             .await
-            .json::<Verification>();
+            .json::<VerifyOut>();
         assert!(verification.is_authenticated);
         let verification = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
             .await
-            .json::<Verification>();
+            .json::<VerifyOut>();
         assert!(verification.is_authenticated);
 
         let prefix1 = token1.chars().take(8).collect::<String>();
@@ -124,13 +124,13 @@ mod tests {
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token1))
             .await
-            .json::<Verification>();
+            .json::<VerifyOut>();
         assert!(!verification.is_authenticated);
         let verification = server
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
             .await
-            .json::<Verification>();
+            .json::<VerifyOut>();
         assert!(verification.is_authenticated);
 
         // can't double revoke token1
@@ -150,7 +150,7 @@ mod tests {
             .get("/verify")
             .add_header(AUTHORIZATION, bearer_auth_header(&token2))
             .await
-            .json::<Verification>();
+            .json::<VerifyOut>();
         assert!(!verification.is_authenticated);
 
         Ok(())

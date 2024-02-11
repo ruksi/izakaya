@@ -7,18 +7,36 @@ use crate::auth::CurrentUser;
 use crate::prelude::*;
 use crate::state::AppState;
 
-#[derive(FromRow, Deserialize, Serialize, Debug)]
+#[derive(FromRow, Debug)]
 pub struct Email {
     pub email_id: uuid::Uuid,
     pub email: String,
     pub is_primary: Option<bool>,
 }
 
+#[derive(Deserialize, Serialize, Debug)]
+pub struct ListEmailOut {
+    pub email_id: uuid::Uuid,
+    pub email: String,
+    pub is_primary: bool,
+}
+
+impl From<Email> for ListEmailOut {
+    fn from(email: Email) -> Self {
+        ListEmailOut {
+            email_id: email.email_id,
+            email: email.email,
+            is_primary: email.is_primary.unwrap_or_default(),
+        }
+    }
+}
+
 pub async fn list(
     State(state): State<AppState>,
     Extension(current_user): Extension<CurrentUser>,
-) -> Result<Json<Vec<Email>>> {
+) -> Result<Json<Vec<ListEmailOut>>> {
     let user_id = current_user.user_id;
+
     let emails = sqlx::query_as!(
         Email,
         // language=SQL
@@ -31,14 +49,16 @@ pub async fn list(
     )
     .fetch_all(&state.db_pool)
     .await?;
-    Ok(Json(emails))
+
+    let outbound = emails.into_iter().map(Into::into).collect();
+    Ok(Json(outbound))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::test_utils::{login, mock_server};
-    use serde_json::{json, Value};
+    use serde_json::json;
 
     #[sqlx::test]
     async fn works(db: sqlx::PgPool) -> Result<()> {
@@ -51,8 +71,9 @@ mod tests {
             .json(&json!({"email": "bob2@example.com"}))
             .await;
 
-        let json = server.get("/api/emails").await.json::<Value>();
-        assert_eq!(json.as_array().unwrap().len(), 2);
+        let emails = server.get("/api/emails").await.json::<Vec<ListEmailOut>>();
+        assert_eq!(emails.len(), 2);
+        assert_eq!(emails.iter().filter(|e| e.is_primary).count(), 1);
 
         Ok(())
     }

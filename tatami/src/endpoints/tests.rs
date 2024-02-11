@@ -1,4 +1,4 @@
-use crate::endpoints::verify::Verification;
+use crate::endpoints::verify::VerifyOut;
 use serde_json::json;
 
 use crate::prelude::*;
@@ -9,7 +9,7 @@ async fn browser_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     let server = mock_server(&db).await;
 
     // you start unauthorized
-    let verification = server.get("/verify").await.json::<Verification>();
+    let verification = server.get("/verify").await.json::<VerifyOut>();
     assert!(!verification.is_authenticated);
 
     // you can sign up and get automatically logged in
@@ -18,12 +18,12 @@ async fn browser_authentication_flow(db: sqlx::PgPool) -> Result<()> {
         .json(&json!({"username": "bob", "email": "bob@example.com", "password": "bobIsBest"}))
         .await
         .assert_status_ok();
-    let verification = server.get("/verify").await.json::<Verification>();
+    let verification = server.get("/verify").await.json::<VerifyOut>();
     assert!(verification.is_authenticated);
 
     // you can log out
     server.post("/log-out").await.assert_status_ok();
-    let verification = server.get("/verify").await.json::<Verification>();
+    let verification = server.get("/verify").await.json::<VerifyOut>();
     assert!(!verification.is_authenticated);
 
     // you can log in
@@ -32,7 +32,7 @@ async fn browser_authentication_flow(db: sqlx::PgPool) -> Result<()> {
         .json(&json!({"username_or_email": "bob", "password": "bobIsBest"}))
         .await
         .assert_status_ok();
-    let verification = server.get("/verify").await.json::<Verification>();
+    let verification = server.get("/verify").await.json::<VerifyOut>();
     assert!(verification.is_authenticated);
 
     // multiple log-out is fine
@@ -40,7 +40,7 @@ async fn browser_authentication_flow(db: sqlx::PgPool) -> Result<()> {
     server.post("/log-out").await.assert_status_ok();
     server.post("/log-out").await.assert_status_ok();
 
-    let verification = server.get("/verify").await.json::<Verification>();
+    let verification = server.get("/verify").await.json::<VerifyOut>();
     assert!(!verification.is_authenticated);
 
     Ok(())

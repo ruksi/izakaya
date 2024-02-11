@@ -8,35 +8,38 @@ use crate::prelude::*;
 use crate::state::AppState;
 use crate::valid::Valid;
 
-#[derive(Deserialize, Validate, Debug, Clone, PartialEq, Eq)]
-pub struct CreateEmailBody {
+#[derive(Deserialize, Serialize, Validate)]
+pub struct CreateEmailIn {
     #[validate(email)]
     pub email: String,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
-pub struct CreateEmailResponse {
+#[derive(Deserialize, Serialize)]
+pub struct CreateEmailOut {
     pub email_id: uuid::Uuid,
 }
 
 pub async fn create(
     State(state): State<AppState>,
     Extension(current_user): Extension<CurrentUser>,
-    body: Valid<CreateEmailBody>,
-) -> Result<Json<CreateEmailResponse>> {
+    inbound: Valid<CreateEmailIn>,
+) -> Result<Json<CreateEmailOut>> {
     let user_id = current_user.user_id;
-    let body = body.into_inner();
+    let inbound = inbound.into_inner();
+
     let email_id = sqlx::query_scalar!(
         // language=SQL
         r#"insert into user_email (user_id, email)
                values ($1, $2)
                returning email_id;"#,
         user_id,
-        body.email,
+        inbound.email,
     )
     .fetch_one(&state.db_pool)
     .await?;
-    Ok(Json(CreateEmailResponse { email_id }))
+
+    let outbound = CreateEmailOut { email_id };
+    Ok(Json(outbound))
 }
 
 #[cfg(test)]
@@ -53,7 +56,7 @@ mod tests {
             .post("/api/emails")
             .json(&json!({"email": "bob2@example.com"}))
             .await
-            .json::<CreateEmailResponse>()
+            .json::<CreateEmailOut>()
             .email_id;
         assert_ne!(new_email_id, uuid::Uuid::nil());
         Ok(())

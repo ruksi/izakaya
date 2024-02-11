@@ -7,14 +7,14 @@ use crate::prelude::*;
 
 // Bare minimum endpoint to verify that the user credentials are valid.
 
-#[derive(Deserialize, Serialize)]
-pub struct Verification {
+#[derive(Deserialize, Serialize, Debug)]
+pub struct VerifyOut {
     pub is_authenticated: bool,
     pub user_id: Option<Uuid>,
 }
 
-pub async fn verify(Extension(visitor): Extension<Visitor>) -> Result<Json<Verification>> {
-    Ok(Json(Verification {
+pub async fn verify(Extension(visitor): Extension<Visitor>) -> Result<Json<VerifyOut>> {
+    Ok(Json(VerifyOut {
         is_authenticated: visitor.user_id.is_some(),
         user_id: visitor.user_id,
     }))
