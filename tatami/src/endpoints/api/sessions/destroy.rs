@@ -1,6 +1,8 @@
 use axum::extract::{Path, State};
+use axum::response::IntoResponse;
 use axum::{Extension, Json};
 use redis::AsyncCommands;
+use serde_json::json;
 
 use crate::auth::{access_token_from_session_key, session_key, session_set_key, CurrentUser};
 use crate::prelude::*;
@@ -11,7 +13,7 @@ pub async fn destroy(
     State(state): State<AppState>,
     Extension(current_user): Extension<CurrentUser>,
     Path(access_token_prefix): Path<String>,
-) -> Result<Json<()>> {
+) -> Result<impl IntoResponse> {
     if access_token_prefix.len() < 8 {
         return Err(Error::BadRequest); // TODO: could have a better error message
     }
@@ -37,7 +39,7 @@ pub async fn destroy(
     for access_token in access_tokens {
         session::destroy(&state, access_token, user_id).await?;
     }
-    Ok(Json(()))
+    Ok(Json(json!({"status": "ok"})))
 }
 
 #[cfg(test)]
