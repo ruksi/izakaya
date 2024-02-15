@@ -1,8 +1,11 @@
-"use client";
-
 import {AccessControl} from "@/app/(authenticated)/settings/AccessControl";
-import {Profile} from "@/app/(authenticated)/settings/Profile";
+import {EmailControl} from "@/app/(authenticated)/settings/EmailControl";
+import {UserControl} from "@/app/(authenticated)/settings/UserControl";
 import {Container, Stack} from "react-bootstrap";
+
+export const metadata = {
+    title: "Settings",
+};
 
 export default function Settings() {
     return (
@@ -10,7 +13,10 @@ export default function Settings() {
             <h1>Settings</h1>
             <Stack gap={3}>
                 <div>
-                    <Profile />
+                    <UserControl />
+                </div>
+                <div>
+                    <EmailControl />
                 </div>
                 <div>
                     <AccessControl />

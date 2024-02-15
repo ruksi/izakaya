@@ -1,28 +1,13 @@
-import {Email, useCurrentUser, useEmails} from "@/services/backend";
-import Col from "react-bootstrap/Col";
-import ListGroup from "react-bootstrap/ListGroup";
-import Placeholder from "react-bootstrap/Placeholder";
-import Row from "react-bootstrap/Row";
+"use client";
 
-export function Profile() {
-    const {user} = useCurrentUser();
+import {Email, useEmails} from "@/services/backend";
+import {Col, ListGroup, Placeholder, Row} from "react-bootstrap";
+
+export function EmailControl() {
     const {emails} = useEmails();
     return (
         <>
-            <h4 className="mt-3">Profile</h4>
-            <div>
-                <label className="text-body-emphasis me-1">Username:</label>
-                {user ? (
-                    user.username
-                ) : (
-                    <Placeholder
-                        aria-hidden="true"
-                        bg="secondary"
-                        style={{width: 60}}
-                    />
-                )}
-            </div>
-            <h4 className="mt-4">Emails</h4>
+            <h4 className="mt-3">Emails</h4>
             <Row>
                 <Col sm={8} md={7} lg={5} xl={4}>
                     <ListGroup>

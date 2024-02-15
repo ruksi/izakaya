@@ -1,3 +1,5 @@
+"use client";
+
 import {
     NewSession,
     Session,
@@ -14,12 +16,14 @@ import {
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {formatDistance, parseISO} from "date-fns";
 import React, {useCallback, useEffect, useState} from "react";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import InputGroup from "react-bootstrap/InputGroup";
-import Modal from "react-bootstrap/Modal";
-import Placeholder from "react-bootstrap/Placeholder";
-import Stack from "react-bootstrap/Stack";
+import {
+    Button,
+    Form,
+    InputGroup,
+    Modal,
+    Placeholder,
+    Stack,
+} from "react-bootstrap";
 
 export function AccessControl() {
     const {sessions, isLoading} = useSessions();
@@ -86,7 +90,7 @@ function SessionDisplay({session}: {session: Session}) {
     const onClickConfirm = useCallback(() => {
         revokeSession();
         setIsDeleting(false);
-    }, [setIsDeleting, revokeSession, session]);
+    }, [setIsDeleting, revokeSession]);
 
     let lastUsed = <span className="text-secondary">Never</span>;
     if (session?.used_at) {

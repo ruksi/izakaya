@@ -2,6 +2,10 @@ import Image from "next/image";
 import {Container, Stack} from "react-bootstrap";
 import PurpleHeartSVG from "../../../public/purple-heart.svg";
 
+export const metadata = {
+    title: "About",
+};
+
 export default function About() {
     return (
         <Container className="py-3">
