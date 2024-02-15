@@ -26,5 +26,5 @@ pub async fn log_out(
     cookies.add(cookie::bake_empty_access(&state.config));
     cookies.add(cookie::bake_csrf(&state.config, None));
 
-    Ok(Json(json!({})))
+    Ok(Json(json!({"status": "ok"})))
 }
