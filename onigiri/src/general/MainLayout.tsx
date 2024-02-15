@@ -1,6 +1,6 @@
 // TODO: move this somewhere else
-import {library} from "@fortawesome/fontawesome-svg-core"
-import {fas} from "@fortawesome/free-solid-svg-icons"
+import {library} from "@fortawesome/fontawesome-svg-core";
+import {fas} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {useEffect} from "react";
 import Button from "react-bootstrap/Button";
@@ -14,8 +14,7 @@ import {store} from "../store.ts";
 
 library.add(fas);
 
-export default function MainLayout({children}: { children?: React.ReactNode }) {
-
+export default function MainLayout({children}: {children?: React.ReactNode}) {
     const isAuthenticated = useSelector(selectIsAuthenticated);
     // reset all data after log out
     // note sure if this is the right place for this, but 🤷
@@ -31,15 +30,18 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
 
     return (
         <div className="d-flex flex-column min-vh-100">
-
             <header className="bg-body-tertiary border-bottom">
                 <Container>
                     <Stack direction="horizontal" gap={2} className="p-3">
                         <div className="d-inline-block me-auto">
-                            <Button variant="outline-secondary" size="sm" onClick={() => navigate("/")}>
-                                <FontAwesomeIcon icon="house"/>
+                            <Button
+                                variant="outline-secondary"
+                                size="sm"
+                                onClick={() => navigate("/")}
+                            >
+                                <FontAwesomeIcon icon="house" />
                             </Button>
-                            {isAuthenticated &&
+                            {isAuthenticated && (
                                 <Button
                                     variant="outline-secondary"
                                     size="sm"
@@ -48,19 +50,35 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                                 >
                                     Dashboard
                                 </Button>
-                            }
+                            )}
                         </div>
-                        {isAuthenticated &&
+                        {isAuthenticated && (
                             <>
-                                <Button variant="outline-secondary" size="sm" onClick={() => navigate("/settings")}>
-                                    <FontAwesomeIcon icon="gear" className="me-1"/>Settings
+                                <Button
+                                    variant="outline-secondary"
+                                    size="sm"
+                                    onClick={() => navigate("/settings")}
+                                >
+                                    <FontAwesomeIcon
+                                        icon="gear"
+                                        className="me-1"
+                                    />
+                                    Settings
                                 </Button>
-                                <Button variant="outline-secondary" size="sm" onClick={logOut}>
-                                    <FontAwesomeIcon icon="right-from-bracket" className="me-1"/>Log out
+                                <Button
+                                    variant="outline-secondary"
+                                    size="sm"
+                                    onClick={logOut}
+                                >
+                                    <FontAwesomeIcon
+                                        icon="right-from-bracket"
+                                        className="me-1"
+                                    />
+                                    Log out
                                 </Button>
                             </>
-                        }
-                        {!isAuthenticated &&
+                        )}
+                        {!isAuthenticated && (
                             <>
                                 <Button
                                     variant="link"
@@ -76,7 +94,11 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                                     onClick={() => navigate("/log-in")}
                                     className="text-nowrap"
                                 >
-                                    <FontAwesomeIcon icon="arrow-right-to-bracket" className="me-1"/>Log in
+                                    <FontAwesomeIcon
+                                        icon="arrow-right-to-bracket"
+                                        className="me-1"
+                                    />
+                                    Log in
                                 </Button>
                                 <Button
                                     variant="secondary"
@@ -84,19 +106,22 @@ export default function MainLayout({children}: { children?: React.ReactNode }) {
                                     onClick={() => navigate(`/sign-up`)}
                                     className="text-nowrap"
                                 >
-                                    <FontAwesomeIcon icon="pen-to-square" className="me-1"/>Sign up
+                                    <FontAwesomeIcon
+                                        icon="pen-to-square"
+                                        className="me-1"
+                                    />
+                                    Sign up
                                 </Button>
                             </>
-                        }
+                        )}
                     </Stack>
                 </Container>
             </header>
 
             <main className="flex-fill d-flex flex-column">
                 {children ? children : null}
-                <Outlet/>
+                <Outlet />
             </main>
-
         </div>
-    )
+    );
 }

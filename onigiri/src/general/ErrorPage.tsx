@@ -1,5 +1,5 @@
-import {useRouteError} from "react-router-dom";
 import Container from "react-bootstrap/Container";
+import {useRouteError} from "react-router-dom";
 import MainLayout from "./MainLayout.tsx";
 
 export default function ErrorPage() {
@@ -11,8 +11,10 @@ export default function ErrorPage() {
             <Container id="error-page">
                 <div className="p-3">
                     <h1 className="pb-3">
-                        <span className="text-body-emphasis">Sorry</span>,
-                        an unexpected <span className="text-danger-emphasis">error</span> occurred
+                        <span className="text-body-emphasis">Sorry</span>, an
+                        unexpected{" "}
+                        <span className="text-danger-emphasis">error</span>{" "}
+                        occurred
                     </h1>
                     <div className="fst-italic text-secondary">
                         {error?.status ? `${error.status} - ` : null}

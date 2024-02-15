@@ -1,7 +1,7 @@
 import {isBackendError} from "../general/errors.ts";
 import {formatMessage} from "./messages.ts";
 
-export function FormGroupFeedback({field, error}: { field: string, error: any }) {
+export function FormGroupFeedback({field, error}: {field: string; error: any}) {
     if (!isBackendError(error)) {
         return null;
     }
@@ -15,9 +15,7 @@ export function FormGroupFeedback({field, error}: { field: string, error: any })
     return (
         <div className="text-danger small ps-1">
             {issues.map((issue: any) => (
-                <div key={issue.code}>
-                    {formatMessage(issue)}
-                </div>
+                <div key={issue.code}>{formatMessage(issue)}</div>
             ))}
         </div>
     );

@@ -20,45 +20,45 @@ export const router = createBrowserRouter([
             return null;
         },
         path: "/",
-        element: <MainLayout/>,
-        errorElement: <ErrorPage/>,
+        element: <MainLayout />,
+        errorElement: <ErrorPage />,
         children: [
             {
                 index: true,
-                element: <LandingPage/>,
+                element: <LandingPage />,
             },
             {
                 path: "about",
-                element: <About/>,
+                element: <About />,
             },
 
             {
-                element: <AuthenticatedOnly/>,
+                element: <AuthenticatedOnly />,
                 children: [
                     {
                         path: "dashboard",
-                        element: <Dashboard/>,
+                        element: <Dashboard />,
                     },
                     {
                         path: "settings",
-                        element: <Settings/>,
+                        element: <Settings />,
                     },
                     {
                         path: "styles",
-                        element: <StyleTester/>,
+                        element: <StyleTester />,
                     },
                 ],
             },
             {
-                element: <AnonymousOnly/>,
+                element: <AnonymousOnly />,
                 children: [
                     {
                         path: "log-in",
-                        element: <LogIn/>,
+                        element: <LogIn />,
                     },
                     {
                         path: "sign-up",
-                        element: <SignUp/>,
+                        element: <SignUp />,
                     },
                 ],
             },

@@ -1,17 +1,19 @@
-import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react"
+import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
 import {backendUrl} from "../utils.ts";
 
 function getCookie(name: string): string | null {
-    const valueStartsAt = (name.length + 1);
-    return document.cookie
-        .split(";")
-        .map(c => c.trim())
-        .filter(cookie => {
-            return cookie.substring(0, valueStartsAt) === `${name}=`;
-        })
-        .map(cookie => {
-            return decodeURIComponent(cookie.substring(valueStartsAt));
-        })[0] || null;
+    const valueStartsAt = name.length + 1;
+    return (
+        document.cookie
+            .split(";")
+            .map((c) => c.trim())
+            .filter((cookie) => {
+                return cookie.substring(0, valueStartsAt) === `${name}=`;
+            })
+            .map((cookie) => {
+                return decodeURIComponent(cookie.substring(valueStartsAt));
+            })[0] || null
+    );
 }
 
 function createBaseQuery() {
@@ -36,14 +38,18 @@ const backend = createApi({
     tagTypes: ["CurrentUser", "Email", "Session"],
     endpoints: (build) => ({
         signUp: build.mutation({
-            query: (params: { username: string, email: string, password: string }) => ({
+            query: (params: {
+                username: string;
+                email: string;
+                password: string;
+            }) => ({
                 url: "/sign-up",
                 method: "POST",
                 body: params,
             }),
         }),
         logIn: build.mutation({
-            query: (params: { username_or_email: string, password: string }) => ({
+            query: (params: {username_or_email: string; password: string}) => ({
                 url: "/log-in",
                 method: "POST",
                 body: params,
@@ -73,7 +79,7 @@ const backend = createApi({
             query: () => "/api/sessions",
             providesTags: ["Session"],
         }),
-        createSession: build.mutation<NewSession, { password: string }>({
+        createSession: build.mutation<NewSession, {password: string}>({
             query: ({password}) => ({
                 url: "/api/sessions",
                 method: "POST",
@@ -82,7 +88,7 @@ const backend = createApi({
             invalidatesTags: ["Session"],
         }),
         revokeSession: build.mutation({
-            query: (params: { access_token_prefix: string }) => ({
+            query: (params: {access_token_prefix: string}) => ({
                 url: `/api/sessions/${params.access_token_prefix}`,
                 method: "DELETE",
             }),

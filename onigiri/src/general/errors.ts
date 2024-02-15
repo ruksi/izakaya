@@ -13,7 +13,7 @@ export interface ErrorData {
 }
 
 export interface ErrorDetails {
-    [fieldName: string]: Issue[]
+    [fieldName: string]: Issue[];
 }
 
 export interface Issue {

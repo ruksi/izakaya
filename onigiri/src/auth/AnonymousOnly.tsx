@@ -4,7 +4,7 @@ import {selectIsAuthenticated} from "./slice.ts";
 
 function AnonymousOnly() {
     const isAuthenticated = useSelector(selectIsAuthenticated);
-    return !isAuthenticated ? <Outlet/> : <Navigate to="/"/>;
+    return !isAuthenticated ? <Outlet /> : <Navigate to="/" />;
 }
 
 export default AnonymousOnly;

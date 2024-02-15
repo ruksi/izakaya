@@ -1,7 +1,7 @@
 import {Issue} from "../general/errors.ts";
 
 const issueFormatters = {
-    "length": (issue: Issue) => {
+    length: (issue: Issue) => {
         if (issue.params.equal) {
             return `Must be exactly ${issue.params.min} characters long`;
         }
@@ -17,9 +17,9 @@ const issueFormatters = {
         if (issue.params.max) {
             return `Must be up to ${issue.params.max} characters long`;
         }
-        return "Must fulfill length requirements"
+        return "Must fulfill length requirements";
     },
-    "range": (issue: Issue) => {
+    range: (issue: Issue) => {
         if (issue.params.min && issue.params.max) {
             return `Must be between values ${issue.params.min} and ${issue.params.max}`;
         }
@@ -29,13 +29,13 @@ const issueFormatters = {
         if (issue.params.max) {
             return `Must be up to ${issue.params.max}`;
         }
-        return "Must fulfill range requirement"
+        return "Must fulfill range requirement";
     },
-    "required": () => `Required`,
-    "unique": () => `Must be unique`,
-    "email": () => `Must be a valid email address`,
-    "url": () => `Must be a valid URL`,
-}
+    required: () => `Required`,
+    unique: () => `Must be unique`,
+    email: () => `Must be a valid email address`,
+    url: () => `Must be a valid URL`,
+};
 
 export function formatMessage(issue: Issue) {
     if (issue.message) {

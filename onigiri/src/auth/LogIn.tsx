@@ -19,60 +19,78 @@ export default function LogIn() {
     const [usernameOrEmail, setUsernameOrEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const [logIn, {isLoading, isError, error}] = backend.endpoints.logIn.useMutation();
+    const [logIn, {isLoading, isError, error}] =
+        backend.endpoints.logIn.useMutation();
 
-    const submit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        logIn({username_or_email: usernameOrEmail, password: password});
-    }, [logIn, usernameOrEmail, password]);
+    const submit = useCallback(
+        (e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            logIn({username_or_email: usernameOrEmail, password: password});
+        },
+        [logIn, usernameOrEmail, password]
+    );
 
     return (
         <Container>
-
             <Row className="justify-content-center mt-lg-3">
                 <Col xs md="8" lg="6" xl="5" xxl="4">
                     <Form className="pt-2 p-sm-2" noValidate onSubmit={submit}>
-
-                        {isError || (isLoading && error)
-                            ? <FormAlert title="Login Failed" error={error} isLoading={isLoading}/>
-                            : null}
+                        {isError || (isLoading && error) ? (
+                            <FormAlert
+                                title="Login Failed"
+                                error={error}
+                                isLoading={isLoading}
+                            />
+                        ) : null}
 
                         <Card className="my-2 my-sm-4" bg="dark">
-
                             <Card.Header>
-                                <Card.Title>
-                                    Log In
-                                </Card.Title>
+                                <Card.Title>Log In</Card.Title>
                             </Card.Header>
 
                             <Card.Body>
                                 <div className="p-sm-2">
-
-                                    <Form.Group className="mb-3" controlId="username_or_email">
+                                    <Form.Group
+                                        className="mb-3"
+                                        controlId="username_or_email"
+                                    >
                                         <Form.Label id="identity-label">
-                                            Username <span className="text-secondary small">or Email</span>
+                                            Username{" "}
+                                            <span className="text-secondary small">
+                                                or Email
+                                            </span>
                                         </Form.Label>
                                         <Form.Control
                                             arial-describedby="identity-label"
                                             disabled={isLoading}
                                             type="text"
                                             value={usernameOrEmail}
-                                            onChange={(e) => setUsernameOrEmail(e.target.value)}
+                                            onChange={(e) =>
+                                                setUsernameOrEmail(
+                                                    e.target.value
+                                                )
+                                            }
                                             autoFocus={true}
                                         />
                                     </Form.Group>
 
-                                    <Form.Group className="mb-4" controlId="password">
-                                        <Form.Label id="password-label">Password</Form.Label>
+                                    <Form.Group
+                                        className="mb-4"
+                                        controlId="password"
+                                    >
+                                        <Form.Label id="password-label">
+                                            Password
+                                        </Form.Label>
                                         <Form.Control
                                             arial-describedby="password-label"
                                             disabled={isLoading}
                                             type="password"
                                             value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
+                                            onChange={(e) =>
+                                                setPassword(e.target.value)
+                                            }
                                         />
                                     </Form.Group>
-
                                 </div>
                             </Card.Body>
 
@@ -86,14 +104,16 @@ export default function LogIn() {
                                         disabled={isLoading}
                                     >
                                         <ButtonSpinnerIf isLoading={isLoading}>
-                                            <FontAwesomeIcon icon="right-from-bracket" className="me-1"/>Log in
+                                            <FontAwesomeIcon
+                                                icon="right-from-bracket"
+                                                className="me-1"
+                                            />
+                                            Log in
                                         </ButtonSpinnerIf>
                                     </Button>
                                 </Stack>
                             </Card.Footer>
-
                         </Card>
-
                     </Form>
                 </Col>
             </Row>
@@ -103,8 +123,6 @@ export default function LogIn() {
                     New to Izakaya? <Link to="/sign-up">Create an account</Link>
                 </Col>
             </Row>
-
         </Container>
-    )
-        ;
+    );
 }

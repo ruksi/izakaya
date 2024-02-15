@@ -11,13 +11,12 @@ export function Settings() {
             <h1>Settings</h1>
             <Stack gap={3}>
                 <div>
-                    <Profile/>
+                    <Profile />
                 </div>
                 <div>
-                    <AccessControl/>
+                    <AccessControl />
                 </div>
             </Stack>
         </Container>
     );
 }
-
