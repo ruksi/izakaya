@@ -17,10 +17,10 @@ auto-deploy on the main branch change.
 
 ### Frontends
 
-* `🍙 onigiri`: Vite + React + React Router
+* `🍙 onigiri`: Vite + React + React Router + RTK Query
   [code](./onigiri),
   [online](https://onigiri.railway.izakaya.dev/)
-* `🍗 yakitori`: Next 14 + App Router
+* `🍗 yakitori`: Next 14 + App Router + SWR
   [code](./yakitori),
   [online](https://yakitori.railway.izakaya.dev/)
 
