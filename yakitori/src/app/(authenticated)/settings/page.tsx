@@ -1,13 +1,13 @@
-import {AccessControl} from "@/app/(authenticated)/settings/AccessControl";
-import {EmailControl} from "@/app/(authenticated)/settings/EmailControl";
-import {UserControl} from "@/app/(authenticated)/settings/UserControl";
 import {Container, Stack} from "react-bootstrap";
+import {AccessControl} from "./AccessControl";
+import {EmailControl} from "./EmailControl";
+import {UserControl} from "./UserControl";
 
 export const metadata = {
     title: "Settings",
 };
 
-export default function Settings() {
+export default function SettingsPage() {
     return (
         <Container className="py-3">
             <h1>Settings</h1>

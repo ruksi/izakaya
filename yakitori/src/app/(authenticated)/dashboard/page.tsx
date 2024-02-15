@@ -4,7 +4,7 @@ export const metadata = {
     title: "Dashboard",
 };
 
-export default function Dashboard() {
+export default function DashboardPage() {
     return (
         <Row className="me-0">
             <Col xs={12} md={4} lg={3} xl={2} className="pe-0">
