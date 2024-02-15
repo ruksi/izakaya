@@ -112,8 +112,4 @@ export interface NewSession {
     access_token: string;
 }
 
-// export const {
-//     useCreateSessionMutation,
-// } = backend;
-
 export default backend;
