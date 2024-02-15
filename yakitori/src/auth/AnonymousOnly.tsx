@@ -1,11 +1,10 @@
 "use client";
 
-import {selectIsAuthenticated} from "@/auth/slice";
-import {useAppSelector} from "@/data/hooks";
+import {useVerify} from "@/services/backend";
 import React from "react";
 
 export default function AnonymousOnly({children}: React.PropsWithChildren) {
-    const isAuthenticated = useAppSelector(selectIsAuthenticated);
+    const {isAuthenticated} = useVerify();
     if (isAuthenticated == true) {
         if (typeof window !== "undefined") {
             window.location.replace("/dashboard");

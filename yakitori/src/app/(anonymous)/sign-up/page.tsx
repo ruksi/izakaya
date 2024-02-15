@@ -3,7 +3,7 @@
 import {isErroneous} from "@/form/checks";
 import {FormGroupFeedback} from "@/form/FormGroupFeedback";
 import SpinnerIf from "@/general/SpinnerIf";
-import backend from "@/services/backend";
+import {useSignUp} from "@/services/backend";
 import {faPenToSquare} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Link from "next/link";
@@ -15,14 +15,14 @@ export default function SignUp() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const [signUp, {isLoading, error}] = backend.endpoints.signUp.useMutation();
+    const {signUp, isLoading, error} = useSignUp();
 
     const submit = useCallback(
         (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
             signUp({email: email, username: username, password: password});
         },
-        [signUp, email, username, password],
+        [signUp, email, username, password]
     );
 
     const onEmailChange = useCallback(
@@ -35,7 +35,7 @@ export default function SignUp() {
                 setUsername(prefix);
             }
         },
-        [setEmail, setUsername, username],
+        [setEmail, setUsername, username]
     );
 
     return (
@@ -65,7 +65,7 @@ export default function SignUp() {
                                             disabled={isLoading}
                                             isInvalid={isErroneous(
                                                 "email",
-                                                error,
+                                                error
                                             )}
                                             type="email"
                                             value={email}
@@ -90,7 +90,7 @@ export default function SignUp() {
                                             disabled={isLoading}
                                             isInvalid={isErroneous(
                                                 "username",
-                                                error,
+                                                error
                                             )}
                                             type="text"
                                             value={username}
@@ -116,7 +116,7 @@ export default function SignUp() {
                                             disabled={isLoading}
                                             isInvalid={isErroneous(
                                                 "password",
-                                                error,
+                                                error
                                             )}
                                             type="password"
                                             value={password}

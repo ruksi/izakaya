@@ -2,7 +2,7 @@
 
 import {FormAlert} from "@/form/FormAlert";
 import SpinnerIf from "@/general/SpinnerIf";
-import backend from "@/services/backend";
+import {useLogIn} from "@/services/backend";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Link from "next/link";
@@ -13,14 +13,14 @@ export default function LogIn() {
     const [usernameOrEmail, setUsernameOrEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const [logIn, {isLoading, isError, error}] = backend.endpoints.logIn.useMutation();
+    const {logIn, isLoading, isError, error} = useLogIn();
 
     const submit = useCallback(
         (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
             logIn({username_or_email: usernameOrEmail, password: password});
         },
-        [logIn, usernameOrEmail, password],
+        [logIn, usernameOrEmail, password]
     );
 
     return (
@@ -60,7 +60,7 @@ export default function LogIn() {
                                             value={usernameOrEmail}
                                             onChange={(e) =>
                                                 setUsernameOrEmail(
-                                                    e.target.value,
+                                                    e.target.value
                                                 )
                                             }
                                             autoFocus={true}

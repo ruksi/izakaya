@@ -1,5 +1,4 @@
 import {MainHeader} from "@/general/MainHeader";
-import Providers from "@/general/Providers";
 import {config} from "@fortawesome/fontawesome-svg-core";
 import type {Metadata} from "next";
 import React from "react";
@@ -19,27 +18,25 @@ export default function MainLayout({children}: React.PropsWithChildren) {
     return (
         <html lang="en" data-bs-theme="dark">
             <body>
-                <Providers>
-                    <div className="d-flex flex-column min-vh-100">
-                        <header
-                            className="bg-body-tertiary border-bottom"
-                            style={{minHeight: 64}}
-                        >
-                            <Container>
-                                <Stack
-                                    direction="horizontal"
-                                    gap={2}
-                                    className="p-3"
-                                >
-                                    <MainHeader />
-                                </Stack>
-                            </Container>
-                        </header>
-                        <main className="flex-fill d-flex flex-column">
-                            {children}
-                        </main>
-                    </div>
-                </Providers>
+                <div className="d-flex flex-column min-vh-100">
+                    <header
+                        className="bg-body-tertiary border-bottom"
+                        style={{minHeight: 64}}
+                    >
+                        <Container>
+                            <Stack
+                                direction="horizontal"
+                                gap={2}
+                                className="p-3"
+                            >
+                                <MainHeader />
+                            </Stack>
+                        </Container>
+                    </header>
+                    <main className="flex-fill d-flex flex-column">
+                        {children}
+                    </main>
+                </div>
             </body>
         </html>
     );

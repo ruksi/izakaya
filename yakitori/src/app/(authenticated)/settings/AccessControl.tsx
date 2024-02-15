@@ -1,4 +1,10 @@
-import backend, {NewSession, Session} from "@/services/backend";
+import {
+    NewSession,
+    Session,
+    useCreateSession,
+    useRevokeSession,
+    useSessions,
+} from "@/services/backend";
 import {
     faBan,
     faKey,
@@ -16,8 +22,7 @@ import Placeholder from "react-bootstrap/Placeholder";
 import Stack from "react-bootstrap/Stack";
 
 export function AccessControl() {
-    const {data: sessions, isLoading} =
-        backend.endpoints.getMySessions.useQuery();
+    const {sessions, isLoading} = useSessions();
     return (
         <>
             <h2>Access</h2>
@@ -67,8 +72,9 @@ export function AccessControl() {
 }
 
 function SessionDisplay({session}: {session: Session}) {
-    const [deleteMySession, {isLoading}] =
-        backend.endpoints.deleteMySession.useMutation();
+    const {revokeSession, isLoading} = useRevokeSession(
+        session.access_token_prefix
+    );
     const [isDeleting, setIsDeleting] = useState(false);
 
     const onClickRevoke = useCallback(() => {
@@ -78,9 +84,9 @@ function SessionDisplay({session}: {session: Session}) {
         setIsDeleting(false);
     }, [setIsDeleting]);
     const onClickConfirm = useCallback(() => {
-        deleteMySession({access_token_prefix: session.access_token_prefix});
+        revokeSession();
         setIsDeleting(false);
-    }, [setIsDeleting, deleteMySession, session]);
+    }, [setIsDeleting, revokeSession, session]);
 
     let lastUsed = <span className="text-secondary">Never</span>;
     if (session?.used_at) {
@@ -139,10 +145,8 @@ function SessionDisplay({session}: {session: Session}) {
 }
 
 function CreateTokenControl({isLoadingSessions}: {isLoadingSessions: boolean}) {
-    const [
-        createSession,
-        {data: newSession, isLoading, isSuccess, reset: resetNewSession},
-    ] = backend.endpoints.createSession.useMutation();
+    const {createSession, newSession, isLoading, isSuccess, resetNewSession} =
+        useCreateSession();
 
     const [isCreating, setIsCreating] = useState(false);
     const [password, setPassword] = useState("");

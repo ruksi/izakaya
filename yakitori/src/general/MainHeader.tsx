@@ -1,8 +1,6 @@
 "use client";
 
-import {selectIsAuthenticated} from "@/auth/slice";
-import {useAppDispatch, useAppSelector} from "@/data/hooks";
-import backend from "@/services/backend";
+import {useLogOut, useVerify} from "@/services/backend";
 import {
     faArrowRightToBracket,
     faGear,
@@ -12,23 +10,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import {useEffect} from "react";
 import {Button, Placeholder} from "react-bootstrap";
 
 export function MainHeader() {
-    const dispatch = useAppDispatch();
-    const isAuthenticated = useAppSelector(selectIsAuthenticated);
-
-    // reset all data after log out
-    // note sure if this is the right place for this, but 🤷
-    // feels like this should be somewhere in Redux side, not React
-    useEffect(() => {
-        if (isAuthenticated === false) {
-            dispatch(backend.util.resetApiState());
-        }
-    }, [isAuthenticated, dispatch]);
-
-    const [logOut] = backend.endpoints.logOut.useMutation()
+    const {isAuthenticated} = useVerify();
+    const {logOut} = useLogOut();
 
     return (
         <>
@@ -39,10 +25,10 @@ export function MainHeader() {
                         aria-labelledby="home-link"
                         size="sm"
                     >
-                        <FontAwesomeIcon icon={faHouse}/>
+                        <FontAwesomeIcon icon={faHouse} />
                     </Button>
                 </Link>
-                {isAuthenticated == true && (
+                {isAuthenticated && (
                     <Link href="/dashboard">
                         <Button
                             variant="outline-secondary"
@@ -95,15 +81,19 @@ export function MainHeader() {
                 </>
             )}
 
-            {isAuthenticated == true && (
+            {isAuthenticated && (
                 <>
                     <Link href="/settings">
                         <Button variant="outline-secondary" size="sm">
-                            <FontAwesomeIcon icon={faGear} className="me-1"/>
+                            <FontAwesomeIcon icon={faGear} className="me-1" />
                             Settings
                         </Button>
                     </Link>
-                    <Button variant="outline-secondary" size="sm" onClick={logOut}>
+                    <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => logOut()}
+                    >
                         <FontAwesomeIcon
                             icon={faRightFromBracket}
                             className="me-1"

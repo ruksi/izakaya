@@ -1,99 +1,67 @@
-import {backendUrl} from "@/utils";
-import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
+import {mutation, query} from "@/services/fetchers";
+import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
 
-function getCookie(name: string): string | null {
-    const valueStartsAt = (name.length + 1);
-    return document.cookie
-        .split(";")
-        .map(c => c.trim())
-        .filter(cookie => {
-            return cookie.substring(0, valueStartsAt) === `${name}=`;
-        })
-        .map(cookie => {
-            return decodeURIComponent(cookie.substring(valueStartsAt));
-        })[0] || null;
+interface Verify {
+    is_authenticated: boolean;
 }
 
-function createBaseQuery() {
-    const baseUrl = backendUrl();
-    return fetchBaseQuery({
-        baseUrl,
-        credentials: "include",
-        prepareHeaders: (headers, {type}) => {
-            if (type === "mutation") {
-                const token = getCookie("Tatami-CSRF");
-                if (token) {
-                    headers.set("CSRF-Token", token);
-                }
-            }
-            return headers;
-        },
-    });
+export function useVerify() {
+    const {data, error, isLoading} = useSWR<Verify>("/verify", query);
+    let isAuthenticated = undefined;
+    if (data) {
+        isAuthenticated = data.is_authenticated;
+    }
+    return {isAuthenticated, isLoading, isError: !!error, error};
 }
 
+interface SignUpExtra {
+    arg: {
+        email: string;
+        username: string;
+        password: string;
+    };
+}
 
-const backend = createApi({
-    baseQuery: createBaseQuery(),
-    tagTypes: ["CurrentUser", "Session"],
-    endpoints: (build) => ({
-        signUp: build.mutation({
-            query: (params: {
-                username: string;
-                email: string;
-                password: string;
-            }) => ({
-                url: "/sign-up",
-                method: "POST",
-                body: params,
-            }),
-        }),
-        logIn: build.mutation({
-            query: (params: { username_or_email: string; password: string }) => ({
-                url: "/log-in",
-                method: "POST",
-                body: params,
-            }),
-        }),
-        logOut: build.mutation({
-            query: () => ({
-                url: "/log-out",
-                method: "POST",
-            }),
-        }),
+export function useSignUp() {
+    const {trigger, error, isMutating} = useSWRMutation(
+        "/verify",
+        (_, extra: SignUpExtra) => mutation(["/sign-up", "POST"], extra)
+    );
+    return {signUp: trigger, isLoading: isMutating, isError: !!error, error};
+}
 
-        // ["CurrentUser"]
-        getMyUser: build.query<User, void>({
-            query: () => "/api/users/me",
-            providesTags: ["CurrentUser"],
-        }),
+interface LogInExtra {
+    arg: {
+        username_or_email: string;
+        password: string;
+    };
+}
 
-        // ["Session"]
-        createSession: build.mutation<NewSession, { password: string }>({
-            query: ({password}) => ({
-                url: "/api/sessions",
-                method: "POST",
-                body: {password},
-            }),
-            invalidatesTags: ["Session"],
-        }),
-        getMySessions: build.query<Session[], void>({
-            query: () => "/api/sessions",
-            providesTags: ["Session"],
-        }),
-        deleteMySession: build.mutation({
-            query: (params: { access_token_prefix: string }) => ({
-                url: `/api/sessions/${params.access_token_prefix}`,
-                method: "DELETE",
-            }),
-            invalidatesTags: ["Session"],
-        }),
-    }),
-});
+export function useLogIn() {
+    const {trigger, error, isMutating} = useSWRMutation(
+        "/verify",
+        (_, extra: LogInExtra) => mutation(["/log-in", "POST"], extra)
+    );
+    return {logIn: trigger, isLoading: isMutating, isError: !!error, error};
+}
 
-// don't know where these belong yet. 🤷
-export interface User {
-    user_id: string;
-    username: string;
+export function useLogOut() {
+    const {trigger, error, isMutating} = useSWRMutation("/verify", (_, extra) =>
+        mutation(["/log-out", "POST"], extra)
+    );
+
+    // TODO: fix this?
+    // if (data?.status == "ok") {
+    //     // clear all cached data
+    //     // mutate(_key => true, undefined, { revalidate: false });
+    // }
+    return {logOut: trigger, isLoading: isMutating, isError: !!error, error};
+}
+
+export function useCurrentUser() {
+    const {data, error, isLoading} = useSWR("/api/users/me", query);
+    return {user: data, isLoading, isError: !!error, error};
 }
 
 export interface Session {
@@ -101,12 +69,41 @@ export interface Session {
     used_at?: string;
 }
 
+export function useSessions() {
+    const {data, error, isLoading} = useSWR<Session[]>("/api/sessions", query);
+    return {sessions: data, isLoading, isError: !!error, error};
+}
+
+interface CreateSessionExtra {
+    arg: {
+        password: string;
+    };
+}
+
 export interface NewSession {
     access_token: string;
 }
 
-// export const {
-//     useCreateSessionMutation,
-// } = backend;
+export function useCreateSession() {
+    const {trigger, data, error, isMutating, reset} = useSWRMutation(
+        "/api/sessions",
+        (url, extra: CreateSessionExtra) => mutation([url, "POST"], extra)
+    );
+    return {
+        createSession: trigger,
+        newSession: data,
+        isLoading: isMutating,
+        isError: !!error,
+        isSuccess: !!data && !error,
+        error,
+        resetNewSession: reset,
+    };
+}
 
-export default backend;
+export function useRevokeSession(prefix: string) {
+    const {trigger, isMutating} = useSWRMutation(
+        "/api/sessions",
+        (url, extra) => mutation([`${url}/${prefix}`, "DELETE"], extra)
+    );
+    return {revokeSession: trigger, isLoading: isMutating};
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import {AccessControl} from "@/app/(authenticated)/settings/AccessControl";
-import backend from "@/services/backend";
+import {useCurrentUser} from "@/services/backend";
 import {Container, Placeholder, Stack} from "react-bootstrap";
 
 export default function Settings() {
@@ -21,7 +21,7 @@ export default function Settings() {
 }
 
 function Profile() {
-    const {data: user} = backend.endpoints.getMyUser.useQuery();
+    const {user} = useCurrentUser();
     return (
         <>
             <h2>Profile</h2>
