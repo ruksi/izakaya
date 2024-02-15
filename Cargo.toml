@@ -14,8 +14,6 @@ axum = { version = "0.7.3" }
 axum-test = { version = "14.2.2" }
 
 # https://lib.rs/crates/sqlx
-# https://lib.rs/crates/sea-query
-# https://lib.rs/crates/sea-query-binder
 # Railway private networking generates non-x.509v3 certificates, so we need to use native TLS
 sqlx = { version = "0.7.3", features = ["runtime-tokio-native-tls", "postgres", "json", "uuid", "time"] }
 
