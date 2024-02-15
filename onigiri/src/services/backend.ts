@@ -33,7 +33,7 @@ function createBaseQuery() {
 
 const backend = createApi({
     baseQuery: createBaseQuery(),
-    tagTypes: ["CurrentUser", "Session"],
+    tagTypes: ["CurrentUser", "Email", "Session"],
     endpoints: (build) => ({
         signUp: build.mutation({
             query: (params: { username: string, email: string, password: string }) => ({
@@ -60,6 +60,12 @@ const backend = createApi({
         getMyUser: build.query<User, void>({
             query: () => "/api/users/me",
             providesTags: ["CurrentUser"],
+        }),
+
+        // ["Email"]
+        getEmails: build.query<Email[], void>({
+            query: () => "/api/emails",
+            providesTags: ["Email"],
         }),
 
         // ["Session"]
@@ -89,6 +95,12 @@ const backend = createApi({
 export interface User {
     user_id: string;
     username: string;
+}
+
+export interface Email {
+    email_id: string;
+    email: string;
+    is_primary: boolean;
 }
 
 export interface Session {

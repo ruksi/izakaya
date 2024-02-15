@@ -12,7 +12,7 @@ import backend, {NewSession, Session} from "../services/backend.ts";
 export function AccessControl() {
     const {data: sessions, isLoading} = backend.endpoints.getMySessions.useQuery();
     return <>
-        <h2>Access</h2>
+        <h4 className="mt-3">Access</h4>
         <Stack gap={3}>
             {sessions
                 ? sessions.map((session: Session) =>
