@@ -25,7 +25,7 @@ export function AccessControl() {
     const {sessions, isLoading} = useSessions();
     return (
         <>
-            <h2>Access</h2>
+            <h4 className="mt-3">Access</h4>
             <Stack gap={3}>
                 {sessions ? (
                     sessions.map((session: Session) => (
