@@ -10,7 +10,7 @@ import Stack from "react-bootstrap/Stack";
 import backend, {NewSession, Session} from "../services/backend.ts";
 
 export function AccessControl() {
-    const {data: sessions, isLoading} = backend.endpoints.getMySessions.useQuery();
+    const {data: sessions, isLoading} = backend.endpoints.getSessions.useQuery();
     return <>
         <h4 className="mt-3">Access</h4>
         <Stack gap={3}>
@@ -38,19 +38,19 @@ export function AccessControl() {
 }
 
 function SessionDisplay({session}: { session: Session }) {
-    const [deleteMySession, {isLoading}] = backend.endpoints.deleteMySession.useMutation();
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [revokeSession, {isLoading}] = backend.endpoints.revokeSession.useMutation();
+    const [isRevoking, setIsRevoking] = useState(false);
 
     const onClickRevoke = useCallback(() => {
-        setIsDeleting(true);
-    }, [setIsDeleting]);
+        setIsRevoking(true);
+    }, [setIsRevoking]);
     const onClickCancel = useCallback(() => {
-        setIsDeleting(false);
-    }, [setIsDeleting]);
+        setIsRevoking(false);
+    }, [setIsRevoking]);
     const onClickConfirm = useCallback(() => {
-        deleteMySession({access_token_prefix: session.access_token_prefix});
-        setIsDeleting(false);
-    }, [setIsDeleting, deleteMySession, session]);
+        revokeSession({access_token_prefix: session.access_token_prefix});
+        setIsRevoking(false);
+    }, [setIsRevoking, revokeSession, session]);
 
     let lastUsed = <span className="text-secondary">Never</span>;
     if (session?.used_at) {
@@ -72,7 +72,7 @@ function SessionDisplay({session}: { session: Session }) {
                 </div>
             </div>
             <div className="d-inline-block mt-1">
-                {isDeleting
+                {isRevoking
                     ? (
                         <Stack direction="horizontal" gap={2}>
                             <span>Are you sure?</span>

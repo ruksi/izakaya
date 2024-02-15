@@ -57,7 +57,7 @@ const backend = createApi({
         }),
 
         // ["CurrentUser"]
-        getMyUser: build.query<User, void>({
+        getCurrentUser: build.query<User, void>({
             query: () => "/api/users/me",
             providesTags: ["CurrentUser"],
         }),
@@ -69,6 +69,10 @@ const backend = createApi({
         }),
 
         // ["Session"]
+        getSessions: build.query<Session[], void>({
+            query: () => "/api/sessions",
+            providesTags: ["Session"],
+        }),
         createSession: build.mutation<NewSession, { password: string }>({
             query: ({password}) => ({
                 url: "/api/sessions",
@@ -77,11 +81,7 @@ const backend = createApi({
             }),
             invalidatesTags: ["Session"],
         }),
-        getMySessions: build.query<Session[], void>({
-            query: () => "/api/sessions",
-            providesTags: ["Session"],
-        }),
-        deleteMySession: build.mutation({
+        revokeSession: build.mutation({
             query: (params: { access_token_prefix: string }) => ({
                 url: `/api/sessions/${params.access_token_prefix}`,
                 method: "DELETE",

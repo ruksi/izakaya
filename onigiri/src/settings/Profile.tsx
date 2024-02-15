@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import backend, {Email}from "../services/backend.ts";
 
 export function Profile() {
-    const {data: user} = backend.endpoints.getMyUser.useQuery();
+    const {data: user} = backend.endpoints.getCurrentUser.useQuery();
     const {data: emails} = backend.endpoints.getEmails.useQuery();
     return <>
         <h4 className="mt-3">Profile</h4>
