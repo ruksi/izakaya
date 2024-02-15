@@ -11,18 +11,6 @@ export function Profile() {
         <>
             <h4 className="mt-3">Profile</h4>
             <div>
-                <label className="text-body-emphasis me-1">User ID:</label>
-                {user ? (
-                    <code className="lh-1">{user.user_id}</code>
-                ) : (
-                    <Placeholder
-                        aria-hidden="true"
-                        bg="secondary"
-                        style={{width: 300}}
-                    />
-                )}
-            </div>
-            <div>
                 <label className="text-body-emphasis me-1">Username:</label>
                 {user ? (
                     user.username
