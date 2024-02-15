@@ -57,7 +57,7 @@ export default function LandingPage() {
                     This is Izakaya landing page
                 </div>
                 <div className="fs-4 text-secondary mt-2 mt-md-3">
-                    with Vite + React + React Router
+                    with Vite + React + React Router + RTK Query
                 </div>
             </div>
 

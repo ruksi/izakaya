@@ -34,7 +34,7 @@ export default function Home() {
                     This is Izakaya landing page
                 </div>
                 <div className="fs-4 text-secondary mt-2 mt-md-3">
-                    with Next 14 + App Router
+                    with Next 14 + App Router + SWR
                 </div>
             </div>
 
