@@ -19,7 +19,7 @@ pub struct ErrorOut {
 
     // optional `validator::ValidationErrors`-style errors
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub issues: Option<ValidationIssues>,
+    pub issues: Option<IssueMapOut>,
 }
 
 impl ErrorOut {
@@ -30,7 +30,7 @@ impl ErrorOut {
         }
     }
 
-    pub fn with_issues(mut self, issues: ValidationIssues) -> Self {
+    pub fn with_issue_map(mut self, issues: IssueMapOut) -> Self {
         self.issues = Some(issues);
         self
     }
@@ -42,21 +42,21 @@ impl ErrorOut {
 }
 
 #[derive(serde::Serialize, Debug, Clone, PartialEq, Eq)]
-pub struct ValidationIssues(HashMap<String, ErrorKind>);
+pub struct IssueMapOut(HashMap<String, IssueKind>);
 
-impl ValidationIssues {
+impl IssueMapOut {
     pub fn new() -> Self {
         Self(HashMap::new())
     }
 
-    pub fn with_issue(mut self, field: String, new_issue: Issue) -> Self {
+    pub fn with_issue(mut self, field: String, new_issue: IssueOut) -> Self {
         let errors = self
             .0
             .entry(field)
-            .or_insert_with(|| ErrorKind::Field(vec![]));
+            .or_insert_with(|| IssueKind::Field(vec![]));
         #[allow(unreachable_patterns)]
         match errors {
-            ErrorKind::Field(ref mut issues) => {
+            IssueKind::Field(ref mut issues) => {
                 issues.push(new_issue);
             }
             _ => unimplemented!(),
@@ -74,19 +74,19 @@ impl ValidationIssues {
 
 #[derive(serde::Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
-pub enum ErrorKind {
-    Field(Vec<Issue>),
+pub enum IssueKind {
+    Field(Vec<IssueOut>),
 }
 
 #[derive(serde::Serialize, Debug, Clone, PartialEq, Eq)]
-pub struct Issue {
+pub struct IssueOut {
     pub code: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
     pub params: HashMap<String, serde_json::Value>,
 }
 
-impl Issue {
+impl IssueOut {
     pub fn new<T: Into<String>>(code: T) -> Self {
         Self {
             code: code.into(),
@@ -108,7 +108,7 @@ impl Issue {
     }
 }
 
-impl From<validator::ValidationErrors> for ValidationIssues {
+impl From<validator::ValidationErrors> for IssueMapOut {
     fn from(err: validator::ValidationErrors) -> Self {
         let source = err.into_errors();
         // the 'statics are killing my groove with this one,
@@ -123,7 +123,7 @@ impl From<validator::ValidationErrors> for ValidationIssues {
                             let code = err.code.to_string();
                             let message = err.message.map(|s| s.to_string());
                             let params = err.params;
-                            Issue {
+                            IssueOut {
                                 code,
                                 message,
                                 params: params
@@ -133,12 +133,12 @@ impl From<validator::ValidationErrors> for ValidationIssues {
                             }
                         })
                         .collect();
-                    (field_name.to_owned(), ErrorKind::Field(errs))
+                    (field_name.to_owned(), IssueKind::Field(errs))
                 }
                 _ => unimplemented!(), // implement nested variants when I need them
             })
             .collect();
-        ValidationIssues(destination)
+        IssueMapOut(destination)
     }
 }
 
@@ -178,7 +178,7 @@ mod tests {
             first_name: "bo".into(),
         };
         let err = person.validate().unwrap_err();
-        let issues: ValidationIssues = err.into();
+        let issues: IssueMapOut = err.into();
         issues.assert_json(json!({
             "first_name": [{
                 "code": "length",

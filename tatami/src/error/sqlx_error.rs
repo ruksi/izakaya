@@ -4,9 +4,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use sqlx::postgres::PgDatabaseError;
 
-use crate::error::error_response::{
-    error_message, ErrorOut, Issue, ValidationIssues, INTERNAL_REASON, INVALID_REASON,
-};
+use crate::error::error_response::*;
 
 // https://www.postgresql.org/docs/current/errcodes-appendix.html
 pub const UNIQUE_VIOLATION: &str = "23505";
@@ -43,11 +41,9 @@ pub fn sqlx_error_to_response_tuple(err: &sqlx::Error) -> (StatusCode, Json<Erro
                         if let Some((column_name, column_value)) =
                             extract_column_name_and_value(detail)
                         {
-                            let unique_issue =
-                                Issue::new("unique").with_param("value", column_value);
-                            let issues =
-                                ValidationIssues::new().with_issue(column_name, unique_issue);
-                            let outbound = ErrorOut::new(INVALID_REASON).with_issues(issues);
+                            let issue = IssueOut::new("unique").with_param("value", column_value);
+                            let issue_map = IssueMapOut::new().with_issue(column_name, issue);
+                            let outbound = ErrorOut::new(INVALID_REASON).with_issue_map(issue_map);
                             return (StatusCode::BAD_REQUEST, Json(outbound));
                         }
                     }
