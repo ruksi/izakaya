@@ -3,7 +3,7 @@ import Stack from "react-bootstrap/Stack";
 import svgPurpleHeart from "../assets/purple-heart.svg";
 import useTitle from "./useTitle.ts";
 
-export function About() {
+export function AboutPage() {
     useTitle("About");
     return (
         <Container className="py-3">

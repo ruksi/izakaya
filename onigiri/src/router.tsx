@@ -4,8 +4,8 @@ import AuthenticatedOnly from "./auth/AuthenticatedOnly.tsx";
 import LogIn from "./auth/LogIn.tsx";
 import SignUp from "./auth/SignUp.tsx";
 import {authVerify} from "./auth/thunks.ts";
-import {About} from "./general/About.tsx";
-import {Dashboard} from "./general/Dashboard.tsx";
+import {AboutPage} from "./general/AboutPage.tsx";
+import {DashboardPage} from "./general/DashboardPage.tsx";
 import ErrorPage from "./general/ErrorPage.tsx";
 import LandingPage from "./general/LandingPage.tsx";
 import MainLayout from "./general/MainLayout.tsx";
@@ -29,7 +29,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: "about",
-                element: <About />,
+                element: <AboutPage />,
             },
 
             {
@@ -37,7 +37,7 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         path: "dashboard",
-                        element: <Dashboard />,
+                        element: <DashboardPage />,
                     },
                     {
                         path: "settings",

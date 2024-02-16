@@ -1,7 +1,8 @@
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
+import {Col, Row} from "react-bootstrap";
+import useTitle from "./useTitle.ts";
 
-export function Dashboard() {
+export function DashboardPage() {
+    useTitle("Dashboard");
     return (
         <Row className="me-0">
             <Col xs={12} md={4} lg={3} xl={2} className="pe-0">
