@@ -56,8 +56,10 @@ base64 = { version = "0.21.7" }
 rand = { version = "0.8.5" }
 rand_seeder = { version = "0.2.3" }
 
+# https://lib.rs/crates/sentry
 # https://lib.rs/crates/tracing
 # https://lib.rs/crates/tracing-subscriber
+sentry = { version = "0.32.2", features = ["tracing", "tower-http", "tower-axum-matched-path"] }
 tracing = { version = "0.1.40" }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 

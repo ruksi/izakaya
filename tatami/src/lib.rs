@@ -5,10 +5,13 @@ use axum::http::{header, HeaderName, HeaderValue, Method};
 use axum::response::Redirect;
 use axum::routing::get;
 use axum::Router;
+use tokio::net::TcpListener;
 use tokio::time::sleep;
 use tower_http::cors::CorsLayer;
 use tower_http::services::ServeDir;
 use tower_http::trace::TraceLayer;
+use tracing_subscriber::prelude::*;
+use tracing_subscriber::EnvFilter;
 
 pub use crate::config::Config;
 use crate::state::AppState;
@@ -26,6 +29,32 @@ mod valid;
 
 #[cfg(test)]
 mod test_utils;
+
+pub async fn run_server() {
+    let config = Config::load();
+
+    let registry = tracing_subscriber::registry();
+    let registry = registry.with(EnvFilter::builder().parse(&config.rust_log).unwrap());
+    let registry = registry.with(tracing_subscriber::fmt::layer());
+    if !std::env::var("SENTRY_DSN").unwrap_or_default().is_empty() {
+        // default Sentry settings:
+        // * `tracing::info!` and up are collected as breadcrumbs
+        // * `tracing::error!` are sent as error events
+        // * `tracing::info_span!` and up are sent as transactions
+        //
+        // NB: a separate `tower-http` integration turns requests to Sentry transactions
+        let registry = registry.with(sentry::integrations::tracing::layer());
+        registry.init();
+    } else {
+        registry.init();
+    }
+
+    let listener = TcpListener::bind(config.bind_address()).await.unwrap();
+    let app = get_app(config).await;
+
+    tracing::debug!("Listening on {} 📢", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
 
 pub async fn get_app<S: Clone + Send + Sync + 'static>(config: Config) -> Router<S> {
     // Railway private networks take time to initialize on deployment,
@@ -64,12 +93,20 @@ pub async fn get_app<S: Clone + Send + Sync + 'static>(config: Config) -> Router
                 let uri = req.uri();
                 tracing::debug_span!("request", %method, %uri)
             })
-            .on_failure(()), // we trace::error the errors ourselves
+            .on_failure(()), // we `trace::error!()` ourselves, we don't want all 404 to be errors
     );
+
+    if !std::env::var("SENTRY_DSN").unwrap_or_default().is_empty() {
+        // record all requests as Sentry transactions filtered by sampling rate
+        let sentry_layer = tower::ServiceBuilder::new()
+            .layer(sentry::integrations::tower::NewSentryLayer::<Request>::new_from_top())
+            .layer(sentry::integrations::tower::SentryHttpLayer::with_transaction());
+        app = app.layer(sentry_layer);
+    }
 
     match config.frontend_urls.len() {
         0 => tracing::warn!("CORS disabled, no FRONTEND_URL set"),
-        _ => tracing::info!("CORS enabled for {:?}", config.frontend_urls),
+        _ => tracing::debug!("CORS enabled for {:?}", config.frontend_urls),
     }
     let mut allowed_origins: Vec<HeaderValue> = vec![];
     for frontend_url in config.frontend_urls {
