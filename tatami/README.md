@@ -94,3 +94,28 @@ Next Steps:
 * Configure public networking for `🟧 tatami` after it runs.
 * Edit `FRONTEND_URL` to include frontends you launch, separated by commas e.g.
     * `http://localhost:3000,http://localhost:5173`
+
+## Terminology Braindump 🧠
+
+Axum is like Express and has little opinion on the structure of the application.
+
+You'll need to create your own abstractions, or everything is going to be just
+a "handler" or an "object".
+
+```
+> Endpoint
+    Route = URL to handler mapping
+    Handler = the logic
+>> Handler
+    In = partial request payload     e.g. CreateUserIn
+    Out = partial response payload   e.g. UserOut
+    Inbound = full request payload
+    Outbound = full response payload
+>>> Action
+    "Action Statements"
+    Declaration = info for create    e.g. UserDeclaration
+    Amendment = info for modify      e.g. UserAmendment
+    Filter = info for filtering      e.g. UserFilter
+    Termination = info for deletion  e.g. UserTermination
+    Model = the backend data         e.g. User
+```
