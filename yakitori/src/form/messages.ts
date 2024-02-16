@@ -1,6 +1,6 @@
-import {BackendIssue} from "@/form/types";
+import {Issue} from "@/general/errors";
 
-export function formatMessage(issue: BackendIssue) {
+export function formatMessage(issue: Issue) {
     if (issue.message) {
         return issue.message;
     }
@@ -11,10 +11,10 @@ export function formatMessage(issue: BackendIssue) {
     return `Invalid value (${issue.code})`;
 }
 
-type Formatter = (issue: BackendIssue) => string;
+type Formatter = (issue: Issue) => string;
 
 const formatters: {[code: string]: Formatter} = {
-    length: (issue: BackendIssue) => {
+    length: (issue: Issue) => {
         if (issue.params.equal) {
             return `Must be exactly ${issue.params.min} characters long`;
         }
@@ -32,7 +32,7 @@ const formatters: {[code: string]: Formatter} = {
         }
         return "Must fulfill length requirements";
     },
-    range: (issue: BackendIssue) => {
+    range: (issue: Issue) => {
         if (issue.params.min && issue.params.max) {
             return `Must be between values ${issue.params.min} and ${issue.params.max}`;
         }
@@ -50,6 +50,6 @@ const formatters: {[code: string]: Formatter} = {
     url: () => `Must be a valid URL`,
 };
 
-function getFormatter(issue: BackendIssue): Formatter | undefined {
+function getFormatter(issue: Issue): Formatter | undefined {
     return formatters[issue.code];
 }

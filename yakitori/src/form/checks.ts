@@ -1,7 +1,7 @@
-import {isBackendErrorResponse} from "@/form/types";
+import {isBackendError} from "@/general/errors";
 
 export function isErroneous(field: string, error: any): boolean {
-    if (!isBackendErrorResponse(error)) {
+    if (!isBackendError(error)) {
         return false;
     }
     if (!error.data.details) {

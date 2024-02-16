@@ -1,8 +1,8 @@
 import {formatMessage} from "@/form/messages";
-import {isBackendErrorResponse} from "@/form/types";
+import {isBackendError} from "@/general/errors";
 
 export function FormGroupFeedback({field, error}: {field: string; error: any}) {
-    if (!isBackendErrorResponse(error)) {
+    if (!isBackendError(error)) {
         return null;
     }
     if (!error.data.details) {

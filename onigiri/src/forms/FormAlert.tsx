@@ -54,7 +54,13 @@ export function FormAlert({title, error, isLoading = false}: FormAlertProps) {
     );
 }
 
-function FieldDisplay({field, issues}: {field: string; issues: Issue[]}) {
+function FieldDisplay({
+    field,
+    issues,
+}: {
+    field: string;
+    issues: Issue[];
+}) {
     return (
         <div className="ps-2">
             <div>{`${field}`}</div>

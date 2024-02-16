@@ -1,5 +1,5 @@
 import {formatMessage} from "@/form/messages";
-import {BackendIssue, isBackendErrorResponse} from "@/form/types";
+import {Issue, isBackendError} from "@/general/errors";
 import {Alert, Spinner} from "react-bootstrap";
 
 interface FormAlertProps {
@@ -14,7 +14,7 @@ export function FormAlert({title, error, isLoading = false}: FormAlertProps) {
         loading = <Spinner animation="border" size="sm" className="ms-2" />;
     }
 
-    if (!isBackendErrorResponse(error)) {
+    if (!isBackendError(error)) {
         return (
             <Alert variant="danger">
                 <div className="text-danger">
@@ -58,7 +58,7 @@ function FieldDisplay({
     issues,
 }: {
     field: string;
-    issues: BackendIssue[];
+    issues: Issue[];
 }) {
     return (
         <div className="ps-2">
@@ -72,7 +72,7 @@ function FieldDisplay({
     );
 }
 
-function IssueDisplay({issue}: {issue: BackendIssue}) {
+function IssueDisplay({issue}: {issue: Issue}) {
     const message = formatMessage(issue);
     return <div className="text-secondary-emphasis">{message}</div>;
 }
