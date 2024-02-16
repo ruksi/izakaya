@@ -1,28 +1,20 @@
-"use client";
-
-import {Email, useEmails} from "@/services/backend";
 import {Col, ListGroup, Placeholder, Row} from "react-bootstrap";
+import backend, {Email} from "../services/backend.ts";
 
-export function EmailControl() {
-    const {emails} = useEmails();
+export function EmailSection() {
+    const {data: emails} = backend.endpoints.getEmails.useQuery();
     return (
-        <>
-            <h4 className="mt-3">Emails</h4>
-            <Row>
-                <Col sm={8} md={7} lg={5} xl={4}>
-                    <ListGroup>
-                        {emails &&
-                            emails.map((email) => (
-                                <EmailDisplay
-                                    key={email.email_id}
-                                    email={email}
-                                />
-                            ))}
-                        {!emails && <EmailDisplayPlaceholder />}
-                    </ListGroup>
-                </Col>
-            </Row>
-        </>
+        <Row>
+            <Col sm={8} md={7} lg={5} xl={4}>
+                <ListGroup>
+                    {emails &&
+                        emails.map((email) => (
+                            <EmailDisplay key={email.email_id} email={email} />
+                        ))}
+                    {!emails && <EmailDisplayPlaceholder />}
+                </ListGroup>
+            </Col>
+        </Row>
     );
 }
 

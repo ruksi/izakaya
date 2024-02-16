@@ -25,53 +25,47 @@ import {
     Stack,
 } from "react-bootstrap";
 
-export function AccessControl() {
+export function AccessSection() {
     const {sessions, isLoading} = useSessions();
     return (
-        <>
-            <h4 className="mt-3">Access</h4>
-            <Stack gap={3}>
-                {sessions ? (
-                    sessions.map((session: Session) => (
-                        <SessionDisplay
-                            key={session.access_token_prefix}
-                            session={session}
-                        />
-                    ))
-                ) : (
-                    <div className="d-flex flex-wrap align-items-center">
-                        <div className="d-inline-block" style={{minWidth: 350}}>
-                            <div>
-                                <Placeholder
-                                    aria-hidden="true"
-                                    bg="secondary"
-                                    style={{width: 190}}
-                                />
-                            </div>
-                            <div>
-                                <Placeholder
-                                    aria-hidden="true"
-                                    bg="secondary"
-                                    style={{width: 225}}
-                                />
-                            </div>
+        <Stack gap={3}>
+            {sessions ? (
+                sessions.map((session: Session) => (
+                    <SessionDisplay
+                        key={session.access_token_prefix}
+                        session={session}
+                    />
+                ))
+            ) : (
+                <div className="d-flex flex-wrap align-items-center">
+                    <div className="d-inline-block" style={{minWidth: 350}}>
+                        <div>
+                            <Placeholder
+                                aria-hidden="true"
+                                bg="secondary"
+                                style={{width: 190}}
+                            />
                         </div>
-                        <div className="d-inline-block mt-1">
-                            <Button size="sm" variant="secondary" disabled>
-                                <FontAwesomeIcon
-                                    icon={faBan}
-                                    className="me-1"
-                                />
-                                Revoke
-                            </Button>
+                        <div>
+                            <Placeholder
+                                aria-hidden="true"
+                                bg="secondary"
+                                style={{width: 225}}
+                            />
                         </div>
                     </div>
-                )}
-                <div>
-                    <CreateTokenControl isLoadingSessions={isLoading} />
+                    <div className="d-inline-block mt-1">
+                        <Button size="sm" variant="secondary" disabled>
+                            <FontAwesomeIcon icon={faBan} className="me-1" />
+                            Revoke
+                        </Button>
+                    </div>
                 </div>
-            </Stack>
-        </>
+            )}
+            <div>
+                <CreateTokenControl isLoadingSessions={isLoading} />
+            </div>
+        </Stack>
     );
 }
 

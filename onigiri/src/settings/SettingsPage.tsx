@@ -1,14 +1,11 @@
-import React from "react";
 import {Container, Stack} from "react-bootstrap";
-import {AccessSection} from "./AccessSection";
-import {EmailSection} from "./EmailSection";
-import {UserSection} from "./UserSection";
+import useTitle from "../general/useTitle.ts";
+import {AccessSection} from "./AccessSection.tsx";
+import {EmailSection} from "./EmailSection.tsx";
+import {UserSection} from "./UserSection.tsx";
 
-export const metadata = {
-    title: "Settings",
-};
-
-export default function SettingsPage() {
+export function SettingsPage() {
+    useTitle("Settings");
     return (
         <Container className="py-3">
             <h1>Settings</h1>

@@ -9,7 +9,7 @@ import {Dashboard} from "./general/Dashboard.tsx";
 import ErrorPage from "./general/ErrorPage.tsx";
 import LandingPage from "./general/LandingPage.tsx";
 import MainLayout from "./general/MainLayout.tsx";
-import {Settings} from "./settings/Settings.tsx";
+import {SettingsPage} from "./settings/SettingsPage.tsx";
 import {store} from "./store.ts";
 import StyleTester from "./styles/StyleTester.tsx";
 
@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: "settings",
-                        element: <Settings />,
+                        element: <SettingsPage />,
                     },
                     {
                         path: "styles",
