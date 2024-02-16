@@ -6,7 +6,7 @@ use crate::error::error_response::{ErrorBody, INVALID_REASON};
 pub fn validator_error_to_response_tuple(
     err: &validator::ValidationErrors,
 ) -> (StatusCode, Json<ErrorBody>) {
-    let error_body = ErrorBody::new(INVALID_REASON).with_validator_details(err.clone());
+    let error_body = ErrorBody::new(INVALID_REASON).with_validator_errors(err.clone());
     (StatusCode::BAD_REQUEST, Json(error_body))
 }
 

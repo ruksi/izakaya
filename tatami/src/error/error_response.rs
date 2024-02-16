@@ -19,32 +19,32 @@ pub struct ErrorBody {
 
     // optional `validator::ValidationErrors`-style errors
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<ErrorDetails>,
+    pub issues: Option<ValidationIssues>,
 }
 
 impl ErrorBody {
     pub fn new<T: Into<String>>(message: T) -> Self {
         Self {
             message: message.into(),
-            details: None,
+            issues: None,
         }
     }
 
-    pub fn with_error_details(mut self, details: ErrorDetails) -> Self {
-        self.details = Some(details);
+    pub fn with_issues(mut self, issues: ValidationIssues) -> Self {
+        self.issues = Some(issues);
         self
     }
 
-    pub fn with_validator_details(mut self, details: validator::ValidationErrors) -> Self {
-        self.details = Some(details.into());
+    pub fn with_validator_errors(mut self, errors: validator::ValidationErrors) -> Self {
+        self.issues = Some(errors.into());
         self
     }
 }
 
 #[derive(serde::Serialize, Debug, Clone, PartialEq, Eq)]
-pub struct ErrorDetails(HashMap<String, ErrorKind>);
+pub struct ValidationIssues(HashMap<String, ErrorKind>);
 
-impl ErrorDetails {
+impl ValidationIssues {
     pub fn new() -> Self {
         Self(HashMap::new())
     }
@@ -108,7 +108,7 @@ impl Issue {
     }
 }
 
-impl From<validator::ValidationErrors> for ErrorDetails {
+impl From<validator::ValidationErrors> for ValidationIssues {
     fn from(err: validator::ValidationErrors) -> Self {
         let source = err.into_errors();
         // the 'statics are killing my groove with this one,
@@ -138,7 +138,7 @@ impl From<validator::ValidationErrors> for ErrorDetails {
                 _ => unimplemented!(), // implement nested variants when I need them
             })
             .collect();
-        ErrorDetails(destination)
+        ValidationIssues(destination)
     }
 }
 
@@ -154,17 +154,17 @@ mod tests {
     async fn json_message_works() {
         let json = json_message("hello");
         assert_eq!(json.message, "hello");
-        assert_eq!(json.details, None);
+        assert_eq!(json.issues, None);
     }
 
     #[tokio::test]
     async fn error_response_body_works() {
         let body = ErrorBody {
             message: "hello".into(),
-            details: None,
+            issues: None,
         };
         assert_eq!(body.message, "hello");
-        assert_eq!(body.details, None);
+        assert_eq!(body.issues, None);
     }
 
     #[tokio::test]
@@ -178,8 +178,8 @@ mod tests {
             first_name: "bo".into(),
         };
         let err = person.validate().unwrap_err();
-        let details: ErrorDetails = err.into();
-        details.assert_json(json!({
+        let issues: ValidationIssues = err.into();
+        issues.assert_json(json!({
             "first_name": [{
                 "code": "length",
                 "params": {"value": "bo", "min": 3}

@@ -39,12 +39,15 @@ export function FormAlert({title, error, isLoading = false}: FormAlertProps) {
             </div>
             <div className="text-secondary small">
                 {`${error.status} - ${error.data.message}`}
-                {error.data.details
-                    ? Object.entries(error.data.details)
+                {error.data.issues
+                    ? Object.entries(error.data.issues)
                           .sort()
-                          .map(([field, issues]) => (
+                          .map(([field, field_issues]) => (
                               <div key={field} className="ps-2">
-                                  <FieldDisplay field={field} issues={issues} />
+                                  <FieldDisplay
+                                      field={field}
+                                      issues={field_issues}
+                                  />
                               </div>
                           ))
                     : null}
@@ -53,13 +56,7 @@ export function FormAlert({title, error, isLoading = false}: FormAlertProps) {
     );
 }
 
-function FieldDisplay({
-    field,
-    issues,
-}: {
-    field: string;
-    issues: Issue[];
-}) {
+function FieldDisplay({field, issues}: {field: string; issues: Issue[]}) {
     return (
         <div className="ps-2">
             <div>{`${field}`}</div>

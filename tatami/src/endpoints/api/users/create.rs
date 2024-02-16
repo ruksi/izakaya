@@ -59,7 +59,7 @@ mod tests {
             .await
             .assert_json(&json!({
                 "message": "Validation failed",
-                "details": {
+                "issues": {
                     "username": [{
                         "code": "regex",
                         "message": "Username must be aLpHaNuMeR1c, but may contain hyphens (-)",

@@ -113,7 +113,7 @@ mod tests {
             let err = create(&db, declaration).await.unwrap_err();
             err.assert_json(json!({
                 "message": "Validation failed",
-                "details": {
+                "issues": {
                     "username": [{
                         "code": "unique",
                         "params": {"value": username},
@@ -133,7 +133,7 @@ mod tests {
             let err = create(&db, declaration).await.unwrap_err();
             err.assert_json(json!({
                 "message": "Validation failed",
-                "details": {
+                "issues": {
                     "email": [{
                         "code": "unique",
                         "params": {"value": email},
@@ -150,7 +150,7 @@ mod tests {
             let err = UserDeclaration::new_valid("bob", email, "p4ssw0rd").unwrap_err();
             err.assert_json(json!({
                 "message": "Validation failed",
-                "details": {
+                "issues": {
                     "email": [{
                         "code": "email",
                         "params": {"value": email},
@@ -168,7 +168,7 @@ mod tests {
                 UserDeclaration::new_valid(username, "doe@example.com", "p4ssw0rd").unwrap_err();
             err.assert_json(json!({
                 "message": "Validation failed",
-                "details": {
+                "issues": {
                     "username": [{
                         "code": "regex",
                         "message": "Username must be aLpHaNuMeR1c, but may contain hyphens (-)",
@@ -187,7 +187,7 @@ mod tests {
                 UserDeclaration::new_valid(username, "a@example.com", "p4ssw0rd").unwrap_err();
             err.assert_json(json!({
                 "message": "Validation failed",
-                "details": {
+                "issues": {
                     "username": [{
                         "code": "length",
                         "params": {

@@ -92,7 +92,7 @@ mod tests {
             .unwrap_err()
             .assert_json(json!({
                 "message": "Validation failed",
-                "details": {
+                "issues": {
                     "username": [{
                         "code": "regex",
                         "message": "Username must be aLpHaNuMeR1c, but may contain hyphens (-)",
@@ -109,7 +109,7 @@ mod tests {
             .assert_status(StatusCode::BAD_REQUEST)
             .assert_json(json!({
                 "message": "Validation failed",
-                "details": {
+                "issues": {
                     "username": [{
                         "code": "unique",
                         "params": {"value": "bobby"},

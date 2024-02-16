@@ -10,7 +10,7 @@ export interface BackendError {
 // prettier-ignore
 export interface BackendErrorData {
     message: string;            // exists for all "controlled" errors
-    details?: ValidationIssues; // exists if validation error
+    issues?: ValidationIssues;  // exists if validation error
 }
 
 export interface ValidationIssues {

@@ -5,7 +5,7 @@ use regex::Regex;
 use sqlx::postgres::PgDatabaseError;
 
 use crate::error::error_response::{
-    json_message, ErrorBody, ErrorDetails, Issue, INTERNAL_REASON, INVALID_REASON,
+    json_message, ErrorBody, Issue, ValidationIssues, INTERNAL_REASON, INVALID_REASON,
 };
 
 // https://www.postgresql.org/docs/current/errcodes-appendix.html
@@ -45,10 +45,9 @@ pub fn sqlx_error_to_response_tuple(err: &sqlx::Error) -> (StatusCode, Json<Erro
                         {
                             let unique_issue =
                                 Issue::new("unique").with_param("value", column_value);
-                            let error_details =
-                                ErrorDetails::new().with_issue(column_name, unique_issue);
-                            let error_body =
-                                ErrorBody::new(INVALID_REASON).with_error_details(error_details);
+                            let issues =
+                                ValidationIssues::new().with_issue(column_name, unique_issue);
+                            let error_body = ErrorBody::new(INVALID_REASON).with_issues(issues);
                             return (StatusCode::BAD_REQUEST, Json(error_body));
                         }
                     }
@@ -114,7 +113,7 @@ mod tests {
             .assert_status(StatusCode::BAD_REQUEST)
             .assert_json(json!({
                 "message": "Validation failed",
-                "details": {
+                "issues": {
                     "username": [{
                         "code": "unique",
                         "params": {

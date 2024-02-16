@@ -73,7 +73,7 @@ mod tests {
         response.assert_status_bad_request();
         let json = response.json::<serde_json::Value>();
         assert_eq!(
-            json.get("details")
+            json.get("issues")
                 .unwrap()
                 .get("email")
                 .unwrap()

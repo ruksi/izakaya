@@ -5,16 +5,16 @@ export function FormGroupFeedback({field, error}: {field: string; error: any}) {
     if (!isBackendError(error)) {
         return null;
     }
-    if (!error.data.details) {
+    if (!error.data.issues) {
         return null;
     }
-    const issues = error.data.details[field];
-    if (!issues) {
+    const field_issues = error.data.issues[field];
+    if (!field_issues) {
         return null;
     }
     return (
         <div className="text-danger small ps-1">
-            {issues.map((issue: any) => (
+            {field_issues.map((issue: any) => (
                 <div key={issue.code}>{formatMessage(issue)}</div>
             ))}
         </div>
