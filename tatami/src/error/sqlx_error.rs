@@ -5,13 +5,13 @@ use regex::Regex;
 use sqlx::postgres::PgDatabaseError;
 
 use crate::error::error_response::{
-    json_message, ErrorBody, Issue, ValidationIssues, INTERNAL_REASON, INVALID_REASON,
+    error_message, ErrorOut, Issue, ValidationIssues, INTERNAL_REASON, INVALID_REASON,
 };
 
 // https://www.postgresql.org/docs/current/errcodes-appendix.html
 pub const UNIQUE_VIOLATION: &str = "23505";
 
-pub fn sqlx_error_to_response_tuple(err: &sqlx::Error) -> (StatusCode, Json<ErrorBody>) {
+pub fn sqlx_error_to_response_tuple(err: &sqlx::Error) -> (StatusCode, Json<ErrorOut>) {
     // check if the error code is our custom SQLSTATE error code
     // if it is, this is a safe, known error to expose to the client
     // if let sqlx::Error::Database(err) = err {
@@ -47,8 +47,8 @@ pub fn sqlx_error_to_response_tuple(err: &sqlx::Error) -> (StatusCode, Json<Erro
                                 Issue::new("unique").with_param("value", column_value);
                             let issues =
                                 ValidationIssues::new().with_issue(column_name, unique_issue);
-                            let error_body = ErrorBody::new(INVALID_REASON).with_issues(issues);
-                            return (StatusCode::BAD_REQUEST, Json(error_body));
+                            let outbound = ErrorOut::new(INVALID_REASON).with_issues(issues);
+                            return (StatusCode::BAD_REQUEST, Json(outbound));
                         }
                     }
                 }
@@ -57,8 +57,8 @@ pub fn sqlx_error_to_response_tuple(err: &sqlx::Error) -> (StatusCode, Json<Erro
     };
 
     tracing::error!("sqlx error: {:?}", err);
-    let error_body = json_message(INTERNAL_REASON);
-    (StatusCode::INTERNAL_SERVER_ERROR, error_body)
+    let outbound = error_message(INTERNAL_REASON);
+    (StatusCode::INTERNAL_SERVER_ERROR, outbound)
 }
 
 fn extract_column_name_and_value(pg_detail_text: &str) -> Option<(String, String)> {

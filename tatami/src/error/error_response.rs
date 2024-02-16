@@ -8,12 +8,12 @@ use axum::Json;
 pub const INVALID_REASON: &str = "Validation failed";
 pub const INTERNAL_REASON: &str = "Something went wrong";
 
-pub fn json_message<T: Display>(message: T) -> Json<ErrorBody> {
-    Json(ErrorBody::new(message.to_string()))
+pub fn error_message<T: Display>(message: T) -> Json<ErrorOut> {
+    Json(ErrorOut::new(message.to_string()))
 }
 
 #[derive(serde::Serialize, Debug, Clone, PartialEq, Eq)]
-pub struct ErrorBody {
+pub struct ErrorOut {
     // user-friendly answer to the question: "Why did this error happen?"
     pub message: String,
 
@@ -22,7 +22,7 @@ pub struct ErrorBody {
     pub issues: Option<ValidationIssues>,
 }
 
-impl ErrorBody {
+impl ErrorOut {
     pub fn new<T: Into<String>>(message: T) -> Self {
         Self {
             message: message.into(),
@@ -152,19 +152,19 @@ mod tests {
 
     #[tokio::test]
     async fn json_message_works() {
-        let json = json_message("hello");
+        let json = error_message("hello");
         assert_eq!(json.message, "hello");
         assert_eq!(json.issues, None);
     }
 
     #[tokio::test]
     async fn error_response_body_works() {
-        let body = ErrorBody {
+        let error = ErrorOut {
             message: "hello".into(),
             issues: None,
         };
-        assert_eq!(body.message, "hello");
-        assert_eq!(body.issues, None);
+        assert_eq!(error.message, "hello");
+        assert_eq!(error.issues, None);
     }
 
     #[tokio::test]

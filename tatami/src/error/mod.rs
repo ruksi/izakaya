@@ -3,7 +3,7 @@ use axum::Json;
 
 use crate::error::argon2_hash_error::argon2_password_hash_error_to_response_tuple;
 use crate::error::axum_json_rejection::axum_json_rejection_to_response_tuple;
-use crate::error::error_response::{json_message, ErrorBody};
+use crate::error::error_response::{error_message, ErrorOut};
 use crate::error::redis_error::redis_error_to_response_tuple;
 use crate::error::redis_pool_error::deadpool_redis_error_to_response_tuple;
 use crate::error::sqlx_error::sqlx_error_to_response_tuple;
@@ -38,24 +38,24 @@ pub enum Error {
 }
 
 impl Error {
-    pub fn response_tuple(&self) -> (StatusCode, Json<ErrorBody>) {
+    pub fn response_tuple(&self) -> (StatusCode, Json<ErrorOut>) {
         use Error::*;
         match self {
             BadRequest => (
                 StatusCode::BAD_REQUEST,
-                json_message("Bad request, check your parameters"),
+                error_message("Bad request, check your parameters"),
             ),
             Unauthorized => (
                 StatusCode::UNAUTHORIZED,
-                json_message("Authentication required"),
+                error_message("Authentication required"),
             ),
             Forbidden => (
                 StatusCode::FORBIDDEN,
-                json_message("You cannot do this thing"),
+                error_message("You cannot do this thing"),
             ),
             NotFound => (
                 StatusCode::NOT_FOUND,
-                json_message("The thing doesn't exist"),
+                error_message("The thing doesn't exist"),
             ),
             AxumJsonRejection(rejection) => axum_json_rejection_to_response_tuple(rejection),
             Validator(err) => validator_error_to_response_tuple(err),

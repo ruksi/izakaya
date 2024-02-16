@@ -1,12 +1,12 @@
 use axum::http::StatusCode;
 use axum::Json;
 
-use crate::error::error_response::{json_message, ErrorBody, INTERNAL_REASON};
+use crate::error::error_response::{error_message, ErrorOut, INTERNAL_REASON};
 
 pub fn tokio_task_join_error_to_response_tuple(
     err: &tokio::task::JoinError,
-) -> (StatusCode, Json<ErrorBody>) {
+) -> (StatusCode, Json<ErrorOut>) {
     tracing::error!("tokio task join error: {:?}", err);
-    let error_body = json_message(INTERNAL_REASON);
-    (StatusCode::INTERNAL_SERVER_ERROR, error_body)
+    let outbound = error_message(INTERNAL_REASON);
+    (StatusCode::INTERNAL_SERVER_ERROR, outbound)
 }
