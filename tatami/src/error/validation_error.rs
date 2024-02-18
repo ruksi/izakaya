@@ -1,7 +1,7 @@
 use axum::http::StatusCode;
 use axum::Json;
 
-use crate::error::error_response::{ErrorOut, REASON_INVALID};
+use crate::error::response::{ErrorOut, REASON_INVALID};
 
 pub fn validator_error_to_response_tuple(
     err: &validator::ValidationErrors,

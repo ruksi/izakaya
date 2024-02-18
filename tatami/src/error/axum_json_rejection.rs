@@ -1,7 +1,7 @@
 use axum::http::StatusCode;
 use axum::Json;
 
-use crate::error::error_response::{error_message, ErrorOut};
+use crate::error::response::{error_message, ErrorOut};
 
 pub fn axum_json_rejection_to_response_tuple(
     rejection: &axum::extract::rejection::JsonRejection,

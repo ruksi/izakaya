@@ -1,7 +1,7 @@
 use axum::http::StatusCode;
 use axum::Json;
 
-use crate::error::error_response::{error_message, ErrorOut, REASON_INTERNAL};
+use crate::error::response::{error_message, ErrorOut, REASON_INTERNAL};
 
 pub fn deadpool_redis_error_to_response_tuple(
     err: &deadpool::managed::PoolError<redis::RedisError>,

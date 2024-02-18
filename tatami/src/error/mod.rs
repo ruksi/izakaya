@@ -3,18 +3,18 @@ use axum::Json;
 
 use crate::error::argon2_hash_error::argon2_password_hash_error_to_response_tuple;
 use crate::error::axum_json_rejection::axum_json_rejection_to_response_tuple;
-use crate::error::error_response::{error_message, ErrorOut};
 use crate::error::redis_error::redis_error_to_response_tuple;
 use crate::error::redis_pool_error::deadpool_redis_error_to_response_tuple;
+use crate::error::response::{error_message, ErrorOut};
 use crate::error::sqlx_error::sqlx_error_to_response_tuple;
 use crate::error::tokio_task_error::tokio_task_join_error_to_response_tuple;
 use crate::error::validation_error::validator_error_to_response_tuple;
 
 mod argon2_hash_error;
 mod axum_json_rejection;
-mod error_response;
 mod redis_error;
 mod redis_pool_error;
+mod response;
 mod sqlx_error;
 mod tokio_task_error;
 mod validation_error;
