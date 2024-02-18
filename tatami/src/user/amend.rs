@@ -96,7 +96,7 @@ mod tests {
                     "username": [{
                         "code": "regex",
                         "message": "Username must be aLpHaNuMeR1c, but may contain hyphens (-)",
-                        "params": {"value": "bad alice"},
+                        "details": {"value": "bad alice"},
                     }],
                 }
             }));
@@ -112,7 +112,7 @@ mod tests {
                 "issues": {
                     "username": [{
                         "code": "unique",
-                        "params": {"value": "bobby"},
+                        "details": {"value": "bobby"},
                     }],
                 }
             }));

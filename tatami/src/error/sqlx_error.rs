@@ -86,7 +86,7 @@ mod tests {
                 "issues": {
                     "username": [{
                         "code": "unique",
-                        "params": {
+                        "details": {
                             "value": "bob",
                         },
                     }],

@@ -37,7 +37,7 @@ mod tests {
                 "first_name": [{
                     "code": "length",
                     "message": null, // we actually drop nulls in our version
-                    "params": {
+                    "params": {      // we call this "details"
                         "min": 3,
                         "value": "bo",
                     },

@@ -67,7 +67,7 @@ impl From<validator::ValidationErrors> for IssueMapOut {
                             IssueOut {
                                 code,
                                 message,
-                                params: params
+                                details: params
                                     .iter()
                                     .map(|(k, v)| (k.to_string(), v.clone()))
                                     .collect(),
@@ -107,7 +107,7 @@ mod tests {
         issues.assert_json(json!({
             "first_name": [{
                 "code": "length",
-                "params": {"value": "bo", "min": 3}
+                "details": {"value": "bo", "min": 3}
             }]
         }));
 

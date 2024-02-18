@@ -116,7 +116,7 @@ mod tests {
                 "issues": {
                     "username": [{
                         "code": "unique",
-                        "params": {"value": username},
+                        "details": {"value": username},
                     }],
                 }
             }));
@@ -136,7 +136,7 @@ mod tests {
                 "issues": {
                     "email": [{
                         "code": "unique",
-                        "params": {"value": email},
+                        "details": {"value": email},
                     }],
                 }
             }));
@@ -153,7 +153,7 @@ mod tests {
                 "issues": {
                     "email": [{
                         "code": "email",
-                        "params": {"value": email},
+                        "details": {"value": email},
                     }],
                 }
             }));
@@ -172,7 +172,7 @@ mod tests {
                     "username": [{
                         "code": "regex",
                         "message": "Username must be aLpHaNuMeR1c, but may contain hyphens (-)",
-                        "params": {"value": username},
+                        "details": {"value": username},
                     }],
                 }
             }));
@@ -190,7 +190,7 @@ mod tests {
                 "issues": {
                     "username": [{
                         "code": "length",
-                        "params": {
+                        "details": {
                             "max": 32,
                             "min": 3,
                             "value": username,

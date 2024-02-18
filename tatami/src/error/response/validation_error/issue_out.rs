@@ -16,7 +16,7 @@ pub struct IssueOut {
     // further details about the validation error e.g.
     // - `value` what was the _value_ that was checked (name is in the issue map)
     // - `min` what is the minimum length requirement
-    pub params: HashMap<String, serde_json::Value>,
+    pub details: HashMap<String, serde_json::Value>,
 }
 
 impl IssueOut {
@@ -24,7 +24,7 @@ impl IssueOut {
         Self {
             code: code.into(),
             message: None,
-            params: HashMap::new(),
+            details: HashMap::new(),
         }
     }
 
@@ -36,7 +36,7 @@ impl IssueOut {
 
     pub fn with_param(mut self, key: impl Into<String>, value: impl Serialize) -> Self {
         let as_json_value = serde_json::to_value(value).unwrap();
-        self.params.insert(key.into(), as_json_value);
+        self.details.insert(key.into(), as_json_value);
         self
     }
 }

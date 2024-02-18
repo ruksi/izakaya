@@ -63,7 +63,7 @@ mod tests {
                     "username": [{
                         "code": "regex",
                         "message": "Username must be aLpHaNuMeR1c, but may contain hyphens (-)",
-                        "params": {
+                        "details": {
                             "value": "john doe"
                         }
                     }]

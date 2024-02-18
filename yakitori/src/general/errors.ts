@@ -20,10 +20,10 @@ export interface ValidationIssues {
 export interface Issue {
     code: string;
     message?: string;
-    params: IssueParameters;
+    details: IssueDetailMap;
 }
 
-export interface IssueParameters {
+export interface IssueDetailMap {
     // almost always, the value that caused the issue
     value?: any;
 

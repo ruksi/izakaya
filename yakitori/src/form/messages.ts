@@ -15,32 +15,32 @@ type Formatter = (issue: Issue) => string;
 
 const formatters: {[code: string]: Formatter} = {
     length: (issue: Issue) => {
-        if (issue.params.equal) {
-            return `Must be exactly ${issue.params.min} characters long`;
+        if (issue.details.equal) {
+            return `Must be exactly ${issue.details.min} characters long`;
         }
-        if (issue.params.min === 0 && issue.params.max) {
-            return `Must be up to ${issue.params.max} characters long`;
+        if (issue.details.min === 0 && issue.details.max) {
+            return `Must be up to ${issue.details.max} characters long`;
         }
-        if (issue.params.min && issue.params.max) {
-            return `Must be ${issue.params.min} to ${issue.params.max} characters long`;
+        if (issue.details.min && issue.details.max) {
+            return `Must be ${issue.details.min} to ${issue.details.max} characters long`;
         }
-        if (issue.params.min) {
-            return `Must be at least ${issue.params.min} characters long`;
+        if (issue.details.min) {
+            return `Must be at least ${issue.details.min} characters long`;
         }
-        if (issue.params.max) {
-            return `Must be up to ${issue.params.max} characters long`;
+        if (issue.details.max) {
+            return `Must be up to ${issue.details.max} characters long`;
         }
         return "Must fulfill length requirements";
     },
     range: (issue: Issue) => {
-        if (issue.params.min && issue.params.max) {
-            return `Must be between values ${issue.params.min} and ${issue.params.max}`;
+        if (issue.details.min && issue.details.max) {
+            return `Must be between values ${issue.details.min} and ${issue.details.max}`;
         }
-        if (issue.params.min) {
-            return `Must be at least ${issue.params.min}`;
+        if (issue.details.min) {
+            return `Must be at least ${issue.details.min}`;
         }
-        if (issue.params.max) {
-            return `Must be up to ${issue.params.max}`;
+        if (issue.details.max) {
+            return `Must be up to ${issue.details.max}`;
         }
         return "Must fulfill range requirement";
     },
