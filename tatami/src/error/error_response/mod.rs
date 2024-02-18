@@ -3,10 +3,8 @@ use std::fmt::Display;
 
 use axum::Json;
 
-// a generic error message for when we don't want to expose what went wrong,
-// you should always log the full details before returning this reason
-pub const INVALID_REASON: &str = "Validation failed";
-pub const INTERNAL_REASON: &str = "Something went wrong";
+pub const REASON_INVALID: &str = "Validation failed";
+pub const REASON_INTERNAL: &str = "Something went wrong";
 
 pub fn error_message<T: Display>(message: T) -> Json<ErrorOut> {
     Json(ErrorOut::new(message.to_string()))

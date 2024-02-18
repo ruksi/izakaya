@@ -1,12 +1,12 @@
 use axum::http::StatusCode;
 use axum::Json;
 
-use crate::error::error_response::{ErrorOut, INVALID_REASON};
+use crate::error::error_response::{ErrorOut, REASON_INVALID};
 
 pub fn validator_error_to_response_tuple(
     err: &validator::ValidationErrors,
 ) -> (StatusCode, Json<ErrorOut>) {
-    let outbound = ErrorOut::new(INVALID_REASON).with_validator_errors(err.clone());
+    let outbound = ErrorOut::new(REASON_INVALID).with_validator_errors(err.clone());
     (StatusCode::BAD_REQUEST, Json(outbound))
 }
 
