@@ -6,9 +6,16 @@ use std::collections::HashMap;
 
 #[derive(serde::Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct IssueOut {
+    // what validation error happened e.g. `length`
     pub code: String,
+
+    // a custom, human readable validation error message
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
+
+    // further details about the validation error e.g.
+    // - `value` what was the _value_ that was checked (name is in the issue map)
+    // - `min` what is the minimum length requirement
     pub params: HashMap<String, serde_json::Value>,
 }
 
