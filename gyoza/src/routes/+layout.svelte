@@ -8,6 +8,11 @@
     export let data: LayoutData;
 </script>
 
+<svelte:head>
+    <!--<title>{data.title}</title>-->
+    <title>Izakaya</title>
+</svelte:head>
+
 <QueryClientProvider client={data.queryClient}>
     <MainHeader />
     <slot />
