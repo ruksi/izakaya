@@ -11,7 +11,7 @@ config.autoAddCss = false;
 export const metadata: Metadata = {
     title: "Izakaya",
     description: "Rust, React, PaaS, and more!",
-    icons: [{url: "/red-paper-lantern.svg", type: "image/svg+xml"}],
+    icons: [{url: "/favicon.svg", type: "image/svg+xml"}],
 };
 
 export default function MainLayout({children}: React.PropsWithChildren) {
