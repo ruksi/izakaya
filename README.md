@@ -23,6 +23,9 @@ auto-deploy on the main branch change.
 * `🍗 yakitori`: Next 14 + App Router + SWR
   [code](./yakitori),
   [online](https://yakitori.railway.izakaya.dev/)
+* `🥟 gyoza`: Vite + SvelteKit + TanStack Query
+  [code](./gyoza),
+  [online](https://gyoza.railway.izakaya.dev/)
 
 ## Why?
 
