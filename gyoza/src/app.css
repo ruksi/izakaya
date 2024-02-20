@@ -8,4 +8,63 @@
         @apply overflow-y-scroll overflow-x-auto;
         @apply scrollbar scrollbar-thumb-neutral-500 scrollbar-track-neutral-700;
     }
+    input[type] {
+        @apply bg-zinc-900 border-zinc-700;
+        @apply outline-none;
+        transition:
+            border-color 0.15s ease-in-out,
+            box-shadow 0.15s ease-in-out;
+    }
+    input[type]:focus {
+        @apply border-slate-400;
+        @apply ring-2 ring-purple-700;
+    }
+    input[type]:disabled {
+        @apply bg-zinc-700 text-gray-400 border-zinc-600;
+        cursor: inherit;
+    }
+    input[type]:-webkit-autofill,
+    input[type]:-webkit-autofill:hover,
+    input[type]:-webkit-autofill:focus,
+    input[type]:-webkit-autofill:active {
+        caret-color: transparent;
+        -webkit-text-fill-color: white !important;
+        @apply shadow-[inset_0_0_0px_1000px_rgb(24,24,27)];
+    }
+    button:focus,
+    button:active,
+    button:focus-visible {
+        @apply outline outline-offset-2 outline-slate-400;
+    }
+}
+
+@layer components {
+    .card {
+        @apply bg-zinc-800 text-gray-300;
+        @apply border border-zinc-700;
+        @apply shadow-lg rounded-lg;
+    }
+    .card-head {
+        @apply bg-zinc-750 text-gray-300;
+        @apply border-b border-zinc-600;
+    }
+    .card-body {
+    }
+    .card-foot {
+        @apply bg-zinc-750 text-gray-300;
+        @apply border-t border-zinc-600;
+    }
+
+    .btn {
+        @apply rounded-md;
+        @apply border border-zinc-400 hover:border-zinc-200;
+        @apply px-2.5 py-1.5;
+        @apply transition-colors duration-150;
+    }
+    .btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    .btn-purple {
+        @apply bg-purple-600 text-gray-100 border-purple-600 hover:bg-purple-800 hover:border-purple-500;
+    }
 }

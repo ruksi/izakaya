@@ -21,8 +21,8 @@ export function logInMutation(client: QueryClient) {
             await client.cancelQueries({queryKey: ["verify"]});
             return null;
         },
-        onSettled: () => {
-            client.invalidateQueries({queryKey: ["verify"]});
+        onSettled: async () => {
+            await client.invalidateQueries({queryKey: ["verify"]});
         },
     });
 }
@@ -34,8 +34,8 @@ export function logOutMutation(client: QueryClient) {
             await client.cancelQueries({queryKey: ["verify"]});
             return null;
         },
-        onSuccess: () => {
-            client.invalidateQueries();
+        onSuccess: async () => {
+            await client.invalidateQueries();
         },
     });
 }
@@ -45,11 +45,11 @@ export function logOutMutation(client: QueryClient) {
 export function api(_fetch = fetch) {
     return {
         getVerify: async (): Promise<Verify> => {
-            const response = await handleFetch({
+            const data = await handleFetch({
                 url: `${baseUrl}/verify`,
                 _fetch,
             });
-            return (await response.json()) as Verify;
+            return data as Verify;
         },
         postLogIn: async ({
             username_or_email,
@@ -58,7 +58,7 @@ export function api(_fetch = fetch) {
             username_or_email: string;
             password: string;
         }): Promise<Status> => {
-            const response = await handleFetch({
+            const data = await handleFetch({
                 url: `${baseUrl}/log-in`,
                 options: {
                     method: "POST",
@@ -66,17 +66,17 @@ export function api(_fetch = fetch) {
                 },
                 _fetch,
             });
-            return (await response.json()) as Status;
+            return data as Status;
         },
         postLogOut: async (): Promise<Status> => {
-            const response = await handleFetch({
+            const data = await handleFetch({
                 url: `${baseUrl}/log-out`,
                 options: {
                     method: "POST",
                 },
                 _fetch,
             });
-            return (await response.json()) as Status;
+            return data as Status;
         },
     };
 }
@@ -106,5 +106,25 @@ async function handleFetch({url, options, _fetch}: HandleFetchParameters) {
         }
     }
 
-    return _fetch(url, _options);
+    const response = await _fetch(url, _options);
+
+    let payload = {};
+    try {
+        payload = await response.json();
+    } catch (e) {
+        // invalid JSON parse _could_ be fine too if response has an empty body
+        console.debug(e);
+    }
+
+    // turn 4xx and 5xx into errors
+    if (!response.ok) {
+        const error = new Error(response.statusText);
+        // @ts-expect-error TS2339
+        error.data = payload;
+        // @ts-expect-error TS2339
+        error.status = response.status;
+        throw error;
+    }
+
+    return payload;
 }

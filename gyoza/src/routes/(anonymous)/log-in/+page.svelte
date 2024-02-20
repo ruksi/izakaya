@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Alert from "$lib/Alert.svelte";
     import {logInMutation} from "$lib/backend";
     import {useQueryClient} from "@tanstack/svelte-query";
 
@@ -20,27 +21,50 @@
     }
 </script>
 
-<h1 class="hidden">Log In</h1>
+<!-- svelte-ignore a11y-autofocus -->
 
-<form on:submit={handleSubmit}>
-    <label>
-        Username or Email
-        <input name="username_or_email" type="text" bind:value={username_or_email} />
-    </label>
-    <label>
-        Password
-        <input name="password" type="password" bind:value={password} />
-    </label>
-    <button>Log in</button>
-</form>
+<main>
+    {#if $logIn.error}
+        <div class="pb-4">
+            <Alert error={$logIn.error} color="red" head="Login Failed" />
+        </div>
+    {/if}
+    <form class="card" on:submit={handleSubmit}>
+        <div class="card-head py-3 px-4 text-xl">
+            <h1>Log In</h1>
+        </div>
+        <div class="card-body py-5 px-6 flex flex-col gap-4">
+            <label>
+                Username <span class="text-sm text-zinc-400">or Email</span>
+                <input
+                    name="username_or_email"
+                    type="text"
+                    bind:value={username_or_email}
+                    autofocus
+                />
+            </label>
+            <label>
+                Password
+                <input name="password" type="password" bind:value={password} />
+            </label>
+        </div>
+        <div class="card-foot py-3 px-4 mt-3 flex">
+            <button class="ms-auto btn btn-purple">Log in</button>
+        </div>
+    </form>
+    <div class="pt-12 text-center text-gray-400">
+        New to Izakaya?
+        <a href="/sign-up" class="text-purple-400"> Create an account </a>
+    </div>
+</main>
 
 <style lang="postcss">
-    form {
-        @apply flex flex-col gap-3 max-w-xl mx-auto pt-10;
+    main {
+        @apply flex flex-col max-w-sm mx-auto mt-10;
     }
     input[type="text"],
     input[type="password"] {
-        @apply form-input p-1 bg-zinc-800 rounded;
-        @apply focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-zinc-300;
+        @apply py-1 px-2 rounded-lg;
+        @apply w-full;
     }
 </style>
