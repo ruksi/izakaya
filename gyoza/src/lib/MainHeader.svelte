@@ -9,12 +9,17 @@
         e.preventDefault();
         $logOut.mutate();
     }
+
+    $: if ($logOut.isSuccess) {
+        window.location.href = "/";
+    }
 </script>
 
 <header>
     <nav>
         <a href="/">🏠️</a>
         {#if $verify?.data?.is_authenticated}
+            <a href="/settings">Settings</a>
             <a href="/log-out" on:click={handleLogOut}>Log Out</a>
         {:else}
             <a href="/log-in">Log In</a>

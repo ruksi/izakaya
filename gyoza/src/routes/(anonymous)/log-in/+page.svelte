@@ -12,6 +12,12 @@
         e.stopPropagation();
         $logIn.mutate({username_or_email, password});
     }
+
+    $: if ($logIn.isSuccess) {
+        if ($logIn?.data?.status == "ok") {
+            window.location.href = "/";
+        }
+    }
 </script>
 
 <h1 class="hidden">Log In</h1>

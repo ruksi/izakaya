@@ -1,9 +1,5 @@
 import {backendUrl, getCookie} from "$lib/utils";
-import {
-    createMutation,
-    createQuery,
-    type QueryClient,
-} from "@tanstack/svelte-query";
+import {createMutation, createQuery, type QueryClient} from "@tanstack/svelte-query";
 
 export type Status = {status: string};
 export type Verify = {is_authenticated: boolean};
