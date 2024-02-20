@@ -2,6 +2,7 @@
     import Alert from "$lib/Alert.svelte";
     import {logInMutation} from "$lib/backend";
     import {useQueryClient} from "@tanstack/svelte-query";
+    import {slide} from "svelte/transition";
 
     const logIn = logInMutation(useQueryClient());
 
@@ -25,7 +26,7 @@
 
 <main>
     {#if $logIn.error}
-        <div class="pb-4">
+        <div class="pb-4" transition:slide>
             <Alert error={$logIn.error} color="red" head="Login Failed" />
         </div>
     {/if}
