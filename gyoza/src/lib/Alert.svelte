@@ -5,7 +5,7 @@
     export let color: "gray" | "red" | "yellow" | "green" = "gray";
 
     $: _head = head ?? error?.data?.message ?? "";
-    $: _body = body ?? (error?.status ? `${error.status} ` : "") + (error?.message ?? "");
+    $: _body = body ?? (error?.status ? `${error.status} ` : "") + (error?.message ?? "Error");
 </script>
 
 <div class="alert {color}">

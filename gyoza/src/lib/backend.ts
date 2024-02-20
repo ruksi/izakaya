@@ -1,5 +1,9 @@
-import {backendUrl, getCookie} from "$lib/utils";
-import {createMutation, createQuery, type QueryClient} from "@tanstack/svelte-query";
+import {backendUrl, getCookie, httpStatusToText} from "$lib/utils";
+import {
+    createMutation,
+    createQuery,
+    type QueryClient,
+} from "@tanstack/svelte-query";
 
 export type Status = {status: string};
 export type Verify = {is_authenticated: boolean};
@@ -118,7 +122,7 @@ async function handleFetch({url, options, _fetch}: HandleFetchParameters) {
 
     // turn 4xx and 5xx into errors
     if (!response.ok) {
-        const error = new Error(response.statusText);
+        const error = new Error(httpStatusToText(response.status));
         // @ts-expect-error TS2339
         error.data = payload;
         // @ts-expect-error TS2339
