@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        @apply bg-zinc-900 text-gray-300;
+        @apply overflow-y-scroll overflow-x-auto;
+        @apply scrollbar scrollbar-thumb-neutral-500 scrollbar-track-neutral-700;
+    }
+}

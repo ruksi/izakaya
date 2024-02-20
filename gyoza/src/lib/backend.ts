@@ -1,5 +1,9 @@
 import {backendUrl, getCookie} from "$lib/utils";
-import {createMutation, createQuery} from "@tanstack/svelte-query";
+import {
+    createMutation,
+    createQuery,
+    type QueryClient,
+} from "@tanstack/svelte-query";
 
 export type Status = {status: string};
 export type Verify = {is_authenticated: boolean};
@@ -14,7 +18,7 @@ export function verifyQuery() {
     });
 }
 
-export function logInMutation(client) {
+export function logInMutation(client: QueryClient) {
     return createMutation({
         mutationFn: api().postLogIn,
         onMutate: async () => {
@@ -27,7 +31,7 @@ export function logInMutation(client) {
     });
 }
 
-export function logOutMutation(client) {
+export function logOutMutation(client: QueryClient) {
     return createMutation({
         mutationFn: api().postLogOut,
         onMutate: async () => {
@@ -51,7 +55,13 @@ export function api(_fetch = fetch) {
             });
             return (await response.json()) as Verify;
         },
-        postLogIn: async ({username_or_email, password}): Promise<Status> => {
+        postLogIn: async ({
+            username_or_email,
+            password,
+        }: {
+            username_or_email: string;
+            password: string;
+        }): Promise<Status> => {
             const response = await handleFetch({
                 url: `${baseUrl}/log-in`,
                 options: {
@@ -87,7 +97,7 @@ async function handleFetch({url, options, _fetch}: HandleFetchParameters) {
         _options["credentials"] = "include";
     }
 
-    _options.headers = _options.headers || {};
+    _options.headers = (_options.headers || {}) as Record<string, string>;
     if (_options.body) {
         _options.headers = {
             "Content-Type": "application/json",
