@@ -16,6 +16,9 @@ export default {
             },
         },
     },
+    corePlugins: {
+        container: false,
+    },
     plugins: [
         require("@tailwindcss/typography"),
         // eslint-disable-next-line @typescript-eslint/no-var-requires
