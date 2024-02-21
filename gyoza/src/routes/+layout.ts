@@ -21,19 +21,24 @@ export const load = async ({fetch, route}) => {
     // this both checks and pre-caches if the user is authenticated,
     // note this does not refresh on log in or log out, only on a page load
     // a `load` function the root layout
-    const verify = await queryClient.fetchQuery({
-        queryKey: ["verify"],
-        queryFn: api(fetch).getVerify,
-    });
-    if (verify?.is_authenticated == false) {
-        if (route.id && (route.id as string).startsWith("/(authenticated)/")) {
-            redirect(307, "/");
+    try {
+        const verify = await queryClient.fetchQuery({
+            queryKey: ["verify"],
+            queryFn: api(fetch).getVerify,
+        });
+        if (verify?.is_authenticated == false) {
+            if (route.id && (route.id as string).startsWith("/(authenticated)/")) {
+                redirect(307, "/");
+            }
         }
-    }
-    if (verify?.is_authenticated == true) {
-        if (route.id && (route.id as string).startsWith("/(anonymous)/")) {
-            redirect(307, "/");
+        if (verify?.is_authenticated == true) {
+            if (route.id && (route.id as string).startsWith("/(anonymous)/")) {
+                redirect(307, "/");
+            }
         }
+    } catch {
+        // the backend server is down, continue to render what we can,
+        // no need to log this as the browser console will be full of errors
     }
 
     return {queryClient};
