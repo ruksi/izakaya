@@ -1,7 +1,9 @@
 <script lang="ts">
+    import FetchError from "$lib/FetchError";
+
     export let head: string | undefined = undefined;
     export let body: string | undefined = undefined;
-    export let error: Error | undefined = undefined;
+    export let error: Error | FetchError | undefined = undefined;
     export let color: "gray" | "red" | "yellow" | "green" = "gray";
 
     $: _head = head ?? error?.data?.message ?? "";

@@ -1,9 +1,6 @@
-import {backendUrl, getCookie, httpStatusToText} from "$lib/utils";
-import {
-    createMutation,
-    createQuery,
-    type QueryClient,
-} from "@tanstack/svelte-query";
+import FetchError from "$lib/FetchError";
+import {backendUrl, getCookie} from "$lib/utils";
+import {createMutation, createQuery, type QueryClient} from "@tanstack/svelte-query";
 
 export type Status = {status: string};
 export type Verify = {is_authenticated: boolean};
@@ -112,9 +109,9 @@ async function handleFetch({url, options, _fetch}: HandleFetchParameters) {
 
     const response = await _fetch(url, _options);
 
-    let payload = {};
+    let data = {};
     try {
-        payload = await response.json();
+        data = await response.json();
     } catch (e) {
         // invalid JSON parse _could_ be fine too if response has an empty body
         console.debug(e);
@@ -122,13 +119,8 @@ async function handleFetch({url, options, _fetch}: HandleFetchParameters) {
 
     // turn 4xx and 5xx into errors
     if (!response.ok) {
-        const error = new Error(httpStatusToText(response.status));
-        // @ts-expect-error TS2339
-        error.data = payload;
-        // @ts-expect-error TS2339
-        error.status = response.status;
-        throw error;
+        throw new FetchError(response.status, data);
     }
 
-    return payload;
+    return data;
 }
