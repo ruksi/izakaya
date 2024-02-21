@@ -1,5 +1,5 @@
 import {formatMessage} from "@/form/messages";
-import {Issue, isBackendError} from "@/general/errors";
+import {isBackendError, Issue} from "@/general/errors";
 import {Alert, Spinner} from "react-bootstrap";
 
 interface FormAlertProps {
@@ -41,15 +41,15 @@ export function FormAlert({title, error, isLoading = false}: FormAlertProps) {
                 {`${error.status} - ${error.data.message}`}
                 {error.data.issues
                     ? Object.entries(error.data.issues)
-                          .sort()
-                          .map(([field, field_issues]) => (
-                              <div key={field} className="ps-2">
-                                  <FieldDisplay
-                                      field={field}
-                                      issues={field_issues}
-                                  />
-                              </div>
-                          ))
+                        .sort()
+                        .map(([field, field_issues]) => (
+                            <div key={field} className="ps-2">
+                                <FieldDisplay
+                                    field={field}
+                                    issues={field_issues}
+                                />
+                            </div>
+                        ))
                     : null}
             </div>
         </Alert>

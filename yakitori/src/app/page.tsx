@@ -2,15 +2,7 @@ import {faPenToSquare} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import Link from "next/link";
-import {
-    Button,
-    Col,
-    Container,
-    Form,
-    InputGroup,
-    Row,
-    Stack,
-} from "react-bootstrap";
+import {Button, Col, Container, Form, InputGroup, Row, Stack,} from "react-bootstrap";
 import PurpleHeartSVG from "../../public/purple-heart.svg";
 import RedPaperLanternSVG from "../../public/red-paper-lantern.svg";
 import styles from "./page.module.scss";

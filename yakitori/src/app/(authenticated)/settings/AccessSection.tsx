@@ -1,29 +1,11 @@
 "use client";
 
-import {
-    NewSession,
-    Session,
-    useCreateSession,
-    useRevokeSession,
-    useSessions,
-} from "@/services/backend/session";
-import {
-    faBan,
-    faKey,
-    faPlus,
-    faThumbsUp,
-} from "@fortawesome/free-solid-svg-icons";
+import {NewSession, Session, useCreateSession, useRevokeSession, useSessions,} from "@/services/backend/session";
+import {faBan, faKey, faPlus, faThumbsUp,} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {formatDistance, parseISO} from "date-fns";
 import React, {useCallback, useEffect, useState} from "react";
-import {
-    Button,
-    Form,
-    InputGroup,
-    Modal,
-    Placeholder,
-    Stack,
-} from "react-bootstrap";
+import {Button, Form, InputGroup, Modal, Placeholder, Stack,} from "react-bootstrap";
 
 export function AccessSection() {
     const {sessions, isLoading} = useSessions();

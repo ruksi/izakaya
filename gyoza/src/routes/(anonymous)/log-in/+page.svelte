@@ -27,7 +27,7 @@
 <main>
     {#if $logIn.error}
         <div class="pb-4" transition:slide>
-            <Alert error={$logIn.error} color="red" head="Login Failed"/>
+            <Alert error={$logIn.error} color="red" head="Login Failed" />
         </div>
     {/if}
     <form class="card" on:submit={handleSubmit}>
@@ -46,7 +46,7 @@
             </label>
             <label>
                 Password
-                <input name="password" type="password" bind:value={password}/>
+                <input name="password" type="password" bind:value={password} />
             </label>
         </div>
         <div class="card-foot py-3 px-4 mt-3 flex">

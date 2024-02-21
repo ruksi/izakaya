@@ -14,6 +14,6 @@
 </svelte:head>
 
 <QueryClientProvider client={data.queryClient}>
-    <MainHeader/>
-    <slot/>
+    <MainHeader />
+    <slot />
 </QueryClientProvider>
