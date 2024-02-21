@@ -10,7 +10,11 @@ type HandleFetchParameters = {
     _fetch: typeof fetch;
 };
 
-export default async function handleFetch({url, options, _fetch}: HandleFetchParameters) {
+export default async function handleFetch({
+    url,
+    options,
+    _fetch,
+}: HandleFetchParameters) {
     const _options: RequestInit = options || {};
     if (url.startsWith(backend)) {
         _options["credentials"] = "include";

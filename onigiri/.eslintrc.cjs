@@ -6,7 +6,7 @@ module.exports = {
         sourceType: "module",
     },
     settings: {
-        react: {version: "18.2"}
+        react: {version: "18.2"},
     },
     env: {
         browser: true,
@@ -19,13 +19,9 @@ module.exports = {
         "plugin:react/jsx-runtime",
         "plugin:react-hooks/recommended",
     ],
-    plugins: [
-        "react-refresh",
-        "@typescript-eslint",
-        "@emotion/eslint-plugin"
-    ],
+    plugins: ["react-refresh", "@typescript-eslint", "@emotion/eslint-plugin"],
     rules: {
         "react-refresh/only-export-components": "warn",
         "@emotion/syntax-preference": [2, "object"],
     },
-}
+};

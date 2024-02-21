@@ -6,7 +6,8 @@
     "dev": "[ -e .env ] && set -a && . ./.env; next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.1",

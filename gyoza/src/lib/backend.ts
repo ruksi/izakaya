@@ -1,6 +1,10 @@
 import handleFetch from "$lib/handleFetch";
 import {backend} from "$lib/urls";
-import {createMutation, createQuery, type QueryClient} from "@tanstack/svelte-query";
+import {
+    createMutation,
+    createQuery,
+    type QueryClient,
+} from "@tanstack/svelte-query";
 
 export function verifyQuery() {
     return createQuery({
