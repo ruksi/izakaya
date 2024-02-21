@@ -1,11 +1,9 @@
-import {backendUrl} from "$lib/utils";
+import {backendUrl} from "$lib/urls";
 import type {HandleFetch} from "@sveltejs/kit";
-
-const baseUrl = backendUrl();
 
 export const handleFetch: HandleFetch = async ({event, request, fetch}) => {
     // TODO: is it bad that this can cause some cookies to be send to ether? 😅
-    if (request.url.startsWith(baseUrl)) {
+    if (request.url.startsWith(backendUrl)) {
         // pass user cookies from SvelteKit backend to the API backend
         const cookies = event.request.headers.get("Cookie");
         if (cookies) {

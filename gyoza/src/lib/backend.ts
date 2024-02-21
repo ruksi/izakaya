@@ -1,17 +1,11 @@
-import FetchError from "$lib/FetchError";
-import {backendUrl, getCookie} from "$lib/utils";
+import handleFetch from "$lib/handleFetch";
+import {backendUrl} from "$lib/urls";
 import {createMutation, createQuery, type QueryClient} from "@tanstack/svelte-query";
-
-export type Status = {status: string};
-export type Verify = {is_authenticated: boolean};
-
-const baseUrl = backendUrl();
-const safeMethods = ["GET", "HEAD", "OPTIONS", "TRACE"];
 
 export function verifyQuery() {
     return createQuery({
-        queryKey: ["verify"],
         queryFn: api().getVerify,
+        queryKey: ["verify"],
     });
 }
 
@@ -41,13 +35,16 @@ export function logOutMutation(client: QueryClient) {
     });
 }
 
+export type Status = {status: string};
+export type Verify = {is_authenticated: boolean};
+
 // In server `load`, the SvelteKit `fetch` is not yet injected, so
-// we need to pass it as an argument to the API function.
+// we sometimes need to pass it as an argument to the API function.
 export function api(_fetch = fetch) {
     return {
         getVerify: async (): Promise<Verify> => {
             const data = await handleFetch({
-                url: `${baseUrl}/verify`,
+                url: `${backendUrl}/verify`,
                 _fetch,
             });
             return data as Verify;
@@ -60,7 +57,7 @@ export function api(_fetch = fetch) {
             password: string;
         }): Promise<Status> => {
             const data = await handleFetch({
-                url: `${baseUrl}/log-in`,
+                url: `${backendUrl}/log-in`,
                 options: {
                     method: "POST",
                     body: JSON.stringify({username_or_email, password}),
@@ -71,7 +68,7 @@ export function api(_fetch = fetch) {
         },
         postLogOut: async (): Promise<Status> => {
             const data = await handleFetch({
-                url: `${baseUrl}/log-out`,
+                url: `${backendUrl}/log-out`,
                 options: {
                     method: "POST",
                 },
@@ -80,47 +77,4 @@ export function api(_fetch = fetch) {
             return data as Status;
         },
     };
-}
-
-type HandleFetchParameters = {
-    url: string;
-    options?: RequestInit;
-    _fetch: typeof fetch;
-};
-
-async function handleFetch({url, options, _fetch}: HandleFetchParameters) {
-    const _options: RequestInit = options || {};
-    if (url.startsWith(baseUrl)) {
-        _options["credentials"] = "include";
-    }
-
-    _options.headers = (_options.headers || {}) as Record<string, string>;
-    if (_options.body) {
-        _options.headers = {
-            "Content-Type": "application/json",
-        };
-    }
-    if (_options.method && !safeMethods.includes(_options.method as string)) {
-        const token = getCookie("Tatami-CSRF");
-        if (token) {
-            _options.headers["CSRF-Token"] = token;
-        }
-    }
-
-    const response = await _fetch(url, _options);
-
-    let data = {};
-    try {
-        data = await response.json();
-    } catch (e) {
-        // invalid JSON parse _could_ be fine too if response has an empty body
-        console.debug(e);
-    }
-
-    // turn 4xx and 5xx into errors
-    if (!response.ok) {
-        throw new FetchError(response.status, data);
-    }
-
-    return data;
 }
