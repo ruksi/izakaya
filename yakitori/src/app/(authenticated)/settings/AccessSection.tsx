@@ -6,7 +6,7 @@ import {
     useCreateSession,
     useRevokeSession,
     useSessions,
-} from "@/services/backend";
+} from "@/services/backend/session";
 import {
     faBan,
     faKey,

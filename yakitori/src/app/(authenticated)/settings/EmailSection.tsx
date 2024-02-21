@@ -1,6 +1,6 @@
 "use client";
 
-import {Email, useEmails} from "@/services/backend";
+import {Email, useEmails} from "@/services/backend/email";
 import {Col, ListGroup, Placeholder, Row} from "react-bootstrap";
 
 export function EmailSection() {

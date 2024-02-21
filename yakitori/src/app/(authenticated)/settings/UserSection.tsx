@@ -1,6 +1,6 @@
 "use client";
 
-import {useCurrentUser} from "@/services/backend";
+import {useCurrentUser} from "@/services/backend/user";
 import {Placeholder} from "react-bootstrap";
 
 export function UserSection() {

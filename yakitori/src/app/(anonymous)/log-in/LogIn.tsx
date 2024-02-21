@@ -2,7 +2,7 @@
 
 import {FormAlert} from "@/form/FormAlert";
 import SpinnerIf from "@/general/SpinnerIf";
-import {useLogIn} from "@/services/backend";
+import {useLogIn} from "@/services/backend/auth";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Link from "next/link";

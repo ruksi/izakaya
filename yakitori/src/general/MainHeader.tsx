@@ -1,6 +1,6 @@
 "use client";
 
-import {useLogOut, useVerify} from "@/services/backend";
+import {useLogOut, useVerify} from "@/services/backend/auth";
 import {
     faArrowRightToBracket,
     faGear,
