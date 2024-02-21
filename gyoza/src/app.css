@@ -11,9 +11,7 @@
     input[type] {
         @apply bg-zinc-900 border-zinc-700;
         @apply outline-none;
-        transition:
-            border-color 0.15s ease-in-out,
-            box-shadow 0.15s ease-in-out;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     }
     input[type]:focus {
         @apply border-slate-400;

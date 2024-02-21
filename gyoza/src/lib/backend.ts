@@ -1,10 +1,6 @@
 import handleFetch from "$lib/handleFetch";
 import {backend} from "$lib/urls";
-import {
-    createMutation,
-    createQuery,
-    type QueryClient,
-} from "@tanstack/svelte-query";
+import {createMutation, createQuery, type QueryClient} from "@tanstack/svelte-query";
 
 export function verifyQuery() {
     return createQuery({
@@ -39,8 +35,8 @@ export function logOutMutation(client: QueryClient) {
     });
 }
 
-export type Status = {status: string};
-export type Verify = {is_authenticated: boolean};
+export type Status = { status: string };
+export type Verify = { is_authenticated: boolean };
 
 // In server `load`, the SvelteKit `fetch` is not yet injected, so
 // we sometimes need to pass it as an argument to the API function.
@@ -54,9 +50,9 @@ export function api(_fetch = fetch) {
             return data as Verify;
         },
         postLogIn: async ({
-            username_or_email,
-            password,
-        }: {
+                              username_or_email,
+                              password,
+                          }: {
             username_or_email: string;
             password: string;
         }): Promise<Status> => {
