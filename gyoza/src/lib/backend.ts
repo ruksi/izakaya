@@ -1,5 +1,5 @@
 import handleFetch from "$lib/handleFetch";
-import {backendUrl} from "$lib/urls";
+import {backend} from "$lib/urls";
 import {createMutation, createQuery, type QueryClient} from "@tanstack/svelte-query";
 
 export function verifyQuery() {
@@ -44,7 +44,7 @@ export function api(_fetch = fetch) {
     return {
         getVerify: async (): Promise<Verify> => {
             const data = await handleFetch({
-                url: `${backendUrl}/verify`,
+                url: `${backend}/verify`,
                 _fetch,
             });
             return data as Verify;
@@ -57,7 +57,7 @@ export function api(_fetch = fetch) {
             password: string;
         }): Promise<Status> => {
             const data = await handleFetch({
-                url: `${backendUrl}/log-in`,
+                url: `${backend}/log-in`,
                 options: {
                     method: "POST",
                     body: JSON.stringify({username_or_email, password}),
@@ -68,7 +68,7 @@ export function api(_fetch = fetch) {
         },
         postLogOut: async (): Promise<Status> => {
             const data = await handleFetch({
-                url: `${backendUrl}/log-out`,
+                url: `${backend}/log-out`,
                 options: {
                     method: "POST",
                 },

@@ -1,5 +1,5 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
-import {backendUrl} from "../utils.ts";
+import {getBackendUrl} from "../urls.ts";
 
 function getCookie(name: string): string | null {
     const valueStartsAt = name.length + 1;
@@ -17,9 +17,9 @@ function getCookie(name: string): string | null {
 }
 
 function createBaseQuery() {
-    const baseUrl = backendUrl();
+    const backend = getBackendUrl();
     return fetchBaseQuery({
-        baseUrl,
+        baseUrl: backend,
         credentials: "include",
         prepareHeaders: (headers, {type}) => {
             if (type === "mutation") {

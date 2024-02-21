@@ -1,7 +1,7 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {backendUrl} from "../utils";
+import {getBackendUrl} from "../urls.ts";
 
-const baseUrl = backendUrl();
+const backend = getBackendUrl();
 
 interface VerifyPayload {
     is_authenticated: boolean;
@@ -9,7 +9,7 @@ interface VerifyPayload {
 }
 
 export const authVerify = createAsyncThunk("auth/verify", async () => {
-    const response = await fetch(`${baseUrl}/verify`, {credentials: "include"});
+    const response = await fetch(`${backend}/verify`, {credentials: "include"});
     if (!response.ok) {
         throw Error();
     }

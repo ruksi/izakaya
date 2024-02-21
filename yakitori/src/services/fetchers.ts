@@ -1,9 +1,9 @@
-import {backendUrl} from "@/utils";
+import {getBackendUrl} from "@/urls";
 
-const base = backendUrl();
+const backend = getBackendUrl();
 
 export async function query(uri: string) {
-    let response = await fetch(`${base}${uri}`, {credentials: "include"});
+    let response = await fetch(`${backend}${uri}`, {credentials: "include"});
     return await handleResponse(response);
 }
 
@@ -20,7 +20,7 @@ export async function mutation([uri, method]: any[], {arg}: {arg: any}) {
         headers["Content-Type"] = "application/json";
     }
 
-    let response = await fetch(`${base}${uri}`, {
+    let response = await fetch(`${backend}${uri}`, {
         credentials: "include",
         method,
         headers,

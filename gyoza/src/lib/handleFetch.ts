@@ -1,6 +1,6 @@
 import FetchError from "$lib/FetchError";
 import getCookie from "$lib/getCookie";
-import {backendUrl} from "$lib/urls";
+import {backend} from "$lib/urls";
 
 const safeMethods = ["GET", "HEAD", "OPTIONS", "TRACE"];
 
@@ -12,7 +12,7 @@ type HandleFetchParameters = {
 
 export default async function handleFetch({url, options, _fetch}: HandleFetchParameters) {
     const _options: RequestInit = options || {};
-    if (url.startsWith(backendUrl)) {
+    if (url.startsWith(backend)) {
         _options["credentials"] = "include";
     }
 

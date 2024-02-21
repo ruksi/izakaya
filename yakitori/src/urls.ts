@@ -1,4 +1,4 @@
-export function selfUrl(): string {
+export function getSelfUrl(): string {
     let url = process.env.NEXT_PUBLIC_SELF_URL ?? "";
     url = url.trim();
     if (url.endsWith("/")) {
@@ -10,7 +10,7 @@ export function selfUrl(): string {
     return url;
 }
 
-export function backendUrl(): string {
+export function getBackendUrl(): string {
     let url = process.env.NEXT_PUBLIC_BACKEND_URL ?? "";
     url = url.trim();
     if (url.endsWith("/")) {

@@ -1,4 +1,4 @@
-export const backendUrl = getBackendUrl();
+export const backend = getBackendUrl();
 
 function getBackendUrl(): string {
     let url = import.meta.env.VITE_BACKEND_URL ?? "";

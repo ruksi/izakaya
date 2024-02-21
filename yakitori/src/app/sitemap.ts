@@ -1,17 +1,17 @@
-import {selfUrl} from "@/utils";
+import {getSelfUrl} from "@/urls";
 import {MetadataRoute} from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const base = selfUrl();
+    const self = getSelfUrl();
     return [
         {
-            url: `${base}/`,
+            url: `${self}/`,
             lastModified: new Date(),
             changeFrequency: "monthly",
             priority: 1,
         },
         {
-            url: `${base}/about`,
+            url: `${self}/about`,
             lastModified: new Date(),
             changeFrequency: "monthly",
             priority: 0.5,
