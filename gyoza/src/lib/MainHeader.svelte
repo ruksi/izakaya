@@ -30,7 +30,7 @@
 
 <style lang="postcss">
     header {
-        @apply bg-[#202023] border-b border-zinc-700;
+        @apply bg-zinc-850 border-b border-zinc-700;
         @apply text-[#88889b] text-sm text-nowrap;
     }
     nav {
