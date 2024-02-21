@@ -1,3 +1,10 @@
+<script>
+</script>
+
+<svelte:head>
+    <title>Izakaya</title>
+</svelte:head>
+
 <main class="flex flex-col max-w-7xl mx-auto p-4">
     <div class="pt-40 pb-20">
         <div class="flex">

@@ -22,8 +22,11 @@
     }
 </script>
 
-<!-- svelte-ignore a11y-autofocus -->
+<svelte:head>
+    <title>Log In</title>
+</svelte:head>
 
+<!-- svelte-ignore a11y-autofocus -->
 <main>
     {#if $logIn.error}
         <div class="pb-4" transition:slide>
