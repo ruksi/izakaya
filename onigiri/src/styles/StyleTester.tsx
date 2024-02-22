@@ -4,7 +4,6 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import {responsive} from "./breakpoints.ts";
 
-// prettier-ignore
 const disco = css(
     responsive({
         textDecoration: "underline",

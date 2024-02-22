@@ -7,7 +7,6 @@ export interface BackendError {
     data: BackendErrorData;
 }
 
-// prettier-ignore
 export interface BackendErrorData {
     message: string;            // exists for all "controlled" errors
     issues?: ValidationIssues;  // exists if validation error
