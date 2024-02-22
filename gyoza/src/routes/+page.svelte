@@ -35,7 +35,7 @@
     </section>
 </main>
 
-<style>
+<style lang="postcss">
     section {
         @apply text-5xl leading-tight font-light;
     }
