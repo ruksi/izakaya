@@ -18,6 +18,7 @@
 <header>
     <nav>
         <a href="/">🏠️</a>
+        <a class="plain" href="/about">About</a>
         {#if $verify?.data?.is_authenticated}
             <a href="/settings">Settings</a>
             <a href="/log-out" on:click={handleLogOut}>Log Out</a>
@@ -39,6 +40,9 @@
     a {
         @apply border border-[#88889b] rounded py-1 px-1.5 text-[#88889b];
         @apply hover:border-white hover:text-white;
+    }
+    a.plain {
+        @apply border-transparent;
     }
     a:first-of-type {
         @apply mr-auto;
