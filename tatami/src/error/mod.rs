@@ -1,8 +1,8 @@
 use axum::http::StatusCode;
 use axum::Json;
 
-use crate::error::argon2_hash_error::argon2_password_hash_error_to_response_tuple;
 use crate::error::axum_json_rejection::axum_json_rejection_to_response_tuple;
+use crate::error::password_hash_error::password_hash_error_to_response_tuple;
 use crate::error::redis_error::redis_error_to_response_tuple;
 use crate::error::redis_pool_error::deadpool_redis_error_to_response_tuple;
 use crate::error::response::{error_message, ErrorOut};
@@ -10,8 +10,8 @@ use crate::error::sqlx_error::sqlx_error_to_response_tuple;
 use crate::error::tokio_task_error::tokio_task_join_error_to_response_tuple;
 use crate::error::validation_error::validator_error_to_response_tuple;
 
-mod argon2_hash_error;
 mod axum_json_rejection;
+mod password_hash_error;
 mod redis_error;
 mod redis_pool_error;
 mod response;
@@ -33,7 +33,7 @@ pub enum Error {
     Sqlx(sqlx::Error),
     Redis(redis::RedisError),
     RedisPool(deadpool::managed::PoolError<redis::RedisError>),
-    Argon2Hash(argon2::password_hash::Error),
+    PasswordHash(argon2::password_hash::Error),
     TokioTask(tokio::task::JoinError),
 }
 
@@ -62,7 +62,7 @@ impl Error {
             Sqlx(err) => sqlx_error_to_response_tuple(err),
             Redis(err) => redis_error_to_response_tuple(err),
             RedisPool(err) => deadpool_redis_error_to_response_tuple(err),
-            Argon2Hash(err) => argon2_password_hash_error_to_response_tuple(err),
+            PasswordHash(err) => password_hash_error_to_response_tuple(err),
             TokioTask(err) => tokio_task_join_error_to_response_tuple(err),
         }
     }
@@ -119,7 +119,7 @@ impl From<deadpool::managed::PoolError<redis::RedisError>> for Error {
 
 impl From<argon2::password_hash::Error> for Error {
     fn from(err: argon2::password_hash::Error) -> Self {
-        Self::Argon2Hash(err)
+        Self::PasswordHash(err)
     }
 }
 

@@ -34,7 +34,7 @@ impl IssueOut {
         self
     }
 
-    pub fn with_param(mut self, key: impl Into<String>, value: impl Serialize) -> Self {
+    pub fn with_detail(mut self, key: impl Into<String>, value: impl Serialize) -> Self {
         let as_json_value = serde_json::to_value(value).unwrap();
         self.details.insert(key.into(), as_json_value);
         self

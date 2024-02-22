@@ -18,10 +18,7 @@ pub struct UserDeclaration {
 
 #[cfg(test)]
 impl UserDeclaration {
-    pub fn new_valid<T>(username: T, email: T, password: T) -> Result<Valid<Self>>
-    where
-        T: Into<String>,
-    {
+    pub fn new_valid<T: Into<String>>(username: T, email: T, password: T) -> Result<Valid<Self>> {
         let declaration = Self {
             username: username.into(),
             email: email.into(),

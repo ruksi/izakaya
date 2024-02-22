@@ -4,7 +4,7 @@ use axum_test::{TestServer, TestServerConfig};
 
 pub mod login;
 
-// mock a server with all endpoint routes and auth middleware enabled
+// a mock server with all endpoint routes and auth middleware enabled
 pub async fn mock_server(db: &sqlx::PgPool) -> TestServer {
     let state = mock_state(db).await;
     let config = TestServerConfig::builder().save_cookies().build(); // <- automatically use cookies

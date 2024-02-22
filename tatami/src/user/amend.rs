@@ -15,14 +15,11 @@ pub struct UserAmendment {
 
 #[cfg(test)]
 impl UserAmendment {
-    pub fn new_valid<T>(username: Option<T>) -> Result<Valid<Self>>
-    where
-        T: Into<String>,
-    {
-        let declaration = Self {
+    pub fn new_valid<T: Into<String>>(username: Option<T>) -> Result<Valid<Self>> {
+        let amendment = Self {
             username: username.map(Into::into),
         };
-        Valid::new(declaration)
+        Valid::new(amendment)
     }
 }
 

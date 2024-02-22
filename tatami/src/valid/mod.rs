@@ -34,7 +34,7 @@ mod tests {
         // you can't skip the validation step, the inner struct is private,
         // e.g. the next won't compile:
         // Valid {
-        //     inner: ValidInner(MyJson {
+        //     inner: ValidInner(Person {
         //         name: "John".to_string(),
         //     }),
         // };

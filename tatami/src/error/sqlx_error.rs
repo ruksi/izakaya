@@ -17,7 +17,7 @@ pub fn sqlx_error_to_response_tuple(err: &sqlx::Error) -> (StatusCode, Json<Erro
                 if let Some(pg_err) = db_err.try_downcast_ref::<PgDatabaseError>() {
                     if let Some(detail) = pg_err.detail() {
                         if let Some((col_name, col_value)) = parse_unique_violation(detail) {
-                            let issue = IssueOut::new("unique").with_param("value", col_value);
+                            let issue = IssueOut::new("unique").with_detail("value", col_value);
                             let issue_map = IssueMapOut::new().with_field_issue(col_name, issue);
                             let outbound = ErrorOut::new(REASON_INVALID).with_issue_map(issue_map);
                             return (StatusCode::BAD_REQUEST, Json(outbound));
@@ -28,7 +28,7 @@ pub fn sqlx_error_to_response_tuple(err: &sqlx::Error) -> (StatusCode, Json<Erro
         };
     };
 
-    tracing::error!("sqlx error: {:?}", err);
+    tracing::error!("SQLx error: {:?}", err);
     let outbound = error_message(REASON_INTERNAL);
     (StatusCode::INTERNAL_SERVER_ERROR, outbound)
 }

@@ -5,13 +5,13 @@ use validator::Validate;
 
 use crate::prelude::*;
 
-// Valid a typestate that marks that the contained struct has been validated, and
-// the only way to mutate the inner value is to remove the validated marker
-// (don't use else with multiple ownership 🙏).
-//
-// You can use it in Axum request handlers through `Valid<T>` like:
-// * `Valid(person): Valid<Person>`
-// * or, if you want to keep the validated marker: `person: Valid<Person>`
+/// Valid is a typestate that marks that the contained struct has been validated,
+/// and the only way to mutate the inner struct is to remove the validated marker
+/// (don't use with anything allowing multiple ownership 🙏).
+///
+/// You can use it in Axum request handlers through `Valid<T>` like:
+/// * `Valid(person): Valid<Person>`
+/// * or, if you want to keep the validated marker: `person: Valid<Person>`
 
 pub struct Valid<T: Validate> {
     inner: ValidInner<T>,
