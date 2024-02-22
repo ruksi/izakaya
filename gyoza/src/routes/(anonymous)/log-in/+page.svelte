@@ -24,6 +24,7 @@
 
 <svelte:head>
     <title>Log In</title>
+    <meta name="description" content="Log in to your Izakaya account" />
 </svelte:head>
 
 <!-- svelte-ignore a11y-autofocus -->

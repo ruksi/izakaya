@@ -3,6 +3,7 @@
 
 <svelte:head>
     <title>Izakaya</title>
+    <meta name="description" content="Explore Izakaya - a state-of-the-art web application!" />
 </svelte:head>
 
 <main class="flex flex-col max-w-7xl mx-auto p-4">
