@@ -27,7 +27,7 @@
 </svelte:head>
 
 <!-- svelte-ignore a11y-autofocus -->
-<main>
+<main class="flex flex-col max-w-sm mx-auto mt-10 px-3">
     {#if $logIn.error}
         <div class="pb-4" transition:slide>
             <Alert error={$logIn.error} color="red" head="Login Failed" />
@@ -40,12 +40,7 @@
         <div class="card-body py-5 px-6 flex flex-col gap-4">
             <label>
                 Username <span class="text-sm text-zinc-400">or Email</span>
-                <input
-                    name="username_or_email"
-                    type="text"
-                    bind:value={username_or_email}
-                    autofocus
-                />
+                <input name="username_or_email" type="text" bind:value={username_or_email} autofocus />
             </label>
             <label>
                 Password
@@ -63,12 +58,7 @@
 </main>
 
 <style lang="postcss">
-    main {
-        @apply flex flex-col max-w-sm mx-auto mt-10;
-    }
-    input[type="text"],
-    input[type="password"] {
-        @apply py-1 px-2 rounded-lg;
-        @apply w-full;
+    input[type] {
+        @apply py-1 px-2 rounded-lg w-full;
     }
 </style>
