@@ -1,12 +1,33 @@
-<script>
-    import svgRedPaperLantern from '$lib/site/red-paper-lantern.svg';
-    import svgPurpleHeart from '$lib/site/purple-heart.svg';
+<script lang="ts">
+    import svgPurpleHeart from "$lib/site/purple-heart.svg";
+    import svgRedPaperLantern from "$lib/site/red-paper-lantern.svg";
+
+    let offsetX = 0;
+    let offsetY = 0;
+    let moving = false;
+
+    function onMouseDown() {
+        moving = true;
+    }
+
+    function onMouseMove(e: MouseEvent) {
+        if (moving) {
+            offsetX += e.movementX;
+            offsetY += e.movementY;
+        }
+    }
+
+    function onMouseUp() {
+        moving = false;
+    }
 </script>
 
 <svelte:head>
     <title>Izakaya</title>
     <meta name="description" content="Explore Izakaya - a state-of-the-art web application!" />
 </svelte:head>
+
+<svelte:window on:mouseup={onMouseUp} on:mousemove={onMouseMove} />
 
 <main class="flex flex-col max-w-7xl mx-auto p-4">
     <div class="
@@ -22,11 +43,14 @@
             ">
                 <picture>
                     <img
+                        on:mousedown={onMouseDown}
+                        style="transform: translate({offsetX}px, {offsetY}px);"
                         src={svgRedPaperLantern}
                         alt="A red paper lantern"
                         height="80"
                         width="80"
                         class="hero-lantern"
+                        draggable=false
                     />
                 </picture>
             </div>
@@ -189,6 +213,9 @@
         background-color: rgba(255, 183, 120, 0.7);
         border-radius: 50%;
         box-shadow: 0 0 0.5rem 0.25rem rgba(255, 183, 120, 0.4);
+        user-select: none;
+        cursor: move;
+        will-change: transform;
     }
 
     section {
