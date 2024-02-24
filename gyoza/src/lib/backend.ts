@@ -48,8 +48,16 @@ export function logOutMutation(client: QueryClient) {
     });
 }
 
+export function currentUserQuery() {
+    return createQuery({
+        queryFn: api().getCurrentUser,
+        queryKey: ["current-user"],
+    });
+}
+
 export type Status = {status: string};
 export type Verify = {is_authenticated: boolean};
+export type User = {user_id: string; username: string;}
 
 type SignUpArgs = {username: string; email: string; password: string;};
 type LogInArgs = {username_or_email: string; password: string;};
@@ -96,6 +104,13 @@ export function api(_fetch = fetch) {
                 _fetch,
             });
             return data as Status;
+        },
+        getCurrentUser: async (): Promise<User> => {
+            const data = await handleFetch({
+                url: `${backend}/api/users/me`,
+                _fetch,
+            });
+            return data as User;
         },
     };
 }

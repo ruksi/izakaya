@@ -2,7 +2,7 @@
     import {logOutMutation, verifyQuery} from "$lib/backend";
     import {useQueryClient} from "@tanstack/svelte-query";
 
-    const verify = verifyQuery();
+    const query = verifyQuery();
     const logOut = logOutMutation(useQueryClient());
 
     function handleLogOut(e: MouseEvent) {
@@ -19,7 +19,7 @@
     <nav>
         <a href="/">🏠️</a>
         <a class="plain" href="/about">About</a>
-        {#if $verify?.data?.is_authenticated}
+        {#if $query?.data?.is_authenticated}
             <a href="/settings">Settings</a>
             <a href="/log-out" on:click={handleLogOut}>Log Out</a>
         {:else}
