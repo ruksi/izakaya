@@ -28,28 +28,28 @@
     }
 
     .gray {
-        @apply bg-gray-950 text-gray-300 border-gray-500;
+        @apply bg-gray-800/35 text-gray-300 border-gray-500;
     }
     .gray .body {
         @apply text-gray-400;
     }
 
     .red {
-        @apply bg-red-990 text-red-300 border-red-900;
+        @apply bg-red-950/35 text-red-300 border-red-900;
     }
     .red .body {
         @apply text-red-400;
     }
 
     .yellow {
-        @apply bg-yellow-990 text-yellow-500 border-yellow-900;
+        @apply bg-yellow-950/35 text-yellow-500 border-yellow-900;
     }
     .yellow .body {
         @apply text-yellow-600;
     }
 
     .green {
-        @apply bg-green-990 text-green-500 border-green-900;
+        @apply bg-green-950/35 text-green-500 border-green-900;
     }
     .green .body {
         @apply text-green-600;

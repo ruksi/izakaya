@@ -4,7 +4,7 @@
 
 @layer base {
     html {
-        @apply bg-zinc-900 text-gray-300;
+        @apply bg-zinc-900 text-neutral-300;
         @apply overflow-y-scroll overflow-x-auto;
         @apply scrollbar scrollbar-thumb-neutral-500 scrollbar-track-neutral-700;
     }
@@ -38,18 +38,16 @@
 
 @layer components {
     .card {
-        @apply bg-zinc-800 text-gray-300;
+        @apply bg-zinc-800;
         @apply border border-zinc-700;
         @apply shadow-lg rounded-lg;
     }
     .card-head {
-        @apply bg-zinc-750 text-gray-300;
+        @apply bg-zinc-700/25;
         @apply border-b border-zinc-600;
     }
-    .card-body {
-    }
     .card-foot {
-        @apply bg-zinc-750 text-gray-300;
+        @apply bg-zinc-700/25;
         @apply border-t border-zinc-600;
     }
 

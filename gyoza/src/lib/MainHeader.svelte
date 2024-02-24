@@ -31,14 +31,14 @@
 
 <style lang="postcss">
     header {
-        @apply bg-zinc-850 border-b border-zinc-700;
-        @apply text-[#88889b] text-sm text-nowrap;
+        @apply bg-zinc-800/50 border-b border-zinc-700;
+        @apply text-zinc-400 text-sm text-nowrap;
     }
     nav {
         @apply flex gap-2 mx-auto max-w-7xl p-4;
     }
     a {
-        @apply border border-[#88889b] rounded py-1 px-1.5 text-[#88889b];
+        @apply border border-zinc-500 rounded py-1 px-1.5 text-zinc-400;
         @apply hover:border-white hover:text-white;
     }
     a.plain {
