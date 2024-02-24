@@ -65,7 +65,7 @@
     </section>
 
     <section>
-        <header class="text-cyan-300/95">
+        <header class="text-orange-300/95">
             Core Message
         </header>
         <p>
@@ -103,7 +103,7 @@
     </section>
 
     <section>
-        <header class="text-green-300/95">
+        <header class="text-amber-300/95">
             Additional Benefits
         </header>
         <p>
@@ -190,17 +190,21 @@
         border-radius: 50%;
         box-shadow: 0 0 0.5rem 0.25rem rgba(255, 183, 120, 0.4);
     }
+
     section {
         @apply my-8 sm:my-16 xl:my-24;
     }
+
     section header {
         @apply mb-1 md:mb-4;
     }
+
     section header,
     section p {
         @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl;
         @apply font-light leading-tight;
     }
+
     .footer-lantern {
         background-color: rgba(255, 183, 120, 0.7);
         border-radius: 50%;
@@ -208,6 +212,7 @@
         will-change: transform, transform-origin;
         animation: swing 4s ease-in-out infinite;
     }
+
     @keyframes swing {
         0% {
             transform: rotate(8deg);
