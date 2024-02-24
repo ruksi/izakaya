@@ -1,6 +1,7 @@
 <script lang="ts">
     import Alert from "$lib/Alert.svelte";
     import {signUpMutation} from "$lib/backend";
+    import InputFeedback from "$lib/InputFeedback.svelte";
     import {useQueryClient} from "@tanstack/svelte-query";
     import {slide} from "svelte/transition";
 
@@ -30,7 +31,7 @@
 
 <!-- svelte-ignore a11y-autofocus -->
 <main class="flex flex-col max-w-sm mx-auto mt-10 px-3">
-    {#if $signUp.error}
+    {#if $signUp.error && $signUp.error.status !== 400}
         <div class="pb-4" transition:slide>
             <Alert error={$signUp.error} color="red" head="Signup Failed" />
         </div>
@@ -43,14 +44,17 @@
             <label>
                 Email
                 <input name="email" type="text" bind:value={email} autofocus />
+                <InputFeedback field="email" error={$signUp.error} />
             </label>
             <label>
                 Username
                 <input name="username" type="text" bind:value={username} />
+                <InputFeedback field="username" error={$signUp.error} />
             </label>
             <label>
                 Password
                 <input name="password" type="password" bind:value={password} />
+                <InputFeedback field="password" error={$signUp.error} />
             </label>
         </div>
         <div class="card-foot py-3 px-4 mt-3 flex">
