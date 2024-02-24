@@ -18,6 +18,9 @@ static HSET_X: Lazy<redis::Script> = Lazy::new(|| {
 
 // get key references from a set and return the hashes
 static SMEMBERS_HGETALL: Lazy<redis::Script> = Lazy::new(|| {
+    // this accesses undeclared keys, so this reliably works:
+    // 1) against a single server Redis
+    // 2) against a Redis cluster if the keys are on the same server
     redis::Script::new(
         // language=Lua
         r#"
