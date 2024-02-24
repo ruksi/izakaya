@@ -57,9 +57,3 @@
         <a href="/sign-up" class="text-purple-400"> Create an account </a>
     </div>
 </main>
-
-<style lang="postcss">
-    input[type] {
-        @apply py-1 px-2 rounded-lg w-full;
-    }
-</style>

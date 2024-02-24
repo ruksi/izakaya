@@ -9,6 +9,7 @@
         @apply scrollbar scrollbar-thumb-neutral-500 scrollbar-track-neutral-700;
     }
     input[type] {
+        @apply py-1 px-2 rounded-lg w-full;
         @apply bg-zinc-900 border-zinc-700;
         @apply outline-none;
         transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;

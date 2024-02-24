@@ -9,6 +9,19 @@ export function verifyQuery() {
     });
 }
 
+export function signUpMutation(client: QueryClient) {
+    return createMutation({
+        mutationFn: api().postSignUp,
+        onMutate: async () => {
+            await client.cancelQueries({queryKey: ["verify"]});
+            return null;
+        },
+        onSettled: async () => {
+            await client.invalidateQueries({queryKey: ["verify"]});
+        },
+    });
+}
+
 export function logInMutation(client: QueryClient) {
     return createMutation({
         mutationFn: api().postLogIn,
@@ -38,6 +51,9 @@ export function logOutMutation(client: QueryClient) {
 export type Status = {status: string};
 export type Verify = {is_authenticated: boolean};
 
+type SignUpArgs = {username: string; email: string; password: string;};
+type LogInArgs = {username_or_email: string; password: string;};
+
 // In server `load`, the SvelteKit `fetch` is not yet injected, so
 // we sometimes need to pass it as an argument to the API function.
 export function api(_fetch = fetch) {
@@ -49,13 +65,18 @@ export function api(_fetch = fetch) {
             });
             return data as Verify;
         },
-        postLogIn: async ({
-            username_or_email,
-            password,
-        }: {
-            username_or_email: string;
-            password: string;
-        }): Promise<Status> => {
+        postSignUp: async ({username, email, password}: SignUpArgs): Promise<Status> => {
+            const data = await handleFetch({
+                url: `${backend}/sign-up`,
+                options: {
+                    method: "POST",
+                    body: JSON.stringify({username, email, password}),
+                },
+                _fetch,
+            });
+            return data as Status;
+        },
+        postLogIn: async ({username_or_email, password}: LogInArgs): Promise<Status> => {
             const data = await handleFetch({
                 url: `${backend}/log-in`,
                 options: {
