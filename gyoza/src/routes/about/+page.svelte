@@ -1,3 +1,7 @@
+<script>
+    import svgPurpleHeart from "$lib/site/purple-heart.svg";
+</script>
+
 <svelte:head>
     <title>About</title>
     <meta name="description" content="What in the world is izakaya.dev?" />
@@ -12,7 +16,19 @@
             </a>
         </div>
         <div>
-            Made with love by <a href="https://ruk.si/">Ruksi</a>
+            Made with
+            <div class="inline-flex align-middle">
+                <picture>
+                    <img
+                        src={svgPurpleHeart}
+                        alt="love"
+                        title="love"
+                        height="24"
+                        width="24"
+                    />
+                </picture>
+            </div>
+            by <a href="https://ruk.si/">Ruksi</a>
         </div>
         <div>
             License:
@@ -56,6 +72,6 @@
         @apply mb-4;
     }
     a {
-        @apply text-purple-300;
+        @apply text-stone-400
     }
 </style>
