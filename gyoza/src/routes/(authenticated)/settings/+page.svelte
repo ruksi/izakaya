@@ -1,5 +1,6 @@
 <script>
     import Profile from "$lib/user/Profile.svelte";
+    import Emails from "$lib/user/Emails.svelte";
 </script>
 
 <svelte:head>
@@ -13,6 +14,10 @@
         <section>
             <h2>Profile</h2>
             <Profile />
+        </section>
+        <section>
+            <h2>Emails</h2>
+            <Emails />
         </section>
     </div>
 </main>
