@@ -38,7 +38,7 @@
         <div class="card-head py-3 px-4 text-xl">
             <h1>Log In</h1>
         </div>
-        <div class="card-body py-5 px-6 flex flex-col gap-4">
+        <div class="py-5 px-6 flex flex-col gap-4">
             <label>
                 Username <span class="text-sm text-zinc-400">or Email</span>
                 <input name="username_or_email" type="text" bind:value={username_or_email} autofocus />

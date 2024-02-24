@@ -40,7 +40,7 @@
         <div class="card-head py-3 px-4 text-xl">
             <h1>Sign Up</h1>
         </div>
-        <div class="card-body py-5 px-6 flex flex-col gap-4">
+        <div class="py-5 px-6 flex flex-col gap-4">
             <label>
                 Email
                 <input name="email" type="text" bind:value={email} autofocus />
