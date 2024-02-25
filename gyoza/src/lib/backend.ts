@@ -62,11 +62,18 @@ export function emailsQuery() {
     });
 }
 
+export function sessionsQuery() {
+    return createQuery({
+        queryFn: api().getSessions,
+        queryKey: ["session"],
+    });
+}
 
 export type Status = {status: string};
 export type Verify = {is_authenticated: boolean};
 export type User = {user_id: string; username: string;}
 export type Email = {email_id: string; email: string; is_primary: boolean;};
+export type Session = {access_token_prefix: string; used_at?: string;};
 
 type SignUpArgs = {username: string; email: string; password: string;};
 type LogInArgs = {username_or_email: string; password: string;};
@@ -127,6 +134,13 @@ export function api(_fetch = fetch) {
                 _fetch,
             });
             return data as Email[];
+        },
+        getSessions: async (): Promise<Session[]> => {
+            const data = await handleFetch({
+                url: `${backend}/api/sessions`,
+                _fetch,
+            });
+            return data as Session[];
         },
     };
 }

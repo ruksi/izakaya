@@ -1,6 +1,7 @@
 <script>
     import Profile from "$lib/user/Profile.svelte";
     import Emails from "$lib/user/Emails.svelte";
+    import Access from "$lib/user/Access.svelte";
 </script>
 
 <svelte:head>
@@ -19,6 +20,10 @@
             <h2>Emails</h2>
             <Emails />
         </section>
+        <section>
+            <h2>Access</h2>
+            <Access />
+        </section>
     </div>
 </main>
 
@@ -27,6 +32,6 @@
         @apply mt-2;
     }
     section h2 {
-        @apply text-2xl;
+        @apply text-2xl mb-1;
     }
 </style>
