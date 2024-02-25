@@ -79,6 +79,15 @@ export function newSessionMutation(client: QueryClient) {
     });
 }
 
+export function revokeSessionMutation(client: QueryClient) {
+    return createMutation({
+        mutationFn: api().deleteSessions,
+        onSuccess: async () => {
+            await client.invalidateQueries({queryKey: ["session"]});
+        },
+    });
+}
+
 export type Status = {status: string};
 export type Verify = {is_authenticated: boolean};
 export type User = {user_id: string; username: string;}
@@ -89,6 +98,7 @@ export type NewSession = {access_token: string;};
 type SignUpArgs = {username: string; email: string; password: string;};
 type LogInArgs = {username_or_email: string; password: string;};
 type PostSessionsArgs = {password: string;};
+type DeleteSessionsArgs = {access_token_prefix: string;};
 
 // In server `load`, the SvelteKit `fetch` is not yet injected, so
 // we sometimes need to pass it as an argument to the API function.
@@ -164,6 +174,16 @@ export function api(_fetch = fetch) {
                 _fetch,
             });
             return data as NewSession;
+        },
+        deleteSessions: async ({access_token_prefix}: DeleteSessionsArgs): Promise<Status> => {
+            const data = await handleFetch({
+                url: `${backend}/api/sessions/${access_token_prefix}`,
+                options: {
+                    method: "DELETE",
+                },
+                _fetch,
+            });
+            return data as Status;
         },
     };
 }
