@@ -65,4 +65,7 @@
     .btn-purple {
         @apply bg-purple-600 text-gray-100 border-purple-600 hover:bg-purple-800 hover:border-purple-500;
     }
+    .btn-red {
+        @apply bg-red-700 text-gray-100 border-red-700 hover:bg-red-900 hover:border-red-500;
+    }
 }
