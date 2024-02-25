@@ -43,7 +43,8 @@ export function logOutMutation(client: QueryClient) {
             return null;
         },
         onSuccess: async () => {
-            await client.invalidateQueries();
+            // noinspection ES6MissingAwait
+            client.invalidateQueries();
         },
     });
 }
