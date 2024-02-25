@@ -1,7 +1,8 @@
 <script lang="ts">
     import {type Session, sessionsQuery} from "$lib/backend";
+    import NewSessionControl from "$lib/user/NewSessionControl.svelte";
 
-    const sortByToken = (a: Session, b: Session) => {
+    const sortByAccessToken = (a: Session, b: Session) => {
         if (a.access_token_prefix < b.access_token_prefix) {
             return -1;
         }
@@ -12,7 +13,7 @@
     };
 
     const query = sessionsQuery();
-    $: sessions = $query?.data?.sort(sortByToken) ?? [];
+    $: sessions = $query?.data?.sort(sortByAccessToken) ?? [];
 </script>
 
 <div class="flex flex-col gap-3">
@@ -34,4 +35,5 @@
             </div>
         </div>
     {/each}
+    <NewSessionControl />
 </div>

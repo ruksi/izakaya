@@ -57,3 +57,9 @@
         <a href="/sign-up" class="text-purple-400"> Create an account </a>
     </div>
 </main>
+
+<style lang="postcss">
+    input[type] {
+        @apply w-full;
+    }
+</style>

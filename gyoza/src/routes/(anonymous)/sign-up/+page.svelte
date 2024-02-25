@@ -66,3 +66,9 @@
         <a href="/log-in" class="text-purple-400"> Log in here </a>
     </div>
 </main>
+
+<style lang="postcss">
+    input[type] {
+        @apply w-full;
+    }
+</style>

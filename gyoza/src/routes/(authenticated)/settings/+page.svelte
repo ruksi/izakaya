@@ -9,7 +9,7 @@
     <meta name="description" content="User settings page">
 </svelte:head>
 
-<main class="max-w-7xl mx-auto p-4">
+<main class="max-w-7xl mx-auto p-4 mb-16">
     <h1 class="text-5xl">Settings</h1>
     <div class="flex flex-col gap-4 mt-4">
         <section>
