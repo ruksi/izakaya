@@ -7,7 +7,7 @@ export default function AnonymousOnly({children}: React.PropsWithChildren) {
     const {isAuthenticated} = useVerify();
     if (isAuthenticated == true) {
         if (typeof window !== "undefined") {
-            window.location.replace("/dashboard");
+            window.location.replace("/");
         }
         return null;
     }

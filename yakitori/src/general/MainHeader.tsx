@@ -28,17 +28,6 @@ export function MainHeader() {
                         <FontAwesomeIcon icon={faHouse} />
                     </Button>
                 </Link>
-                {isAuthenticated && (
-                    <Link href="/dashboard">
-                        <Button
-                            variant="outline-secondary"
-                            size="sm"
-                            className="ms-1"
-                        >
-                            Dashboard
-                        </Button>
-                    </Link>
-                )}
             </div>
 
             {isAuthenticated == false && (
