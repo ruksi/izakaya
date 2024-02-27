@@ -5,16 +5,23 @@
     const create = newSessionMutation(useQueryClient());
     let isCreating = false;
     let password = "";
+    let modal: HTMLDialogElement | null = null;
 
     function confirm() {
         $create.mutate({password});
     }
 
     $: if ($create.isSuccess) {
-        console.log("todo render:", $create.data);
         password = "";
         isCreating = false;
-        $create.reset();
+        if (modal) {
+            modal.showModal();
+            // this probably adds the event listener multiple times,
+            // but it's fine for now 🤷
+            modal.addEventListener("close", () => {
+                $create.reset();
+            });
+        }
     }
 </script>
 
@@ -24,21 +31,40 @@
     </main>
     <aside class="">
         {#if isCreating}
-            <form on:submit|preventDefault={confirm}>
+            <form class="join" on:submit|preventDefault={confirm}>
                 <!-- svelte-ignore a11y-autofocus -->
                 <input
+                    class="input input-sm join-item w-full sm:w-auto border-r-0"
                     type="password"
                     placeholder="Re-type your password..."
                     bind:value={password}
-                    class="w-full sm:w-auto"
                     autofocus
                 >
-                <button class="btn btn-purple" type="submit">Confirm</button>
+                <button class="btn btn-sm btn-primary join-item" type="submit">Confirm</button>
             </form>
         {:else}
-            <button class="btn" on:click|preventDefault={() => isCreating = true}>
+            <button class="btn btn-sm btn-outline" on:click|preventDefault={() => isCreating = true}>
                 Create API token
             </button>
         {/if}
     </aside>
 </div>
+
+<dialog class="modal" bind:this={modal}>
+    <div class="modal-box">
+        <h3 class="font-bold text-lg">Your API Token is Ready!</h3>
+        <p class="py-4">Copy the following token:</p>
+        <p class="font-mono break-words text-amber-200">
+            {$create.data?.access_token}
+        </p>
+        <p class="py-4">
+            <span class="font-bold">Keep this token safe!</span>
+            You won't be seeing it again.
+        </p>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn btn-sm btn-outline">Yes, I copied it</button>
+            </form>
+        </div>
+    </div>
+</dialog>

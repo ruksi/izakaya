@@ -12,7 +12,7 @@
 </script>
 
 {#each Object.values(fieldIssues) as issue}
-    <div class="text-sm text-red-500 pl-1 pt-0.5" transition:slide>
+    <div class="text-error text-sm pl-1 pt-0.5" transition:slide>
         {formatMessage(issue)}
     </div>
 {/each}

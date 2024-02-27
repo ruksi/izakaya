@@ -33,7 +33,7 @@
 <main class="flex flex-col max-w-sm mx-auto mt-10 px-3">
     {#if $signUp.error && $signUp.error.status !== 400}
         <div class="pb-4" transition:slide>
-            <Alert error={$signUp.error} color="red" head="Signup Failed" />
+            <Alert class="alert-error" error={$signUp.error} head="Signup Failed" />
         </div>
     {/if}
     <form class="card" on:submit={handleSubmit}>
@@ -41,29 +41,51 @@
             <h1>Sign Up</h1>
         </div>
         <div class="py-5 px-6 flex flex-col gap-4">
-            <label>
-                Email
-                <input name="email" type="text" bind:value={email} autofocus />
+            <label class="form-control">
+                <div class="label">
+                    Email
+                </div>
+                <input
+                    class="input input-sm"
+                    name="email"
+                    type="text"
+                    bind:value={email}
+                    autofocus
+                />
                 <InputFeedback field="email" error={$signUp.error} />
             </label>
-            <label>
-                Username
-                <input name="username" type="text" bind:value={username} />
+            <label class="form-control">
+                <div class="label">
+                    Username
+                </div>
+                <input
+                    class="input input-sm"
+                    name="username"
+                    type="text"
+                    bind:value={username}
+                />
                 <InputFeedback field="username" error={$signUp.error} />
             </label>
-            <label>
-                Password
-                <input name="password" type="password" bind:value={password} />
+            <label class="form-control">
+                <div class="label">
+                    Password
+                </div>
+                <input
+                    class="input input-sm"
+                    name="password"
+                    type="password"
+                    bind:value={password}
+                />
                 <InputFeedback field="password" error={$signUp.error} />
             </label>
         </div>
         <div class="card-foot py-3 px-4 mt-3 flex">
-            <button class="ms-auto btn btn-purple">Sign up</button>
+            <button class="ms-auto btn btn-primary">Sign up</button>
         </div>
     </form>
     <div class="pt-12 text-center text-gray-400">
         Already got an account?
-        <a href="/log-in" class="text-purple-400"> Log in here </a>
+        <a href="/log-in" class="text-primary link-hover"> Log in here </a>
     </div>
 </main>
 

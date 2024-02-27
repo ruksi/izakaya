@@ -40,11 +40,13 @@
         {#if isRevoking}
             <form on:submit|preventDefault={confirm}>
                 <span class="mr-2 select-none">Are you sure?</span>
-                <button class="btn" on:click|preventDefault={() => isRevoking = false}>Cancel</button>
-                <button class="btn btn-red" type="submit">Revoke</button>
+                <button class="btn btn-sm btn-outline" on:click|preventDefault={() => isRevoking = false}>
+                    Cancel
+                </button>
+                <button class="btn btn-sm btn-error" type="submit">Revoke</button>
             </form>
         {:else}
-            <button class="btn btn-red" on:click|preventDefault={() => isRevoking = true}>Revoke</button>
+            <button class="btn btn-sm btn-error" on:click|preventDefault={() => isRevoking = true}>Revoke</button>
         {/if}
     </aside>
 </div>

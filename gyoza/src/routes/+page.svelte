@@ -174,7 +174,7 @@
             <div>They aren't verified.</div>
         </div>
         <div class="mt-3">
-            <a href="/sign-up" class="ms-auto btn btn-purple">Sign Up</a>
+            <a href="/sign-up" class="ms-auto btn btn-primary">Sign Up</a>
         </div>
     </section>
 
