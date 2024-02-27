@@ -41,16 +41,6 @@ export default function MainLayout({children}: {children?: React.ReactNode}) {
                             >
                                 <FontAwesomeIcon icon="house" />
                             </Button>
-                            {isAuthenticated && (
-                                <Button
-                                    variant="outline-secondary"
-                                    size="sm"
-                                    onClick={() => navigate("/dashboard")}
-                                    className="ms-1"
-                                >
-                                    Dashboard
-                                </Button>
-                            )}
                         </div>
                         {isAuthenticated && (
                             <>

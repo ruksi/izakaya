@@ -5,7 +5,6 @@ import LogIn from "./auth/LogIn.tsx";
 import SignUp from "./auth/SignUp.tsx";
 import {authVerify} from "./auth/thunks.ts";
 import {AboutPage} from "./general/AboutPage.tsx";
-import {DashboardPage} from "./general/DashboardPage.tsx";
 import ErrorPage from "./general/ErrorPage.tsx";
 import LandingPage from "./general/LandingPage.tsx";
 import MainLayout from "./general/MainLayout.tsx";
@@ -35,10 +34,6 @@ export const router = createBrowserRouter([
             {
                 element: <AuthenticatedOnly />,
                 children: [
-                    {
-                        path: "dashboard",
-                        element: <DashboardPage />,
-                    },
                     {
                         path: "settings",
                         element: <SettingsPage />,
