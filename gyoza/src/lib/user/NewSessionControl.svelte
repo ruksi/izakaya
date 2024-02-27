@@ -18,11 +18,11 @@
     }
 </script>
 
-<div class="flex">
-    <main class="basis-96">
-        todo placeholder
+<div class="flex flex-wrap">
+    <main class="basis-80">
+        &nbsp;
     </main>
-    <aside>
+    <aside class="">
         {#if isCreating}
             <form on:submit|preventDefault={confirm}>
                 <!-- svelte-ignore a11y-autofocus -->
@@ -30,6 +30,7 @@
                     type="password"
                     placeholder="Re-type your password..."
                     bind:value={password}
+                    class="w-full sm:w-auto"
                     autofocus
                 >
                 <button class="btn btn-purple" type="submit">Confirm</button>

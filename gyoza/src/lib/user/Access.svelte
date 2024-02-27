@@ -17,7 +17,7 @@
     $: sessions = $query?.data?.sort(sortByAccessToken) ?? [];
 </script>
 
-<div class="flex flex-col gap-3">
+<div class="flex flex-col gap-4">
     {#each sessions as session (session.access_token_prefix)}
         <SessionControl {session} />
     {/each}
